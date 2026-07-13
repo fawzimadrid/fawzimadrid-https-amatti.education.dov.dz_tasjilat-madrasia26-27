@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأرضية الرقمية لوزارة التربية الوطنية</title>
+    <!-- استدعاء خط Noto Kufi Arabic -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- QRCode.js -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --main-blue: #007bff;
+            --header-blue: #0056b3;
+            --faint-red: #fff5f5;
+            --faint-blue: #f0f7ff;
+            --border-color: #ddd;
+            --modal-bg: rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .top-navbar {
+            background-color: var(--header-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            height: 70px;
+        }
+
+        .nav-part {
+            flex: 1;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .nav-part:first-child {
+            text-align: right;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 60px;
+            margin-left: 10px;
+        }
+
+        .window-outer {
+            background-color: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 80vh;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .window-inner {
+            background-color: white;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            min-height: 70vh;
+        }
+
+        .window-content {
+            background-color: white;
+            padding: 10px;
+            min-height: 60vh;
+        }
+
+        .main-title {
+            color: var(--main-blue);
+            font-size: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .sub-title {
+            color: var(--main-blue);
+            font-size: 16px;
+            text-align: right;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .tabs-container {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            cursor: pointer;
+            color: #555;
+            transition: 0.3s;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .tab-btn.active {
+            color: var(--main-blue);
+            border-bottom: 3px solid var(--main-blue);
+            font-weight: bold;
+        }
+
+        .filter-section {
+            background-color: var(--faint-red);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            border: 1px solid #ffdada;
+        }
+
+        select, input[type="text"], input[type="date"], input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            outline: none;
+            background: white;
+        }
+
+        .table-section {
+            background-color: var(--faint-blue);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddecff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-import { background-color: #28a745; color: white; }
+        .btn-export { background-color: #ffc107; color: white; }
+        .btn-search { background-color: var(--main-blue); color: white; }
+        .btn-update { background-color: #17a2b8; color: white; font-size: 12px; padding: 4px 8px; }
+        .btn-print { background-color: #6f42c1; color: white; font-size: 12px; padding: 4px 8px; }
+
+        .pagination {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--main-blue);
+            color: var(--main-blue);
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #fileInput { display: none; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-bg);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            background: #f8f9fa;
+        }
+
+        /* Certificate Styles */
+        #certificatePreview {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 8px double #000;
+            padding: 30px;
+            background: #fff;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .cert-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .cert-republic {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .cert-ministry {
+            font-size: 18px;
+            margin: 8px 0;
+        }
+
+        .cert-bar {
+            background: linear-gradient(to right, #0056b3, #007bff);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 18px;
+            border-radius: 4px;
+        }
+
+        .cert-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .cert-main {
+            text-align: center;
+            margin: 25px 0;
+            line-height: 1.8;
+        }
+
+        .cert-qr {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--main-blue);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الشريط العلوي -->
+    <header class="top-navbar">
+        <div class="nav-part">
+            <img src="https://awlyaa.education.dz/public/assets/images/logo_black.png?v=1.0.2" alt="Logo" class="logo-img">
+        </div>
+        <div class="nav-part">
+            مديرية التربية للجزائر غرب<br>متوسطة الشهيد خالد مكاوي (سطاوالي)
+        </div>
+        <div class="nav-part">إعلاناتك</div>
+        <div class="nav-part"><i class="fas fa-user-circle"></i> حسابي الشخصي</div>
+    </header>
+
+    <div class="window-outer">
+        <h1 class="main-title">الأرضية الرقمية لوزارة التربية الوطنية</h1>
+        
+        <div class="window-inner">
+            <div class="window-content">
+                <h2 class="sub-title">التسجيلات المدرسية</h2>
+
+                <!-- التبويبات -->
+                <div class="tabs-container" id="tabs">
+                    <button class="tab-btn active" onclick="switchTab(0)">الدخول المدرسي</button>
+                    <button class="tab-btn" onclick="switchTab(1)">متابعة الدخول المدرسي</button>
+                    <button class="tab-btn" onclick="switchTab(2)">متابعة حجز النقاط</button>
+                    <button class="tab-btn" onclick="switchTab(3)">تحيين بيانات التلاميذ</button>
+                    <button class="tab-btn" onclick="switchTab(4)">تسجيلات الامتحانات المدرسية</button>
+                </div>
+
+                <!-- قسم الفلاتر -->
+                <div class="filter-section" id="filtersSection">
+                    <div>
+                        <label>السنة الدراسية:</label>
+                        <select id="filterYear" onchange="filterTable()">
+                            <option value="all">--جميع السنوات--</option>
+                            <option value="2026-2027" selected>2026-2027</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>المستوى:</label>
+                        <select id="filterLevel" onchange="filterTable()">
+                            <option value="all">--جميع المستويات--</option>
+                            <option value="رابعة" selected>رابعة</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>رقم الفوج:</label>
+                        <select id="filterGroup" onchange="filterTable()">
+                            <option value="all">--جميع الأفواج--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div style="margin-right: auto; display: flex; gap: 10px; align-items: flex-end;">
+                        <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="importExcel(event)">
+                        <button class="btn btn-import" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-file-import"></i> استيراد بيانات اكسيل
+                        </button>
+                        <button class="btn btn-export" onclick="exportTable()">
+                            <i class="fas fa-file-export"></i> تصدير
+                        </button>
+                    </div>
+                </div>
+
+                <!-- محرك البحث -->
+                <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;" id="searchSection">
+                    <input type="text" id="searchBox" placeholder="بحث عن تلميذ..." style="width: 350px;" onkeyup="filterTable()">
+                    <button class="btn btn-search" onclick="filterTable()"><i class="fas fa-search"></i> بحث</button>
+                </div>
+
+                <!-- قسم الإحصائيات (للتبويب 1) -->
+                <div id="statsSection" style="display: none; margin-bottom: 20px;">
+                    <h3 class="sub-title">إحصائيات الدخول المدرسي</h3>
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- قسم الجدول -->
+                <div class="table-section">
+                    <table id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>رقم التعريف</th>
+                                <th>اللقب</th>
+                                <th>الاسم</th>
+                                <th>الجنس</th>
+                                <th>تاريخ الميلاد</th>
+                                <th>العنوان</th>
+                                <th>مكان الميلاد</th>
+                                <th>المستوى</th>
+                                <th>رقم الفوج</th>
+                                <th>الصفة</th>
+                                <th>عمليات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Update -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">تحيين بيانات التلميذ</div>
+            <div class="modal-body">
+                <div class="form-grid" id="modalForm">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background:#28a745; color:white;" onclick="confirmUpdate()">تأكيد التحيين</button>
+                <button class="btn" style="background:#dc3545; color:white;" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificate Modal -->
+    <div id="certificateModal" class="modal">
+        <div class="modal-content" style="max-width: 850px;">
+            <div class="modal-header">
+                شهادة مدرسية
+                <button onclick="closeCertificateModal()" style="float: left; background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <div id="certificatePreview">
+                    <!-- Certificate content populated by JS -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background:#28a745; color:white;" onclick="printCertificate()">
+                    <i class="fas fa-print"></i> طباعة / تحميل PDF
+                </button>
+                <button class="btn" style="background:#dc3545; color:white;" onclick="closeCertificateModal()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Students array starts empty (no fake data)
+        let students = [];
+
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let currentEditIndex = -1;
+        let currentTab = 0;
+        let currentStudentForCert = null;
+
+        function renderTable(filteredStudents) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredStudents.slice(start, end);
+
+            pageData.forEach((student, idx) => {
+                const globalIndex = start + idx;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.lastName}</td>
+                    <td>${student.firstName}</td>
+                    <td>${student.gender}</td>
+                    <td>${student.birthDate}</td>
+                    <td>${student.address}</td>
+                    <td>${student.birthPlace}</td>
+                    <td>${student.level}</td>
+                    <td>${student.group}</td>
+                    <td>${student.status}</td>
+                    <td>
+                        ${currentTab === 0 ? `
+                            <button class="btn btn-print" onclick="printSchoolCertificate(${globalIndex})" style="margin-bottom:4px;">
+                                <i class="fas fa-print"></i> شهادة
+                            </button>
+                        ` : ''}
+                        ${currentTab === 3 ? `<button class="btn btn-update" onclick="openEditModal(${globalIndex})"><i class="fas fa-edit"></i> تحيين</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderPagination(filteredStudents.length);
+        }
+
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            const prev = document.createElement('button');
+            prev.className = 'page-btn';
+            prev.textContent = 'السابق';
+            prev.disabled = currentPage === 1;
+            prev.onclick = () => { currentPage--; filterTable(); };
+            pagination.appendChild(prev);
+
+            const pageInfo = document.createElement('span');
+            pageInfo.style.padding = '8px 16px';
+            pageInfo.textContent = `صفحة ${currentPage} من ${totalPages}`;
+            pagination.appendChild(pageInfo);
+
+            const next = document.createElement('button');
+            next.className = 'page-btn';
+            next.textContent = 'التالي';
+            next.disabled = currentPage === totalPages;
+            next.onclick = () => { currentPage++; filterTable(); };
+            pagination.appendChild(next);
+        }
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+            const year = document.getElementById('filterYear').value;
+            const level = document.getElementById('filterLevel').value;
+            const group = document.getElementById('filterGroup').value;
+
+            const filtered = students.filter(s => {
+                const matchesSearch = !searchTerm || 
+                    s.lastName.toLowerCase().includes(searchTerm) || 
+                    s.firstName.toLowerCase().includes(searchTerm) ||
+                    s.id.includes(searchTerm);
+
+                const matchesYear = year === 'all' || true;
+                const matchesLevel = level === 'all' || s.level === level;
+                const matchesGroup = group === 'all' || s.group === group;
+
+                return matchesSearch && matchesYear && matchesLevel && matchesGroup;
+            });
+
+            currentPage = 1;
+            renderTable(filtered);
+        }
+
+        function switchTab(tabIndex) {
+            currentTab = tabIndex;
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === tabIndex);
+            });
+
+            // Show/hide stats
+            const statsSection = document.getElementById('statsSection');
+            if (tabIndex === 1) {
+                statsSection.style.display = 'block';
+                renderStatistics();
+            } else {
+                statsSection.style.display = 'none';
+            }
+
+            filterTable();
+        }
+
+        // Import Excel (remains the same)
+        function importExcel(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const data = new Uint8Array(ev.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                students = jsonData.map(row => ({
+                    id: row['رقم التعريف'] || row['ID'] || ('2026' + String(10001 + students.length)),
+                    lastName: row['اللقب'] || row['LastName'] || '',
+                    firstName: row['الاسم'] || row['FirstName'] || '',
+                    gender: row['الجنس'] || 'ذكر',
+                    birthDate: row['تاريخ الميلاد'] || '2016-01-01',
+                    address: row['العنوان'] || '',
+                    birthPlace: row['مكان الميلاد'] || 'الجزائر',
+                    level: row['المستوى'] || 'رابعة',
+                    group: String(row['رقم الفوج'] || 1),
+                    status: 'خارجي'
+                }));
+
+                Swal.fire('نجح!', 'تم استيراد البيانات بنجاح', 'success');
+                filterTable();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportTable() {
+            if (students.length === 0) {
+                Swal.fire('تنبيه', 'لا توجد بيانات للتصدير', 'warning');
+                return;
+            }
+            const ws = XLSX.utils.json_to_sheet(students);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "التلاميذ");
+            XLSX.writeFile(wb, "بيانات_التلاميذ.xlsx");
+            Swal.fire('تم!', 'تم تصدير الجدول إلى Excel', 'success');
+        }
+
+        function openEditModal(index) {
+            currentEditIndex = index;
+            const student = students[index];
+            const modal = document.getElementById('updateModal');
+            const formContainer = document.getElementById('modalForm');
+            
+            formContainer.innerHTML = `
+                <div class="form-group">
+                    <label>رقم التعريف</label>
+                    <input type="text" id="editId" value="${student.id}">
+                </div>
+                <div class="form-group">
+                    <label>اللقب</label>
+                    <input type="text" id="editLast" value="${student.lastName}">
+                </div>
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" id="editFirst" value="${student.firstName}">
+                </div>
+                <div class="form-group">
+                    <label>الجنس</label>
+                    <select id="editGender">
+                        <option value="ذكر" ${student.gender==='ذكر'?'selected':''}>ذكر</option>
+                        <option value="أنثى" ${student.gender==='أنثى'?'selected':''}>أنثى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الميلاد</label>
+                    <input type="date" id="editBirth" value="${student.birthDate}">
+                </div>
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <input type="text" id="editAddress" value="${student.address}">
+                </div>
+                <div class="form-group">
+                    <label>مكان الميلاد</label>
+                    <input type="text" id="editBirthPlace" value="${student.birthPlace}">
+                </div>
+                <div class="form-group">
+                    <label>المستوى</label>
+                    <select id="editLevel">
+                        <option value="رابعة" selected>رابعة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>رقم الفوج</label>
+                    <select id="editGroup">
+                        <option value="1" ${student.group==='1'?'selected':''}>1</option>
+                        <option value="2" ${student.group==='2'?'selected':''}>2</option>
+                        <option value="3" ${student.group==='3'?'selected':''}>3</option>
+                        <option value="4" ${student.group==='4'?'selected':''}>4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الصفة</label>
+                    <input type="text" id="editStatus" value="${student.status}" readonly>
+                </div>
+            `;
+
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('updateModal').style.display = 'none';
+        }
+
+        function confirmUpdate() {
+            if (currentEditIndex === -1) return;
+            const student = students[currentEditIndex];
+
+            student.id = document.getElementById('editId').value;
+            student.lastName = document.getElementById('editLast').value;
+            student.firstName = document.getElementById('editFirst').value;
+            student.gender = document.getElementById('editGender').value;
+            student.birthDate = document.getElementById('editBirth').value;
+            student.address = document.getElementById('editAddress').value;
+            student.birthPlace = document.getElementById('editBirthPlace').value;
+            student.level = document.getElementById('editLevel').value;
+            student.group = document.getElementById('editGroup').value;
+
+            closeModal();
+            Swal.fire('تم التحيين!', 'تم تحديث بيانات التلميذ بنجاح', 'success');
+            filterTable();
+        }
+
+        // Statistics for Tab 1
+        function renderStatistics() {
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = '';
+
+            const total = students.length;
+            const boys = students.filter(s => s.gender === 'ذكر').length;
+            const girls = students.filter(s => s.gender === 'أنثى').length;
+            const groups = {};
+            students.forEach(s => {
+                groups[s.group] = (groups[s.group] || 0) + 1;
+            });
+
+            const cards = [
+                { title: 'إجمالي التلاميذ', value: total, color: '#007bff' },
+                { title: 'الذكور', value: boys, color: '#28a745' },
+                { title: 'الإناث', value: girls, color: '#e83e8c' },
+            ];
+
+            cards.forEach(card => {
+                const div = document.createElement('div');
+                div.className = 'stat-card';
+                div.innerHTML = `
+                    <div style="font-size:14px; color:#555;">${card.title}</div>
+                    <div class="stat-number" style="color:${card.color};">${card.value}</div>
+                `;
+                grid.appendChild(div);
+            });
+
+            // Group breakdown
+            Object.keys(groups).sort().forEach(g => {
+                const div = document.createElement('div');
+                div.className = 'stat-card';
+                div.innerHTML = `
+                    <div style="font-size:14px; color:#555;">الفوج ${g}</div>
+                    <div class="stat-number">${groups[g]}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // Certificate Functions
+        function printSchoolCertificate(index) {
+            currentStudentForCert = students[index];
+            const certContainer = document.getElementById('certificatePreview');
+            const student = currentStudentForCert;
+
+            const latinName = `${student.firstName} ${student.lastName}`.toUpperCase();
+
+            certContainer.innerHTML = `
+                <div class="cert-header">
+                    <div class="cert-republic">الجمهورية الجزائرية الديمقراطية الشعبية</div>
+                    <div class="cert-ministry">وزارة التربية الوطنية</div>
+                </div>
+                
+                <div class="cert-info">
+                    <div>مديرية التربية للجزائر غرب</div>
+                    <div>متوسطة الشهيد خالد مكاوي</div>
+                </div>
+
+                <div class="cert-bar">
+                    رقم التعريف المدرسي: <strong>${student.id}</strong>
+                </div>
+
+                <div style="text-align:center; margin:20px 0;">
+                    <strong>السنة الدراسية: 2026/2027</strong>
+                </div>
+
+                <div class="cert-main">
+                    <h2 style="margin:15px 0;">شهادة مدرسية</h2>
+                    <p>(ت) يشهد مدير(ة) المتوسطة أن التلميذ(ة):</p>
+                    <p style="font-size:18px; font-weight:bold; margin:12px 0;">
+                        الاسم: <span style="color:#0056b3;">${student.firstName}</span>  اللقب: <span style="color:#0056b3;">${student.lastName}</span>
+                    </p>
+                    <p>مواليد: ${student.birthDate} بـ ${student.birthPlace}</p>
+                    <p>متمدرس(ة) إلى يومنا هذا بالمؤسسة</p>
+                    <p>رقم التسجيل: <strong>${student.id}</strong></p>
+                    <p>المستوى: ${student.level}  الفوج التربوي: ${student.group}</p>
+                </div>
+
+                <div style="text-align:center; margin-top:30px; font-size:14px;">
+                    سطاوالي في ${new Date().toLocaleDateString('ar-DZ')}
+                </div>
+
+                <div style="display:flex; justify-content:space-between; margin-top:40px; align-items:flex-end;">
+                    <div>
+                        الاسم واللقب باللاتينية:<br>
+                        <strong>${latinName}</strong>
+                    </div>
+                    <div class="cert-qr" id="qrContainer"></div>
+                </div>
+            `;
+
+            // Generate QR Code
+            setTimeout(() => {
+                const qrDiv = document.getElementById('qrContainer');
+                qrDiv.innerHTML = '';
+                new QRCode(qrDiv, {
+                    text: `ID:${student.id}|${student.lastName} ${student.firstName}`,
+                    width: 110,
+                    height: 110,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                });
+            }, 100);
+
+            document.getElementById('certificateModal').style.display = 'flex';
+        }
+
+        function closeCertificateModal() {
+            document.getElementById('certificateModal').style.display = 'none';
+        }
+
+        function printCertificate() {
+            const printContents = document.getElementById('certificatePreview').innerHTML;
+            const originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = `
+                <div style="padding:20px; direction:rtl; font-family:'Noto Kufi Arabic',sans-serif;">
+                    ${printContents}
+                </div>
+            `;
+            
+            window.print();
+            
+            // Restore after print
+            setTimeout(() => {
+                document.body.innerHTML = originalContents;
+                // Re-attach event listeners would be needed in production, but for this demo we reload
+                location.reload();
+            }, 1000);
+        }
+
+        // Initialize
+        window.onload = function() {
+            // Students start empty
+            filterTable();
+
+            Swal.fire({
+                title: 'مرحبا!',
+                text: 'المنصة جاهزة. استورد بيانات التلاميذ من ملف Excel.',
+                icon: 'info',
+                timer: 3000
+            });
+        };
+    </script>
+</body>
+</html>
