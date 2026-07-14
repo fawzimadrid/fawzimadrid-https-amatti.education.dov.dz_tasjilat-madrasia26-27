@@ -21,6 +21,8 @@
             --faint-blue: #f0f7ff;
             --border-color: #ddd;
             --modal-bg: rgba(0, 0, 0, 0.7);
+            --success-green: #28a745;
+            --danger-red: #dc3545;
         }
 
         body {
@@ -146,6 +148,7 @@
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #ddecff;
+            overflow-x: auto;
         }
 
         table {
@@ -181,12 +184,31 @@
         .btn-export { background-color: #ffc107; color: white; }
         .btn-search { background-color: var(--main-blue); color: white; }
         .btn-update { background-color: #17a2b8; color: white; font-size: 12px; padding: 4px 8px; }
+        .btn-register { background-color: #007bff; color: white; font-size: 12px; padding: 4px 8px; }
+
+        .status-pending {
+            background-color: #dc3545;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        .status-registered {
+            background-color: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 12px;
+        }
 
         .pagination {
             margin-top: 15px;
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 5px;
             align-items: center;
             flex-wrap: wrap;
         }
@@ -198,25 +220,17 @@
             color: var(--main-blue);
             cursor: pointer;
             border-radius: 4px;
-            font-size: 14px;
             min-width: 40px;
-            text-align: center;
         }
 
         .page-btn.active {
             background-color: var(--main-blue);
             color: white;
-            border-color: var(--main-blue);
         }
 
         .page-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        .ellipsis {
-            padding: 8px 8px;
-            color: #666;
         }
 
         #fileInput { display: none; }
@@ -239,8 +253,8 @@
             background: white;
             border-radius: 12px;
             width: 90%;
-            max-width: 900px;
-            max-height: 90vh;
+            max-width: 700px;
+            max-height: 92vh;
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
@@ -258,9 +272,19 @@
             padding: 20px;
         }
 
+        .info-box {
+            background: #28a745;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 15px;
         }
 
@@ -287,12 +311,11 @@
             font-size: 16px;
         }
 
-        /* تحسينات إضافية */
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-size: 18px;
+        .student-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -372,20 +395,8 @@
                 <!-- قسم الجدول -->
                 <div class="table-section">
                     <table id="studentsTable">
-                        <thead>
-                            <tr>
-                                <th>رقم التعريف</th>
-                                <th>اللقب</th>
-                                <th>الاسم</th>
-                                <th>الجنس</th>
-                                <th>تاريخ الميلاد</th>
-                                <th>العنوان</th>
-                                <th>مكان الميلاد</th>
-                                <th>المستوى</th>
-                                <th>رقم الفوج</th>
-                                <th>الصفة</th>
-                                <th>عمليات</th>
-                            </tr>
+                        <thead id="tableHeader">
+                            <!-- Dynamic header populated by JS -->
                         </thead>
                         <tbody id="tableBody"></tbody>
                     </table>
@@ -397,7 +408,7 @@
         </div>
     </div>
 
-    <!-- Modal for Update -->
+    <!-- Modal for Student Update (Tab 3) -->
     <div id="updateModal" class="modal">
         <div class="modal-content">
             <div class="modal-header" id="modalTitle">تحيين بيانات التلميذ</div>
@@ -413,32 +424,86 @@
         </div>
     </div>
 
+    <!-- Modal for Exam Registration (Tab 4) -->
+    <div id="examRegisterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="examModalTitle">تسجيل التلميذ في الامتحانات</div>
+            <div class="modal-body">
+                <div id="studentInfoSection"></div>
+
+                <div style="margin: 25px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+                    <h4 style="margin-bottom: 15px;">البيانات الإضافية</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>اسم الأب</label>
+                            <input type="text" id="fatherName" placeholder="اسم الأب">
+                        </div>
+                        <div class="form-group">
+                            <label>اسم ولقب الأم</label>
+                            <input type="text" id="motherName" placeholder="اسم ولقب الأم">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>حالة التسجيل</label>
+                    <select id="registrationSelect" style="width: 100%; padding: 10px;">
+                        <option value="">-- الرجاء الاختيار --</option>
+                        <option value="registered">مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background:#28a745; color:white;" onclick="confirmExamRegistration()">تأكيد التسجيل</button>
+                <button class="btn" style="background:#dc3545; color:white;" onclick="closeExamModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // تم حذف كل البيانات الوهمية - يبدأ الجدول فارغاً
+        // Empty students array - no dummy data
         let students = [];
 
         let currentPage = 1;
-        const itemsPerPage = 15; // زيادة عدد العناصر في الصفحة
+        const itemsPerPage = 10;
         let currentEditIndex = -1;
+        let currentExamIndex = -1;
         let currentTab = 0;
 
+        // Render dynamic table header based on tab
+        function renderTableHeader() {
+            const thead = document.getElementById('tableHeader');
+            thead.innerHTML = '';
+
+            let headerHTML = `
+                <tr>
+                    <th>رقم التعريف</th>
+                    <th>اللقب</th>
+                    <th>الاسم</th>
+                    <th>الجنس</th>
+                    <th>تاريخ الميلاد</th>
+                    <th>العنوان</th>
+                    <th>مكان الميلاد</th>
+                    <th>المستوى</th>
+                    <th>رقم الفوج</th>
+            `;
+
+            if (currentTab === 3) {
+                headerHTML += `<th>الصفة</th>`;
+            } else if (currentTab === 4) {
+                headerHTML += `<th>حالة التسجيل</th>`;
+            } else {
+                headerHTML += `<th>الصفة</th>`;
+            }
+
+            headerHTML += `<th>عمليات</th></tr>`;
+            thead.innerHTML = headerHTML;
+        }
+
         function renderTable(filteredStudents) {
+            renderTableHeader();
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
-
-            if (filteredStudents.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="11" class="no-data">
-                            <i class="fas fa-inbox" style="font-size: 48px; opacity: 0.3; margin-bottom: 15px;"></i><br>
-                            لا توجد بيانات حالياً<br>
-                            <small>استورد ملف Excel للبدء</small>
-                        </td>
-                    </tr>
-                `;
-                renderPagination(0);
-                return;
-            }
 
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
@@ -447,20 +512,42 @@
             pageData.forEach((student, idx) => {
                 const globalIndex = start + idx;
                 const tr = document.createElement('tr');
+
+                let statusCell = '';
+                let operations = '';
+
+                if (currentTab === 4) {
+                    const regStatus = student.registrationStatus || 'غير مسجل';
+                    const statusClass = regStatus.includes('مسجل') ? 'status-registered' : 'status-pending';
+                    statusCell = `<td><span class="${statusClass}">${regStatus}</span></td>`;
+                    operations = `
+                        <button class="btn btn-register" onclick="openExamRegisterModal(${globalIndex})">
+                            <i class="fas fa-clipboard-check"></i> تسجيل
+                        </button>
+                    `;
+                } else if (currentTab === 3) {
+                    operations = `
+                        <button class="btn btn-update" onclick="openEditModal(${globalIndex})">
+                            <i class="fas fa-edit"></i> تحيين
+                        </button>
+                    `;
+                    statusCell = `<td>${student.status || 'خارجي'}</td>`;
+                } else {
+                    statusCell = `<td>${student.status || 'خارجي'}</td>`;
+                }
+
                 tr.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.lastName}</td>
-                    <td>${student.firstName}</td>
-                    <td>${student.gender}</td>
-                    <td>${student.birthDate}</td>
-                    <td>${student.address}</td>
-                    <td>${student.birthPlace}</td>
-                    <td>${student.level}</td>
-                    <td>${student.group}</td>
-                    <td>${student.status}</td>
-                    <td>
-                        ${currentTab === 3 ? `<button class="btn btn-update" onclick="openEditModal(${globalIndex})"><i class="fas fa-edit"></i> تحيين</button>` : ''}
-                    </td>
+                    <td>${student.id || ''}</td>
+                    <td>${student.lastName || ''}</td>
+                    <td>${student.firstName || ''}</td>
+                    <td>${student.gender || ''}</td>
+                    <td>${student.birthDate || ''}</td>
+                    <td>${student.address || ''}</td>
+                    <td>${student.birthPlace || ''}</td>
+                    <td>${student.level || ''}</td>
+                    <td>${student.group || ''}</td>
+                    ${statusCell}
+                    <td>${operations}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -468,65 +555,21 @@
             renderPagination(filteredStudents.length);
         }
 
-        // تحسين الـ Pagination: أرقام الصفحات فقط (بدون أزرار السابق/التالي)
         function renderPagination(totalItems) {
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             const pagination = document.getElementById('pagination');
             pagination.innerHTML = '';
 
-            if (totalPages <= 1) return;
-
-            // دالة لإنشاء زر صفحة
-            const createPageButton = (pageNum) => {
+            // Page numbers only (as requested)
+            for (let i = 1; i <= totalPages; i++) {
                 const btn = document.createElement('button');
-                btn.className = `page-btn ${pageNum === currentPage ? 'active' : ''}`;
-                btn.textContent = pageNum;
+                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                btn.textContent = i;
                 btn.onclick = () => {
-                    currentPage = pageNum;
-                    filterTable(); // إعادة التصفية مع الصفحة الجديدة
+                    currentPage = i;
+                    filterTable();
                 };
-                return btn;
-            };
-
-            // عرض أرقام الصفحات بطريقة ذكية (مع ... إذا كان هناك الكثير)
-            const maxVisiblePages = 7;
-            
-            if (totalPages <= maxVisiblePages) {
-                for (let i = 1; i <= totalPages; i++) {
-                    pagination.appendChild(createPageButton(i));
-                }
-            } else {
-                // أول صفحة دائماً
-                pagination.appendChild(createPageButton(1));
-
-                // ... 
-                if (currentPage > 4) {
-                    const ellipsis1 = document.createElement('span');
-                    ellipsis1.className = 'ellipsis';
-                    ellipsis1.textContent = '...';
-                    pagination.appendChild(ellipsis1);
-                }
-
-                // صفحات حول الصفحة الحالية
-                let startPage = Math.max(2, currentPage - 2);
-                let endPage = Math.min(totalPages - 1, currentPage + 2);
-
-                for (let i = startPage; i <= endPage; i++) {
-                    pagination.appendChild(createPageButton(i));
-                }
-
-                // آخر ...
-                if (currentPage < totalPages - 3) {
-                    const ellipsis2 = document.createElement('span');
-                    ellipsis2.className = 'ellipsis';
-                    ellipsis2.textContent = '...';
-                    pagination.appendChild(ellipsis2);
-                }
-
-                // آخر صفحة
-                if (totalPages > 1) {
-                    pagination.appendChild(createPageButton(totalPages));
-                }
+                pagination.appendChild(btn);
             }
         }
 
@@ -542,19 +585,13 @@
                     (s.firstName && s.firstName.toLowerCase().includes(searchTerm)) ||
                     (s.id && s.id.includes(searchTerm));
 
-                const matchesYear = year === 'all' || true;
                 const matchesLevel = level === 'all' || s.level === level;
                 const matchesGroup = group === 'all' || s.group === group;
 
-                return matchesSearch && matchesYear && matchesLevel && matchesGroup;
+                return matchesSearch && matchesLevel && matchesGroup;
             });
 
-            // الحفاظ على الصفحة الحالية إذا كانت صالحة
-            const totalPages = Math.ceil(filtered.length / itemsPerPage);
-            if (currentPage > totalPages) {
-                currentPage = Math.max(1, totalPages);
-            }
-
+            currentPage = 1;
             renderTable(filtered);
         }
 
@@ -566,7 +603,7 @@
             filterTable();
         }
 
-        // Import Excel - محسن
+        // Import Excel
         function importExcel(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -582,26 +619,22 @@
 
                     students = jsonData.map((row, index) => ({
                         id: row['رقم التعريف'] || row['ID'] || String(20260000 + index + 1),
-                        lastName: row['اللقب'] || row['LastName'] || row['الاسم العائلي'] || '',
-                        firstName: row['الاسم'] || row['FirstName'] || row['الاسم الشخصي'] || '',
-                        gender: row['الجنس'] || (row['Sex'] === 'F' ? 'أنثى' : 'ذكر'),
-                        birthDate: row['تاريخ الميلاد'] || row['BirthDate'] || '2016-01-01',
-                        address: row['العنوان'] || row['Address'] || '',
-                        birthPlace: row['مكان الميلاد'] || row['BirthPlace'] || 'الجزائر',
-                        level: row['المستوى'] || row['Level'] || 'رابعة',
-                        group: String(row['رقم الفوج'] || row['Group'] || 1),
-                        status: 'خارجي'
+                        lastName: row['اللقب'] || row['LastName'] || '',
+                        firstName: row['الاسم'] || row['FirstName'] || '',
+                        gender: row['الجنس'] || 'ذكر',
+                        birthDate: row['تاريخ الميلاد'] || '',
+                        address: row['العنوان'] || '',
+                        birthPlace: row['مكان الميلاد'] || 'الجزائر',
+                        level: row['المستوى'] || 'رابعة',
+                        group: String(row['رقم الفوج'] || 1),
+                        status: 'خارجي',
+                        registrationStatus: '' // for exam tab
                     }));
 
-                    Swal.fire({
-                        title: 'نجح الاستيراد!',
-                        text: `تم استيراد ${students.length} تلميذ بنجاح`,
-                        icon: 'success'
-                    });
-                    currentPage = 1;
+                    Swal.fire('نجح!', 'تم استيراد البيانات بنجاح', 'success');
                     filterTable();
                 } catch (err) {
-                    Swal.fire('خطأ', 'حدث خطأ أثناء قراءة الملف: ' + err.message, 'error');
+                    Swal.fire('خطأ', 'حدث خطأ أثناء استيراد الملف', 'error');
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -610,17 +643,17 @@
         // Export to Excel
         function exportTable() {
             if (students.length === 0) {
-                Swal.fire('تنبيه', 'لا توجد بيانات للتصدير', 'warning');
+                Swal.fire('تحذير', 'لا توجد بيانات للتصدير', 'warning');
                 return;
             }
             const ws = XLSX.utils.json_to_sheet(students);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "التلاميذ");
-            XLSX.writeFile(wb, `بيانات_التلاميذ_${new Date().toISOString().slice(0,10)}.xlsx`);
-            Swal.fire('تم!', 'تم تصدير البيانات بنجاح', 'success');
+            XLSX.writeFile(wb, "بيانات_التلاميذ.xlsx");
+            Swal.fire('تم!', 'تم تصدير الجدول إلى Excel', 'success');
         }
 
-        // Open Edit Modal
+        // Update Modal Functions (Tab 3)
         function openEditModal(index) {
             currentEditIndex = index;
             const student = students[index];
@@ -662,7 +695,7 @@
                 <div class="form-group">
                     <label>المستوى</label>
                     <select id="editLevel">
-                        <option value="رابعة" ${student.level==='رابعة'?'selected':''}>رابعة</option>
+                        <option value="رابعة" selected>رابعة</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -683,13 +716,8 @@
             modal.style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('updateModal').style.display = 'none';
-        }
-
         function confirmUpdate() {
             if (currentEditIndex === -1) return;
-
             const student = students[currentEditIndex];
 
             student.id = document.getElementById('editId').value;
@@ -703,25 +731,78 @@
             student.group = document.getElementById('editGroup').value;
 
             closeModal();
-            Swal.fire({
-                title: 'تم التحيين!',
-                text: 'تم تحديث بيانات التلميذ بنجاح',
-                icon: 'success',
-                confirmButtonText: 'حسنًا'
-            });
+            Swal.fire('تم التحيين!', 'تم تحديث بيانات التلميذ بنجاح', 'success');
             filterTable();
+        }
+
+        function closeModal() {
+            document.getElementById('updateModal').style.display = 'none';
+        }
+
+        // Exam Registration Modal (Tab 4)
+        function openExamRegisterModal(index) {
+            currentExamIndex = index;
+            const student = students[index];
+            const modal = document.getElementById('examRegisterModal');
+            
+            document.getElementById('studentInfoSection').innerHTML = `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <h3>معلومات التلميذ</h3>
+                    <div class="info-box">
+                        ${student.lastName || ''} ${student.firstName || ''}
+                    </div>
+                </div>
+                <div class="student-info-grid">
+                    <div><strong>تاريخ الميلاد:</strong> ${student.birthDate || ''}</div>
+                    <div><strong>الجنس:</strong> ${student.gender || ''}</div>
+                    <div><strong>العنوان:</strong> ${student.address || ''}</div>
+                    <div><strong>مكان الميلاد:</strong> ${student.birthPlace || ''}</div>
+                </div>
+            `;
+
+            // Reset form
+            document.getElementById('fatherName').value = '';
+            document.getElementById('motherName').value = '';
+            document.getElementById('registrationSelect').value = '';
+
+            modal.style.display = 'flex';
+        }
+
+        function confirmExamRegistration() {
+            if (currentExamIndex === -1) return;
+            const selectValue = document.getElementById('registrationSelect').value;
+            
+            if (!selectValue) {
+                Swal.fire('خطأ', 'الرجاء اختيار حالة التسجيل', 'error');
+                return;
+            }
+
+            students[currentExamIndex].registrationStatus = 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات';
+            
+            closeExamModal();
+            Swal.fire('تم!', 'تم تسجيل التلميذ بنجاح', 'success');
+            filterTable();
+        }
+
+        function closeExamModal() {
+            document.getElementById('examRegisterModal').style.display = 'none';
         }
 
         // Initialize
         window.onload = function() {
+            // Ensure status for all students
+            students.forEach(s => {
+                if (!s.status) s.status = "خارجي";
+            });
+            
+            renderTableHeader();
             filterTable();
 
             Swal.fire({
                 title: 'مرحبا!',
-                text: 'المنصة جاهزة. استورد بيانات التلاميذ من ملف Excel للبدء.',
+                text: 'المنصة جاهزة. قم باستيراد بيانات التلاميذ من ملف Excel.',
                 icon: 'info',
-                timer: 2800,
-                showConfirmButton: false
+                timer: 3000
             });
         };
     </script>
