@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js لأشكال البيانات والإحصائيات -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -23,7 +25,7 @@
             --modal-bg: rgba(0, 0, 0, 0.7);
             --success-green: #28a745;
             --danger-red: #dc3545;
-            --dark-red: #8B0000;
+            --dark-red: #800000; /* أحمر غامق مخصص لغير المسجل */
         }
 
         body {
@@ -115,7 +117,8 @@
             color: #555;
             transition: 0.3s;
             flex: 1;
-            min-width: 180px;
+            min-width: 150px;
+            text-align: center;
         }
 
         .tab-btn.active {
@@ -188,7 +191,7 @@
         .btn-register { background-color: #007bff; color: white; font-size: 12px; padding: 4px 8px; }
 
         .status-pending {
-            background-color: var(--dark-red);
+            background-color: var(--dark-red); /* مربع أحمر غامق */
             color: white;
             padding: 6px 14px;
             border-radius: 4px;
@@ -224,11 +227,17 @@
             cursor: pointer;
             border-radius: 4px;
             min-width: 40px;
+            font-weight: bold;
+            transition: all 0.2s ease;
         }
 
         .page-btn.active {
             background-color: var(--main-blue);
             color: white;
+        }
+
+        .page-btn:hover:not(.active) {
+            background-color: #e0eeff;
         }
 
         .page-btn:disabled {
@@ -323,103 +332,56 @@
 
         /* تنسيقات الإحصائيات لمتابعة الدخول المدرسي */
         .stats-container {
-            display: none; /* مخفي افتراضياً ويظهر عند النقر على تبويب المتابعة */
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 10px;
+            display: none;
+            animation: fadeIn 0.5s ease;
         }
 
-        .stats-cards {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .stats-card {
+        .stat-card {
             background: white;
-            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 20px;
-            text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-right: 5px solid var(--main-blue);
+            text-align: center;
         }
 
-        .stats-card i {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: var(--main-blue);
-        }
+        .stat-card.boys { border-right-color: #00bcd4; }
+        .stat-card.girls { border-right-color: #e91e63; }
+        .stat-card.total { border-right-color: #4caf50; }
 
-        .stats-card h3 {
-            margin: 5px 0;
+        .stat-card h3 {
+            margin: 0;
             font-size: 14px;
-            color: #718096;
+            color: #777;
         }
 
-        .stats-card p {
+        .stat-card p {
+            margin: 10px 0 0 0;
             font-size: 28px;
             font-weight: bold;
-            margin: 0;
-            color: #2d3748;
+            color: #333;
         }
 
-        .stats-charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-            margin-top: 10px;
-        }
-
-        .chart-card {
+        .chart-wrapper {
             background: white;
-            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            max-width: 500px;
+            margin: 0 auto;
         }
 
-        .chart-card h4 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 16px;
-            color: #2d3748;
-            border-bottom: 2px solid var(--faint-blue);
-            padding-bottom: 8px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        /* رسم بياني أفقي مخصص بـ CSS و HTML */
-        .progress-bar-wrapper {
-            margin-bottom: 15px;
-        }
-
-        .progress-bar-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .progress-bar-outer {
-            background-color: #edf2f7;
-            height: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .progress-bar-inner {
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.5s ease-in-out;
-        }
-
-        .bg-blue { background-color: #3182ce; }
-        .bg-pink { background-color: #ed64a6; }
-        .bg-green { background-color: #48bb78; }
-        .bg-orange { background-color: #ed8936; }
-        .bg-purple { background-color: #9f7aea; }
-        .bg-teal { background-color: #38b2ac; }
     </style>
 </head>
 <body>
@@ -441,124 +403,96 @@
         
         <div class="window-inner">
             <div class="window-content">
-                <h2 class="sub-title">التسجيلات المدرسية</h2>
+                <h2 class="sub-title" id="subTitleText">التسجيلات المدرسية</h2>
 
-                <!-- التبويبات -->
+                <!-- التبويبات (مع دمج وإضافة الأقسام والاحتفاظ بالقديم) -->
                 <div class="tabs-container" id="tabs">
                     <button class="tab-btn active" onclick="switchTab(0)">الدخول المدرسي</button>
                     <button class="tab-btn" onclick="switchTab(1)">متابعة الدخول المدرسي</button>
-                    <button class="tab-btn" onclick="switchTab(2)">متابعة حجز النقاط والاستدراك</button>
+                    <button class="tab-btn" onclick="switchTab(2)">متابعة حجز النقاط</button>
                     <button class="tab-btn" onclick="switchTab(3)">تحيين بيانات التلاميذ</button>
                     <button class="tab-btn" onclick="switchTab(4)">تسجيلات الامتحانات المدرسية</button>
+                    <button class="tab-btn" onclick="switchTab(5)">نقاط الاستدراك</button>
                 </div>
 
-                <!-- قسم الفلاتر -->
-                <div class="filter-section" id="filterSection">
-                    <div>
-                        <label>السنة الدراسية:</label>
-                        <select id="filterYear" onchange="filterTable(true)">
-                            <option value="all">--جميع السنوات--</option>
-                            <option value="2026-2027" selected>2026-2027</option>
-                        </select>
+                <!-- واجهة إحصائيات متابعة الدخول المدرسي (جديد) -->
+                <div id="statsSection" class="stats-container">
+                    <div class="stats-grid">
+                        <div class="stat-card total">
+                            <h3>إجمالي التلاميذ المسجلين</h3>
+                            <p id="totalCount">0</p>
+                        </div>
+                        <div class="stat-card boys">
+                            <h3>عدد الذكور</h3>
+                            <p id="boysCount">0</p>
+                        </div>
+                        <div class="stat-card girls">
+                            <h3>عدد الإناث</h3>
+                            <p id="girlsCount">0</p>
+                        </div>
                     </div>
-                    <div>
-                        <label>المستوى:</label>
-                        <select id="filterLevel" onchange="filterTable(true)">
-                            <option value="all">--جميع المستويات--</option>
-                            <option value="رابعة" selected>رابعة</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>رقم الفوج:</label>
-                        <select id="filterGroup" onchange="filterTable(true)">
-                            <option value="all">--جميع الأفواج--</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div style="margin-right: auto; display: flex; gap: 10px; align-items: flex-end;">
-                        <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="importExcel(event)">
-                        <button class="btn btn-import" onclick="document.getElementById('fileInput').click()">
-                            <i class="fas fa-file-import"></i> استيراد بيانات اكسيل
-                        </button>
-                        <button class="btn btn-export" onclick="exportTable()">
-                            <i class="fas fa-file-export"></i> تصدير
-                        </button>
+                    <div class="chart-wrapper">
+                        <h4 style="text-align: center; margin-bottom: 15px;">النسبة المئوية لتوزيع الجنسين</h4>
+                        <canvas id="genderChart"></canvas>
                     </div>
                 </div>
 
-                <!-- محرك البحث -->
-                <div id="searchSection" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="searchBox" placeholder="بحث عن تلميذ..." style="width: 350px;" onkeyup="filterTable(true)">
-                    <button class="btn btn-search" onclick="filterTable(true)"><i class="fas fa-search"></i> بحث</button>
-                </div>
-
-                <!-- قسم الجدول للتلاميذ -->
-                <div class="table-section" id="studentTableContainer">
-                    <table id="studentsTable">
-                        <thead id="tableHeader">
-                            <!-- Dynamic header populated by JS -->
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-
-                    <!-- Pagination -->
-                    <div class="pagination" id="pagination"></div>
-                </div>
-
-                <!-- قسم متابعة الدخول المدرسي (الإحصائيات والأشكال البيانية) -->
-                <div class="stats-container" id="statsContainer">
-                    <div class="stats-cards">
-                        <div class="stats-card">
-                            <i class="fas fa-user-graduate" style="color: var(--main-blue);"></i>
-                            <h3>إجمالي التلاميذ المستوردين</h3>
-                            <p id="statTotalStudents">0</p>
+                <!-- الهيكل الرئيسي للتحكم بالطلاب (يظهر في الأقسام الأخرى) -->
+                <div id="mainManagementSection">
+                    <!-- قسم الفلاتر -->
+                    <div class="filter-section">
+                        <div>
+                            <label>السنة الدراسية:</label>
+                            <select id="filterYear" onchange="filterTable()">
+                                <option value="all">--جميع السنوات--</option>
+                                <option value="2026-2027" selected>2026-2027</option>
+                            </select>
                         </div>
-                        <div class="stats-card">
-                            <i class="fas fa-mars" style="color: #3182ce;"></i>
-                            <h3>عدد التلاميذ الذكور</h3>
-                            <p id="statTotalMales">0</p>
+                        <div>
+                            <label>المستوى:</label>
+                            <select id="filterLevel" onchange="filterTable()">
+                                <option value="all">--جميع المستويات--</option>
+                                <option value="رابعة" selected>رابعة</option>
+                            </select>
                         </div>
-                        <div class="stats-card">
-                            <i class="fas fa-venus" style="color: #ed64a6;"></i>
-                            <h3>عدد التلاميذ الإناث</h3>
-                            <p id="statTotalFemales">0</p>
+                        <div>
+                            <label>رقم الفوج:</label>
+                            <select id="filterGroup" onchange="filterTable()">
+                                <option value="all">--جميع الأفواج--</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div style="margin-right: auto; display: flex; gap: 10px; align-items: flex-end;">
+                            <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="importExcel(event)">
+                            <button class="btn btn-import" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-file-import"></i> استيراد بيانات اكسيل
+                            </button>
+                            <button class="btn btn-export" onclick="exportTable()">
+                                <i class="fas fa-file-export"></i> تصدير
+                            </button>
                         </div>
                     </div>
 
-                    <div class="stats-charts-section">
-                        <!-- الشكل البياني الأول: توزيع الجنسين -->
-                        <div class="chart-card">
-                            <h4><i class="fas fa-chart-bar"></i> توزيع التلاميذ حسب الجنس</h4>
-                            <div class="progress-bar-wrapper">
-                                <div class="progress-bar-label">
-                                    <span>ذكور</span>
-                                    <span id="labelMalePercent">0% (0)</span>
-                                </div>
-                                <div class="progress-bar-outer">
-                                    <div class="progress-bar-inner bg-blue" id="barMale" style="width: 0%;"></div>
-                                </div>
-                            </div>
-                            <div class="progress-bar-wrapper">
-                                <div class="progress-bar-label">
-                                    <span>إناث</span>
-                                    <span id="labelFemalePercent">0% (0)</span>
-                                </div>
-                                <div class="progress-bar-outer">
-                                    <div class="progress-bar-inner bg-pink" id="barFemale" style="width: 0%;"></div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- محرك البحث -->
+                    <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="searchBox" placeholder="بحث عن تلميذ..." style="width: 350px;" onkeyup="filterTable()">
+                        <button class="btn btn-search" onclick="filterTable()"><i class="fas fa-search"></i> بحث</button>
+                    </div>
 
-                        <!-- الشكل البياني الثاني: توزيع الأفواج المدرسية -->
-                        <div class="chart-card">
-                            <h4><i class="fas fa-chart-pie"></i> نسبة التلاميذ حسب الأفواج المدرسية</h4>
-                            <div id="groupsChartContainer">
-                                <!-- سيتم بناؤه ديناميكياً بواسطة الجافاسكربت -->
-                            </div>
-                        </div>
+                    <!-- قسم الجدول -->
+                    <div class="table-section">
+                        <table id="studentsTable">
+                            <thead id="tableHeader">
+                                <!-- يتم إنشاؤه عبر JS -->
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+
+                        <!-- نظام التصفح بالأرقام المعالج والمصلح -->
+                        <div class="pagination" id="pagination"></div>
                     </div>
                 </div>
 
@@ -566,7 +500,7 @@
         </div>
     </div>
 
-    <!-- Modal for Student Update (Tab 3) -->
+    <!-- Modal للتحيين (Tab 3) -->
     <div id="updateModal" class="modal">
         <div class="modal-content">
             <div class="modal-header" id="modalTitle">تحيين بيانات التلميذ</div>
@@ -582,7 +516,7 @@
         </div>
     </div>
 
-    <!-- Modal for Exam Registration (Tab 4) -->
+    <!-- Modal للتسجيل بالامتحانات الرسمية (Tab 4) -->
     <div id="examRegisterModal" class="modal">
         <div class="modal-content">
             <div class="modal-header" id="examModalTitle">تسجيل التلميذ في الامتحانات</div>
@@ -619,16 +553,73 @@
     </div>
 
     <script>
-        // مصفوفة التلاميذ
-        let students = [];
+        // إعدادات قاعدة البيانات المحلية IndexedDB لحفظ البيانات نهائياً وتجنب فقدانها
+        const DB_NAME = "EducationPlatformDB";
+        const DB_VERSION = 1;
+        const STORE_NAME = "students";
+        let db;
 
+        let students = [];
         let currentPage = 1;
         const itemsPerPage = 10;
         let currentEditIndex = -1;
         let currentExamIndex = -1;
         let currentTab = 0;
+        let genderChartInstance = null; // لحفظ وتحديث شكل الرسم البياني
 
-        // بناء رأس الجدول ديناميكياً تبعاً للتبويب المفتوح
+        // فتح قاعدة البيانات عند تحميل الصفحة
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = (event) => {
+                    console.error("خطأ في فتح قاعدة البيانات:", event);
+                    reject();
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve();
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const dbInstance = event.target.result;
+                    if (!dbInstance.objectStoreNames.contains(STORE_NAME)) {
+                        dbInstance.createObjectStore(STORE_NAME, { keyPath: "id" });
+                    }
+                };
+            });
+        }
+
+        // جلب كافة البيانات المخزنة من قاعدة البيانات
+        function loadStudentsFromDB() {
+            const transaction = db.transaction([STORE_NAME], "readonly");
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                students = request.result || [];
+                filterTable();
+            };
+        }
+
+        // حفظ أو تعديل طالب في قاعدة البيانات
+        function saveStudentToDB(student) {
+            const transaction = db.transaction([STORE_NAME], "readwrite");
+            const store = transaction.objectStore(STORE_NAME);
+            store.put(student);
+        }
+
+        // حفظ مصفوفة طلاب كاملة في قاعدة البيانات (عند الاستيراد من الإكسيل)
+        function saveAllStudentsToDB(studentList) {
+            const transaction = db.transaction([STORE_NAME], "readwrite");
+            const store = transaction.objectStore(STORE_NAME);
+            studentList.forEach(student => {
+                store.put(student);
+            });
+        }
+
+        // دالة إنشاء الهيدر تتبعاً للقسم النشط
         function renderTableHeader() {
             const thead = document.getElementById('tableHeader');
             thead.innerHTML = '';
@@ -646,9 +637,7 @@
                     <th>رقم الفوج</th>
             `;
 
-            if (currentTab === 3) {
-                headerHTML += `<th>الصفة</th>`;
-            } else if (currentTab === 4) {
+            if (currentTab === 4) {
                 headerHTML += `<th>حالة التسجيل</th>`;
             } else {
                 headerHTML += `<th>الصفة</th>`;
@@ -658,7 +647,7 @@
             thead.innerHTML = headerHTML;
         }
 
-        // بناء وعرض جدول التلاميذ
+        // دالة عرض وتحديث محتويات الجدول الأساسية
         function renderTable(filteredStudents) {
             renderTableHeader();
             const tbody = document.getElementById('tableBody');
@@ -669,16 +658,17 @@
             const pageData = filteredStudents.slice(start, end);
 
             pageData.forEach((student, idx) => {
-                const globalIndex = start + idx;
+                const globalIndex = students.findIndex(s => s.id === student.id);
                 const tr = document.createElement('tr');
 
                 let statusCell = '';
                 let operations = '';
 
                 if (currentTab === 4) {
-                    // القيمة الافتراضية "غير مسجل" في حال لم يسجل التلميذ سابقاً
                     const regStatus = student.registrationStatus || 'غير مسجل';
-                    const statusClass = regStatus === 'غير مسجل' ? 'status-pending' : 'status-registered';
+                    const isRegistered = regStatus.includes('مسجل');
+                    const statusClass = isRegistered ? 'status-registered' : 'status-pending';
+                    
                     statusCell = `<td><span class="${statusClass}">${regStatus}</span></td>`;
                     operations = `
                         <button class="btn btn-register" onclick="openExamRegisterModal(${globalIndex})">
@@ -694,6 +684,7 @@
                     statusCell = `<td>${student.status || 'خارجي'}</td>`;
                 } else {
                     statusCell = `<td>${student.status || 'خارجي'}</td>`;
+                    operations = `<span style="color: #777; font-size: 11px;">عرض فقط</span>`;
                 }
 
                 tr.innerHTML = `
@@ -715,7 +706,7 @@
             renderPagination(filteredStudents.length);
         }
 
-        // معالجة التنقل بين الصفحات وإصلاح الخلل بشكل نهائي
+        // تعديل وإصلاح نظام التصفح والتحرك السلس بين أرقام الصفحات
         function renderPagination(totalItems) {
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             const pagination = document.getElementById('pagination');
@@ -725,26 +716,22 @@
                 const btn = document.createElement('button');
                 btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
                 btn.textContent = i;
-                // استخدام دالة مخصصة للانتقال دون إعادة تعيين الصفحة إلى 1
                 btn.onclick = () => {
-                    goToPage(i);
+                    currentPage = i;
+                    executeFilterAndRender(); // التنقل المباشر والسريع دون إعادة تعيين الصفحة للأولى
                 };
                 pagination.appendChild(btn);
             }
         }
 
-        // دالة التنقل المباشر
-        function goToPage(pageNumber) {
-            currentPage = pageNumber;
-            filterTable(false); // استدعاء الفلترة بدون تصفير رقم الصفحة
+        // دالة الفلترة التي تحافظ على تعيين رقم الصفحة الافتراضي عند كتابة فلتر جديد
+        function filterTable() {
+            currentPage = 1; 
+            executeFilterAndRender();
         }
 
-        // فلترة وعرض البيانات بناءً على مدخلات البحث والمصنفات
-        function filterTable(resetPage = true) {
-            if (resetPage) {
-                currentPage = 1;
-            }
-
+        // التنفيذ الفعلي للفلترة وعرض النتائج
+        function executeFilterAndRender() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
             const level = document.getElementById('filterLevel').value;
             const group = document.getElementById('filterGroup').value;
@@ -764,17 +751,18 @@
             renderTable(filtered);
         }
 
-        // تبديل التبويبات بالمنصة
+        // نظام تبديل الأقسام وتأمين الأقسام المقفلة
         function switchTab(tabIndex) {
-            // معالجة تبويب "متابعة حجز النقاط والاستدراك" (غير متاح حالياً)
-            if (tabIndex === 2) {
+            // معالجة وحجب قسم حجز النقاط (قسم 2) والاستدراك (قسم 5) لجعلهما غير متاحين حالياً[cite: 1]
+            if (tabIndex === 2 || tabIndex === 5) {
                 Swal.fire({
-                    title: 'تنبيه',
+                    title: 'تنبيه هائل وقريب!',
                     text: 'متابعة حجز النقاط والاستدراك غير متاحة حالياً وسيتم إطلاقها قريباً.',
                     icon: 'warning',
-                    confirmButtonText: 'حسناً'
+                    confirmButtonText: 'مفهوم',
+                    confirmButtonColor: '#007bff'
                 });
-                return; // منع الانتقال إليها
+                return; // منع إكمال التبديل
             }
 
             currentTab = tabIndex;
@@ -782,89 +770,68 @@
                 btn.classList.toggle('active', i === tabIndex);
             });
 
-            const studentTableContainer = document.getElementById('studentTableContainer');
-            const statsContainer = document.getElementById('statsContainer');
-            const searchSection = document.getElementById('searchSection');
-            const filterSection = document.getElementById('filterSection');
+            const mainSection = document.getElementById('mainManagementSection');
+            const statsSection = document.getElementById('statsSection');
 
             if (tabIndex === 1) {
-                // تفعيل تبويب الإحصائيات وإخفاء الجداول
-                studentTableContainer.style.display = 'none';
-                searchSection.style.display = 'none';
-                filterSection.style.display = 'none';
-                statsContainer.style.display = 'flex';
-                calculateAndRenderStats();
+                // تفعيل شاشة الإحصائيات والأشكال البيانية لمتابعة الدخول المدرسي
+                mainSection.style.display = 'none';
+                statsSection.style.display = 'block';
+                document.getElementById('subTitleText').textContent = "متابعة الدخول المدرسي - الإحصائيات العامة";
+                renderStatsAndCharts();
             } else {
-                // إظهار جداول التلاميذ في بقية التبويبات النشطة
-                studentTableContainer.style.display = 'block';
-                searchSection.style.display = 'flex';
-                filterSection.style.display = 'flex';
-                statsContainer.style.display = 'none';
-                filterTable(true);
+                // إظهار لوحة التحكم الاعتيادية
+                mainSection.style.display = 'block';
+                statsSection.style.display = 'none';
+                document.getElementById('subTitleText').textContent = "التسجيلات المدرسية";
+                filterTable();
             }
         }
 
-        // حساب وإظهار البيانات الإحصائية للدخول المدرسي
-        function calculateAndRenderStats() {
+        // تفعيل الأشكال البيانية والحسابات الإحصائية الديناميكية للطلاب
+        function renderStatsAndCharts() {
             const total = students.length;
-            const males = students.filter(s => s.gender === 'ذكر').length;
-            const females = students.filter(s => s.gender === 'أنثى').length;
+            const boys = students.filter(s => s.gender === 'ذكر').length;
+            const girls = students.filter(s => s.gender === 'أنثى').length;
 
-            // تحديث البطاقات الرقمية
-            document.getElementById('statTotalStudents').textContent = total;
-            document.getElementById('statTotalMales').textContent = males;
-            document.getElementById('statTotalFemales').textContent = females;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('boysCount').textContent = boys;
+            document.getElementById('girlsCount').textContent = girls;
 
-            // حساب النسب المئوية للجنسين
-            const malePercent = total > 0 ? Math.round((males / total) * 100) : 0;
-            const femalePercent = total > 0 ? Math.round((females / total) * 100) : 0;
-
-            document.getElementById('labelMalePercent').textContent = `${malePercent}% (${males})`;
-            document.getElementById('barMale').style.width = `${malePercent}%`;
-
-            document.getElementById('labelFemalePercent').textContent = `${femalePercent}% (${females})`;
-            document.getElementById('barFemale').style.width = `${femalePercent}%`;
-
-            // حساب الإحصائيات والأفواج ديناميكياً
-            const groupCounts = {};
-            students.forEach(s => {
-                const gp = s.group || 'غير محدد';
-                groupCounts[gp] = (groupCounts[gp] || 0) + 1;
-            });
-
-            const groupsContainer = document.getElementById('groupsChartContainer');
-            groupsContainer.innerHTML = '';
-
-            const colors = ['bg-green', 'bg-orange', 'bg-purple', 'bg-teal', 'bg-blue'];
-            let colorIdx = 0;
-
-            const sortedGroups = Object.keys(groupCounts).sort();
-            if (sortedGroups.length === 0) {
-                groupsContainer.innerHTML = '<p style="text-align:center; color:#718096; font-size:13px;">لا توجد بيانات أفواج كافية، يرجى استيراد الملف أولاً.</p>';
-            } else {
-                sortedGroups.forEach(gp => {
-                    const count = groupCounts[gp];
-                    const percent = total > 0 ? Math.round((count / total) * 100) : 0;
-                    const currentColor = colors[colorIdx % colors.length];
-                    colorIdx++;
-
-                    const barHTML = `
-                        <div class="progress-bar-wrapper">
-                            <div class="progress-bar-label">
-                                <span>الفوج رقم ${gp}</span>
-                                <span>${percent}% (${count} تلميذ)</span>
-                            </div>
-                            <div class="progress-bar-outer">
-                                <div class="progress-bar-inner ${currentColor}" style="width: ${percent}%;"></div>
-                            </div>
-                        </div>
-                    `;
-                    groupsContainer.insertAdjacentHTML('beforeend', barHTML);
-                });
+            // بناء رسم بياني تفاعلي باستخدام مكتبة Chart.js
+            const ctx = document.getElementById('genderChart').getContext('2d');
+            if (genderChartInstance) {
+                genderChartInstance.destroy(); // تدمير الهيكل السابق لتفادي تراكب الرسوم البيانية
             }
+
+            genderChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ذكور', 'إناث'],
+                    datasets: [{
+                        data: [boys, girls],
+                        backgroundColor: ['#00bcd4', '#e91e63'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Noto Kufi Arabic'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
-        // استيراد ملفات Excel
+        // استيراد ملف إكسيل وحفظ البيانات فوراً وبشكل دائم في قاعدة البيانات
         function importExcel(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -878,47 +845,50 @@
                     const worksheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-                    students = jsonData.map((row, index) => ({
-                        id: row['رقم التعريف'] || row['ID'] || String(20260000 + index + 1),
-                        lastName: row['اللقب'] || row['LastName'] || '',
-                        firstName: row['الاسم'] || row['FirstName'] || '',
-                        gender: row['الجنس'] || 'ذكر',
-                        birthDate: row['تاريخ الميلاد'] || '',
-                        address: row['العنوان'] || '',
-                        birthPlace: row['مكان الميلاد'] || 'الجزائر',
-                        level: row['المستوى'] || 'رابعة',
-                        group: String(row['رقم الفوج'] || 1),
-                        status: 'خارجي',
-                        registrationStatus: 'غير مسجل' // تحديد القيمة الافتراضية بشكل صريح "غير مسجل"
-                    }));
+                    const importedStudents = jsonData.map((row, index) => {
+                        const idVal = row['رقم التعريف'] || row['ID'] || String(20260000 + index + 1);
+                        return {
+                            id: String(idVal),
+                            lastName: row['اللقب'] || row['LastName'] || '',
+                            firstName: row['الاسم'] || row['FirstName'] || '',
+                            gender: row['الجنس'] || 'ذكر',
+                            birthDate: row['تاريخ الميلاد'] || '',
+                            address: row['العنوان'] || '',
+                            birthPlace: row['مكان الميلاد'] || 'الجزائر',
+                            level: row['المستوى'] || 'رابعة',
+                            group: String(row['رقم الفوج'] || 1),
+                            status: 'خارجي',
+                            registrationStatus: 'غير مسجل' // الحالة الافتراضية
+                        };
+                    });
 
-                    Swal.fire('نجح!', 'تم استيراد البيانات بنجاح', 'success');
-                    if (currentTab === 1) {
-                        calculateAndRenderStats();
-                    } else {
-                        filterTable(true);
-                    }
+                    // الحفظ في مصفوفة الواجهة وقاعدة البيانات indexedDB بشكل دائم
+                    students = importedStudents;
+                    saveAllStudentsToDB(importedStudents);
+
+                    Swal.fire('نجح الاستيراد!', 'تم استيراد البيانات وحفظها نهائياً بقاعدة البيانات للمنصة.', 'success');
+                    filterTable();
                 } catch (err) {
-                    Swal.fire('خطأ', 'حدث خطأ أثناء استيراد الملف', 'error');
+                    Swal.fire('خطأ في العملية', 'حدث خلل أثناء استيراد وقراءة الملف الصادر.', 'error');
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // تصدير البيانات لملفات Excel
+        // تصدير جدول الطلاب لملفات إكسيل Excel
         function exportTable() {
             if (students.length === 0) {
-                Swal.fire('تحذير', 'لا توجد بيانات للتصدير', 'warning');
+                Swal.fire('تنبيه', 'لا توجد بيانات متاحة للتصدير حالياً.', 'warning');
                 return;
             }
             const ws = XLSX.utils.json_to_sheet(students);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "التلاميذ");
             XLSX.writeFile(wb, "بيانات_التلاميذ.xlsx");
-            Swal.fire('تم!', 'تم تصدير الجدول إلى Excel', 'success');
+            Swal.fire('عملية ناجحة!', 'تم تصدير الجدول إلى ملف Excel بنجاح.', 'success');
         }
 
-        // نافذة تحيين البيانات (Tab 3)
+        // تحيين وتحديث بيانات تلميذ (Tab 3)
         function openEditModal(index) {
             currentEditIndex = index;
             const student = students[index];
@@ -928,7 +898,7 @@
             formContainer.innerHTML = `
                 <div class="form-group">
                     <label>رقم التعريف</label>
-                    <input type="text" id="editId" value="${student.id || ''}">
+                    <input type="text" id="editId" value="${student.id || ''}" readonly>
                 </div>
                 <div class="form-group">
                     <label>اللقب</label>
@@ -985,7 +955,6 @@
             if (currentEditIndex === -1) return;
             const student = students[currentEditIndex];
 
-            student.id = document.getElementById('editId').value;
             student.lastName = document.getElementById('editLast').value;
             student.firstName = document.getElementById('editFirst').value;
             student.gender = document.getElementById('editGender').value;
@@ -995,16 +964,19 @@
             student.level = document.getElementById('editLevel').value;
             student.group = document.getElementById('editGroup').value;
 
+            // الحفظ المباشر والنهائي في قاعدة البيانات
+            saveStudentToDB(student);
+
             closeModal();
-            Swal.fire('تم التحيين!', 'تم تحديث بيانات التلميذ بنجاح', 'success');
-            filterTable(false);
+            Swal.fire('تم التحيين بنجاح!', 'تم حفظ البيانات المعدلة نهائياً في قاعدة البيانات.', 'success');
+            executeFilterAndRender();
         }
 
         function closeModal() {
             document.getElementById('updateModal').style.display = 'none';
         }
 
-        // نافذة التسجيل للامتحانات المدرسية (Tab 4)
+        // نافذة تسجيل الطلاب بالامتحانات الرسمية (Tab 4)
         function openExamRegisterModal(index) {
             currentExamIndex = index;
             const student = students[index];
@@ -1012,7 +984,7 @@
             
             document.getElementById('studentInfoSection').innerHTML = `
                 <div style="text-align:center; margin-bottom:20px;">
-                    <h3>معلومات التلميذ</h3>
+                    <h3>معلومات التلميذ للترشح</h3>
                     <div class="info-box">
                         ${student.lastName || ''} ${student.firstName || ''}
                     </div>
@@ -1025,10 +997,9 @@
                 </div>
             `;
 
-            // إعداد القيم الافتراضية
-            document.getElementById('fatherName').value = '';
-            document.getElementById('motherName').value = '';
-            document.getElementById('registrationSelect').value = '';
+            document.getElementById('fatherName').value = student.fatherName || '';
+            document.getElementById('motherName').value = student.motherName || '';
+            document.getElementById('registrationSelect').value = student.registrationStatus === 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات' ? 'registered' : '';
 
             modal.style.display = 'flex';
         }
@@ -1038,37 +1009,40 @@
             const selectValue = document.getElementById('registrationSelect').value;
             
             if (!selectValue) {
-                Swal.fire('خطأ', 'الرجاء اختيار حالة التسجيل للامتحان', 'error');
+                Swal.fire('خطأ', 'الرجاء تحديد واختيار خيار التسجيل بالديوان الوطني أولاً.', 'error');
                 return;
             }
 
-            students[currentExamIndex].registrationStatus = 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات';
+            const student = students[currentExamIndex];
+            student.fatherName = document.getElementById('fatherName').value;
+            student.motherName = document.getElementById('motherName').value;
+            student.registrationStatus = 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات';
             
+            // تحديث قاعدة البيانات للتلميذ المسجل
+            saveStudentToDB(student);
+
             closeExamModal();
-            Swal.fire('تم!', 'تم تسجيل التلميذ بنجاح في قاعدة بيانات الامتحان الموحد', 'success');
-            filterTable(false);
+            Swal.fire('تم تأكيد التسجيل!', 'تم تسجيل التلميذ بنجاح وحفظ حالته نهائياً.', 'success');
+            executeFilterAndRender();
         }
 
         function closeExamModal() {
             document.getElementById('examRegisterModal').style.display = 'none';
         }
 
-        // عند بدء تشغيل المنصة
+        // تشغيل المنصة فور تحميل الصفحة وبناء بيئة العمل وقاعدة البيانات
         window.onload = function() {
-            // تفعيل القيم الافتراضية
-            students.forEach(s => {
-                if (!s.status) s.status = "خارجي";
-                if (!s.registrationStatus) s.registrationStatus = "غير مسجل";
-            });
-            
-            renderTableHeader();
-            filterTable(true);
-
-            Swal.fire({
-                title: 'مرحبا بك في الأرضية الرقمية المحدثة!',
-                text: 'تمت معالجة خلل أزرار الترقيم وتفعيل قسم المتابعة الإحصائية.',
-                icon: 'success',
-                timer: 4000
+            initDB().then(() => {
+                loadStudentsFromDB();
+                Swal.fire({
+                    title: 'أهلاً بك مجدداً!',
+                    text: 'تمت تهيئة قاعدة البيانات المحلية للمنصة بنجاح. بياناتك آمنة ومحفوظة دائماً.',
+                    icon: 'success',
+                    timer: 3000
+                });
+            }).catch(() => {
+                Swal.fire('تحذير', 'تعذر تشغيل قاعدة البيانات الداخلية. سيتم تشغيل المنصة في الوضع المؤقت.', 'warning');
+                filterTable();
             });
         };
     </script>
