@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الأرضية الرقمية لوزارة التربية الوطنية</title>
-    <!-- استدعاء خط Noto Kufi Arabic -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- استدعاء خط Noto Kufi Arabic للواجهات و Droid Arabic Kufi للطباعة -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
     <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js لأشكال بيانية حقيقية ومتحركة -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -22,10 +24,10 @@
             --border-color: #ddd;
             --modal-bg: rgba(0, 0, 0, 0.7);
             --success-green: #28a745;
-            --danger-red: #8b0000; /* أحمر غامق للغير مسجل */
-            --pending-orange: #d97706; /* برتقالي غامق لقيد الانتظار */
-            --navy-teal: #e0f2f1; /* أخضر باهت مائل للأزرق البحري للملاحظات */
-            --marine-text: #004d40;
+            --danger-red: #dc3545;
+            --dark-red: #8b0000;
+            --dark-orange: #ff8c00;
+            --custom-teal: #e0f2f1; /* باهت مائل للأزرق البحري */
         }
 
         body {
@@ -35,40 +37,33 @@
             background-color: #f4f4f4;
         }
 
-        /* شاشة الانتظار الـ Processing */
-        #processing-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
-            z-index: 9999;
+        /* شاشة التحميل المعلقة */
+        #loadingOverlay {
             display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
             align-items: center;
             justify-content: center;
             flex-direction: column;
         }
-
         .spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid var(--main-blue);
-            border-radius: 50%;
             width: 60px;
             height: 60px;
+            border: 6px solid #ccc;
+            border-top-color: var(--main-blue);
+            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 15px;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .processing-text {
-            font-size: 20px;
+        .loading-text {
+            margin-top: 20px;
             font-weight: bold;
-            color: var(--header-blue);
+            font-size: 18px;
+            color: #333;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .top-navbar {
@@ -147,15 +142,14 @@
         .tab-btn {
             background: none;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             font-family: 'Noto Kufi Arabic', sans-serif;
             cursor: pointer;
             color: #555;
             transition: 0.3s;
             flex: 1;
-            min-width: 130px;
-            text-align: center;
-            border-bottom: 3px solid transparent;
+            min-width: 140px;
+            font-size: 13px;
         }
 
         .tab-btn.active {
@@ -164,15 +158,27 @@
             font-weight: bold;
         }
 
-        /* تنبيه المدارس للتسجيلات */
-        .navy-alert {
-            background-color: var(--navy-teal);
-            color: var(--marine-text);
+        /* التنبيهات */
+        .alert-message {
+            background-color: var(--custom-teal);
             border: 1px solid #b2dfdb;
-            padding: 15px;
+            color: #004d40;
+            padding: 12px;
             border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-orange {
+            background-color: #fff3e0;
+            border: 1px solid #ffe0b2;
+            color: #e65100;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -188,7 +194,6 @@
             gap: 15px;
             flex-wrap: wrap;
             border: 1px solid #ffdada;
-            align-items: flex-end;
         }
 
         select, input[type="text"], input[type="date"], input[type="number"] {
@@ -242,43 +247,33 @@
         .btn-search { background-color: var(--main-blue); color: white; }
         .btn-update { background-color: #17a2b8; color: white; font-size: 12px; padding: 4px 8px; }
         .btn-register { background-color: #007bff; color: white; font-size: 12px; padding: 4px 8px; }
-        .btn-check { background-color: #6f42c1; color: white; font-size: 12px; padding: 4px 8px; }
+        .btn-print { background-color: #6c757d; color: white; }
+        .btn-auto-group { background-color: #6f42c1; color: white; }
 
-        /* حالات الدفع والتسجيل المخصصة */
-        .status-not-registered {
-            background-color: var(--danger-red);
+        .status-dark-red {
+            background-color: var(--dark-red);
             color: white;
-            padding: 6px 12px;
+            padding: 4px 12px;
             border-radius: 4px;
             display: inline-block;
             font-size: 12px;
             font-weight: bold;
         }
 
-        .status-registered {
-            background-color: #28a745;
+        .status-orange {
+            background-color: var(--dark-orange);
             color: white;
-            padding: 6px 12px;
+            padding: 4px 12px;
             border-radius: 4px;
             display: inline-block;
             font-size: 12px;
             font-weight: bold;
         }
 
-        .pay-pending {
-            background-color: var(--pending-orange);
+        .status-blue-box {
+            background-color: #0056b3;
             color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            display: inline-block;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .pay-confirmed {
-            background-color: #0056b3; /* مربع أزرق */
-            color: white;
-            padding: 6px 12px;
+            padding: 4px 12px;
             border-radius: 4px;
             display: inline-block;
             font-size: 12px;
@@ -309,64 +304,47 @@
             color: white;
         }
 
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         #fileInput { display: none; }
 
-        /* Modal Styles */
+        /* تعديل النوافذ البيداغوجية الموسعة والمفتوحة بالعرض بدون حدود */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--modal-bg);
             z-index: 1000;
             align-items: center;
             justify-content: center;
         }
 
-        /* تعديل النوافذ البيداغوجية لتكون بدون حدود موسعة جداً بعرض 37cm (حوالي 1400px) */
-        .modal-content-pedagogic {
+        .modal-content-wide {
             background: white;
-            border-radius: 0px; /* بدون حدود عادية جداً */
+            border-radius: 0; /* بدون حدود */
             border: none;
-            width: 95%;
-            max-width: 1400px; /* ما يقارب 37 سم كعرض للشاشات الكبيرة */
+            width: 37cm; /* عرض بيداغوجي موسع حوالي 37 سم */
+            max-width: 95%;
             max-height: 92vh;
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            padding: 20px;
         }
 
-        /* النافذة البيضاء المتداخلة (مستوى أول) */
-        .nested-level-1 {
-            background: #ffffff;
-            border: 1px solid #eee;
-            padding: 20px;
-            margin: 10px;
-        }
-
-        /* النافذة البيضاء الثانية المتداخلة (مستوى ثانٍ) */
-        .nested-level-2 {
-            background: #fbfbfb;
-            border: 1px solid #e0e0e0;
-            padding: 15px;
-            margin: 10px;
-        }
-
-        .modal-content {
+        /* نافذة متطابقة متداخلة 3 مستويات بيضاء بالكامل */
+        .nested-outer {
             background: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 92vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 15px;
+            border: 1px solid #ccc;
+        }
+        .nested-middle {
+            background: white;
+            padding: 15px;
+            border: 1px solid #bbb;
+            margin: 10px 0;
+        }
+        .nested-inner {
+            background: white;
+            padding: 15px;
+            border: 1px solid #999;
+            margin: 10px 0;
         }
 
         .modal-header {
@@ -382,14 +360,12 @@
             padding: 20px;
         }
 
-        .info-box {
-            background: #28a745;
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 12px 0;
-            text-align: center;
-            font-weight: bold;
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            background: #f8f9fa;
         }
 
         .form-grid {
@@ -408,100 +384,28 @@
             font-weight: bold;
         }
 
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            background: #f8f9fa;
-        }
-
-        .modal-footer button {
-            padding: 10px 25px;
-            font-size: 16px;
-        }
-
-        .student-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        /* لوحة الإحصائيات لمتابعة الدخول المدرسي */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: 1fr 2fr;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-top: 20px;
         }
 
-        .card {
-            background: white;
+        .dashboard-card {
+            background: #fff;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-right: 5px solid var(--main-blue);
-            text-align: center;
-        }
-
-        .card.success { border-right-color: #28a745; }
-        .card.warning { border-right-color: var(--pending-orange); }
-        .card.danger { border-right-color: var(--danger-red); }
-
-        .card h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .card .value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .chart-mockup {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .bar-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-end;
-            height: 200px;
-            margin-top: 20px;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
-        }
-
-        .bar {
-            width: 50px;
-            background-color: var(--main-blue);
-            text-align: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            border-radius: 4px 4px 0 0;
-            transition: height 0.5s ease;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding-bottom: 5px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
     </style>
 </head>
 <body>
 
-    <!-- شاشة الانتظار الدائرية Processing -->
-    <div id="processing-loader">
+    <!-- شاشة Processing مع دائرة متحركة -->
+    <div id="loadingOverlay">
         <div class="spinner"></div>
-        <div class="processing-text">Processing...</div>
+        <div class="loading-text">Processing...</div>
     </div>
 
     <!-- الشريط العلوي -->
@@ -521,27 +425,32 @@
         
         <div class="window-inner">
             <div class="window-content">
-                <h2 class="sub-title" id="sectionTitle">التسجيلات المدرسية</h2>
+                <h2 class="sub-title" id="currentSectionTitle">الدخول المدرسي</h2>
 
-                <!-- التبويبات مع الحفاظ التام على التبويبات القديمة وإضافة الجديدة -->
+                <!-- التبويبات الرسمية والجديدة كاملة -->
                 <div class="tabs-container" id="tabs">
                     <button class="tab-btn active" onclick="switchTab(0)">الدخول المدرسي</button>
                     <button class="tab-btn" onclick="switchTab(1)">متابعة الدخول المدرسي</button>
                     <button class="tab-btn" onclick="switchTab(2)">متابعة حجز النقاط والاستدراك</button>
                     <button class="tab-btn" onclick="switchTab(3)">تحيين بيانات التلاميذ</button>
-                    <button class="tab-btn" onclick="switchTab(4)">تسجيلات الامتحانات المدرسية</button>
+                    <button class="tab-btn" onclick="switchTab(4)">تسجيلات الامتحانات الرسمية</button>
                     <button class="tab-btn" onclick="switchTab(5)">التسجيل البيداغوجي</button>
                     <button class="tab-btn" onclick="switchTab(6)">نتائج شهادة التعليم المتوسط</button>
-                    <button class="tab-btn" onclick="switchTab(7)">نسبة ملف التسجيل البيداغوجي</button>
                 </div>
 
-                <!-- تنبيه عدم تعديل البيانات في الدخول المدرسي والتسجيلات -->
-                <div class="navy-alert" id="navyAlertBox">
-                    <i class="fas fa-info-circle"></i>
-                    تنبيه: لا يمكن تعديل بيانات / معلومات التلميذ مباشرة، إذا كانت هناك أخطاء يرجى الاتصال بمصلحة التمدرس التابعة لمديرية التربية.
+                <!-- التنبيه الخاص بالتسجيلات المدرسية (يظهر في تبويبات معينة) -->
+                <div id="schoolAlert" class="alert-message" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    تنبيه: لا يمكن تعديل بيانات/ معلومات التلميذ، إذا كانت هناك أخطاء يرجى الاتصال بمصلحة التمدرس التابعة لمديرية التربية.
                 </div>
 
-                <!-- قسم الفلاتر والاستيراد والتصدير الديناميكي -->
+                <!-- التنبيه الخاص بالتسجيل البيداغوجي -->
+                <div id="pedagogicAlert" class="alert-orange" style="display: none;">
+                    <i class="fas fa-calendar-alt"></i>
+                    سيتم إعادة التسجيل ودفع الحقوق ابتداءً من يوم 17-07-2026. الرجاء التقيد بالرزنامة من أجل تمكين أولياء التلاميذ من إعادة التسجيل بدفع المستحقات الخاصة بهم عبر فضاء الأولياء.
+                </div>
+
+                <!-- قسم الفلاتر -->
                 <div class="filter-section" id="filterSection">
                     <div>
                         <label>السنة الدراسية:</label>
@@ -567,43 +476,92 @@
                             <option value="4">4</option>
                         </select>
                     </div>
-                    
-                    <!-- أزرار الاستيراد والتصدير الديناميكية -->
-                    <div style="margin-right: auto; display: flex; gap: 10px; align-items: flex-end;" id="actionButtonsArea">
-                        <!-- تظهر هنا الازرار ديناميكياً بواسطة الجافاسكربت -->
+                    <div style="margin-right: auto; display: flex; gap: 10px; align-items: flex-end;" id="actionButtons">
+                        <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="importExcel(event)">
+                        <!-- يظهر زر الاستيراد في الدخول المدرسي فقط -->
+                        <button class="btn btn-import" id="btnImport" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-file-import"></i> استيراد بيانات اكسيل
+                        </button>
+                        <button class="btn btn-export" onclick="exportExcelFile()">
+                            <i class="fas fa-file-export"></i> تصدير إكسيل
+                        </button>
+                        <!-- زر طباعة للقوائم البيداغوجية -->
+                        <button class="btn btn-print" id="btnPrintPedagogic" onclick="printPedagogicList()" style="display: none;">
+                            <i class="fas fa-print"></i> طباعة القوائم
+                        </button>
+                        <!-- زر طباعة لنتائج البيام -->
+                        <button class="btn btn-print" id="btnPrintBem" onclick="printBemResults()" style="display: none;">
+                            <i class="fas fa-print"></i> طباعة النتائج
+                        </button>
+                        <!-- أزرار التسجيل الشامل للتلاميذ في التسجيل البيداغوجي -->
+                        <button class="btn btn-import" id="btnRegisterAll" onclick="registerAllStudents()" style="display: none; background-color:#28a745;">
+                            <i class="fas fa-users-cog"></i> تسجيل كل التلاميذ
+                        </button>
+                        <button class="btn btn-update" id="btnUnregisterAll" onclick="unregisterAllStudents()" style="display: none; background-color:#dc3545;">
+                            <i class="fas fa-user-slash"></i> إلغاء تسجيل الكل
+                        </button>
                     </div>
                 </div>
 
-                <!-- محرك البحث (يخفى في التبويبات غير المناسبة تلقائياً) -->
-                <div id="searchBarContainer" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                <!-- محرك البحث -->
+                <div id="searchContainer" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
                     <input type="text" id="searchBox" placeholder="بحث عن تلميذ..." style="width: 350px;" onkeyup="filterTable()">
                     <button class="btn btn-search" onclick="filterTable()"><i class="fas fa-search"></i> بحث</button>
                 </div>
 
-                <!-- المنطقة الديناميكية الرئيسية للجدول ومحتويات التبويبات -->
-                <div class="table-section" id="mainDisplayArea">
+                <!-- قسم الجدول الأساسي للعمليات -->
+                <div class="table-section" id="tableWrapper">
                     <table id="studentsTable">
-                        <thead id="tableHeader">
-                            <!-- يتم بناؤه برمجياً -->
-                        </thead>
+                        <thead id="tableHeader"></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
 
-                    <!-- أزرار ترقيم الصفحات -->
+                    <!-- Pagination -->
                     <div class="pagination" id="pagination"></div>
                 </div>
+
+                <!-- قسم متابعة الدخول المدرسي (الإحصائيات والأشكال البيانية والتفويج الآلي) -->
+                <div id="statsSection" style="display: none;">
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-auto-group" onclick="applyAutoGrouping()">
+                            <i class="fas fa-users"></i> التفويج الآلي للتلاميذ
+                        </button>
+                    </div>
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h3>إحصائيات إجمالية</h3>
+                            <p>إجمالي التلاميذ بالمنصة: <strong id="statTotal">0</strong></p>
+                            <p>الفوج 1: <strong id="statG1">0</strong> تلاميذ</p>
+                            <p>الفوج 2: <strong id="statG2">0</strong> تلاميذ</p>
+                            <p>الفوج 3: <strong id="statG3">0</strong> تلاميذ</p>
+                            <p>أخرى / غير مفوج: <strong id="statG0">0</strong></p>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>توزيع التلاميذ على الأفواج الثلاثة</h3>
+                            <div style="max-height: 250px; position: relative;">
+                                <canvas id="chartGroups"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- قسم غير متاح حالياً -->
+                <div id="notAvailableSection" style="display: none; text-align: center; padding: 50px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px;">
+                    <i class="fas fa-ban" style="font-size: 50px; color: var(--danger-red); margin-bottom: 20px;"></i>
+                    <h3 style="color: #333;">هذه الخدمة غير متاحة حالياً</h3>
+                    <p style="color: #666;">سيتم تفعيل المتابعة لاحقاً وفق الرزنامة الرسمية للوزارة.</p>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <!-- نافذة تحيين البيانات (Tab 3) -->
+    <!-- نافذة تحيين بيانات التلاميذ (Tab 3) -->
     <div id="updateModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content-wide">
             <div class="modal-header">تحيين بيانات التلميذ</div>
             <div class="modal-body">
-                <div class="form-grid" id="modalForm">
-                    <!-- Populated by JS -->
-                </div>
+                <div class="form-grid" id="modalForm"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn" style="background:#28a745; color:white;" onclick="confirmUpdate()">تأكيد التحيين</button>
@@ -614,12 +572,12 @@
 
     <!-- نافذة تسجيل الامتحانات الرسمية (Tab 4) -->
     <div id="examRegisterModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">تسجيل التلميذ في الامتحانات</div>
+        <div class="modal-content-wide">
+            <div class="modal-header">تسجيل التلميذ في الامتحانات الرسمية</div>
             <div class="modal-body">
                 <div id="studentInfoSection"></div>
-                <div style="margin: 25px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
-                    <h4 style="margin-bottom: 15px;">البيانات الإضافية للديوان</h4>
+                <div style="margin: 25px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+                    <h4 style="margin-bottom: 15px;">البيانات الإضافية</h4>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>اسم الأب</label>
@@ -634,7 +592,7 @@
                 <div class="form-group">
                     <label>حالة التسجيل</label>
                     <select id="registrationSelect" style="width: 100%; padding: 10px;">
-                        <option value="">-- الرجاء الاختيار للتأكيد --</option>
+                        <option value="">-- الرجاء الاختيار --</option>
                         <option value="registered">مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات</option>
                     </select>
                 </div>
@@ -646,347 +604,287 @@
         </div>
     </div>
 
-    <!-- النافذة البيداغوجية الموسعة جداً (التأكد من التسجيل ودفع الحقوق) بدون حدود عادية -->
-    <div id="pedagogicModal" class="modal">
-        <div class="modal-content-pedagogic">
-            <!-- النافذة البيضاء المستوى الأول المتداخلة -->
-            <div class="nested-level-1">
-                <h2 style="text-align: center; color: var(--header-blue); margin-top: 0;">النافذة البيداغوجية الموسعة - تأكيد الرسوم الدراسية ومستلزمات الملف</h2>
-                <hr>
-                
-                <!-- النافذة البيضاء المستوى الثاني المتداخلة -->
-                <div class="nested-level-2">
-                    <div id="pedagogicStudentDetail" style="margin-bottom: 20px;"></div>
-                    
-                    <div style="background-color: #fff9db; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-right: 5px solid #f59e0b;">
-                        <strong>حالة الدفع الحالية:</strong> <span id="currentModalPayStatus" style="font-weight: bold;"></span>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="font-weight: bold; margin-bottom: 8px;">قائمة اختيارية لتأكيد العملية البيداغوجية:</label>
-                        <select id="payDecisionSelect" style="width: 100%; padding: 12px; font-size: 15px;">
-                            <option value="">-- اختر إجراء لتعديل حالة دفع الحقوق المدرسية --</option>
-                            <option value="confirmed">تأكيد الدفع (يصبح أزرق بالجدول)</option>
-                            <option value="pending">إبقاء الحالة قيد الانتظار (برتقالي بالجدول)</option>
-                        </select>
-                    </div>
-
-                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
-                        <button class="btn" style="background-color: #007bff; color: white; padding: 10px 25px;" onclick="savePedagogicDecision('confirm')">
-                            <i class="fas fa-check-circle"></i> زر حجز الدفع
-                        </button>
-                        <button class="btn" style="background-color: #dc3545; color: white; padding: 10px 25px;" onclick="savePedagogicDecision('cancel')">
-                            <i class="fas fa-times-circle"></i> زر إلغاء الدفع
-                        </button>
+    <!-- نافذة الفحص المتداخلة للتسجيل البيداغوجي (3 مستويات بيضاء متداخلة) -->
+    <div id="pedagogicConfirmModal" class="modal">
+        <div class="modal-content-wide" style="padding: 20px;">
+            <div class="nested-outer">
+                <h3>المستوى الأول: تدقيق العمليات</h3>
+                <div class="nested-middle">
+                    <h4>المستوى الثاني: حالة الدفع والتحقق</h4>
+                    <div class="nested-inner">
+                        <h5>المستوى الثالث: تأكيد دفع حقوق التسجيل</h5>
+                        <p>اسم التلميذ: <strong id="nestedStudentName"></strong></p>
+                        <p>حالة الدفع الحالية: <span id="nestedPaymentState" style="font-weight: bold;"></span></p>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>تأكيد الإجراء بصفة بيداغوجية اختيارية:</label>
+                            <select id="pedagogicActionSelect" style="padding: 8px;">
+                                <option value="">-- اختر الإجراء --</option>
+                                <option value="confirm">حجز ودفع حقوق التسجيل</option>
+                                <option value="cancel">إلغاء حجز الدفع</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div style="text-align: left; padding: 10px;">
-                <button class="btn" style="background-color: #6c757d; color: white;" onclick="closePedagogicModal()">إغلاق النافذة</button>
+            <div class="modal-footer" style="margin-top: 15px;">
+                <button class="btn" style="background:#0056b3; color:white;" onclick="executePedagogicAction()">تأكيد وتطبيق</button>
+                <button class="btn" style="background:#dc3545; color:white;" onclick="closePedagogicModal()">إغلاق</button>
             </div>
         </div>
     </div>
 
     <script>
-        // إعداد قاعدة البيانات الدائمة (تخزين محلي localStorage)
-        let students = [];
-        
-        const defaultStudents = [
-            { id: "20261012", lastName: "بلقاسم", firstName: "محمد", gender: "ذكر", birthDate: "2012-05-14", address: "شارع الشهداء سطاوالي", birthPlace: "الجزائر", level: "رابعة", group: "1", status: "داخلي", registrationStatus: "غير مسجل", paymentStatus: "pending" },
-            { id: "20261013", lastName: "حداد", firstName: "مريم", gender: "أنثى", birthDate: "2012-09-21", address: "حي المنظر الجميل", birthPlace: "البليدة", level: "رابعة", group: "2", status: "خارجي", registrationStatus: "غير مسجل", paymentStatus: "pending" },
-            { id: "20261014", lastName: "يوسفي", firstName: "أمين", gender: "ذكر", birthDate: "2012-02-11", address: "حي 500 مسكن سطاوالي", birthPlace: "تيبازة", level: "رابعة", group: "1", status: "نصف داخلي", registrationStatus: "غير مسجل", paymentStatus: "pending" }
-        ];
-
-        // تحميل البيانات من الـ LocalStorage إن وجدت أو استخدام الافتراضية
-        if (localStorage.getItem('edu_platform_students')) {
-            students = JSON.parse(localStorage.getItem('edu_platform_students'));
-        } else {
-            students = defaultStudents;
-            saveToDatabase();
-        }
+        // إعداد قاعدة البيانات واسترجاعها نهائياً من الـ localStorage
+        let students = JSON.parse(localStorage.getItem('students_db')) || [];
+        let chartInstance = null;
 
         let currentPage = 1;
         const itemsPerPage = 10;
         let currentEditIndex = -1;
         let currentExamIndex = -1;
-        let currentPedIndex = -1;
+        let currentPedagogicIndex = -1;
         let currentTab = 0;
 
-        // حفظ قاعدة البيانات
+        // حفظ البيانات نهائياً في المنصة
         function saveToDatabase() {
-            localStorage.setItem('edu_platform_students', JSON.stringify(students));
+            localStorage.setItem('students_db', JSON.stringify(students));
         }
 
-        // بناء هيدر الجدول المخصص بحسب التبويب النشط
+        // معالجة الانتقال مع دائرة الانتظار المتحركة Processing
+        function switchTab(tabIndex) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = 'flex';
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                currentTab = tabIndex;
+                document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === tabIndex);
+                });
+                
+                // تحديث عنوان القسم النشط
+                const tabTitles = [
+                    "الدخول المدرسي", 
+                    "متابعة الدخول المدرسي", 
+                    "متابعة حجز النقاط والاستدراك", 
+                    "تحيين بيانات التلاميذ", 
+                    "تسجيلات الامتحانات الرسمية", 
+                    "التسجيل البيداغوجي", 
+                    "نتائج شهادة التعليم المتوسط"
+                ];
+                document.getElementById('currentSectionTitle').innerText = tabTitles[tabIndex];
+
+                // إدارة ظهور عناصر الواجهة بحسب التبويب النشط
+                document.getElementById('schoolAlert').style.display = (tabIndex === 0 || tabIndex === 3) ? 'flex' : 'none';
+                document.getElementById('pedagogicAlert').style.display = (tabIndex === 5) ? 'flex' : 'none';
+                
+                // إدارة أزرار الطباعة والعمليات البيداغوجية المتقدمة
+                document.getElementById('btnImport').style.display = (tabIndex === 0) ? 'inline-flex' : 'none';
+                document.getElementById('btnPrintPedagogic').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
+                document.getElementById('btnRegisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
+                document.getElementById('btnUnregisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
+                document.getElementById('btnPrintBem').style.display = (tabIndex === 6) ? 'inline-flex' : 'none';
+
+                if (tabIndex === 1) {
+                    // شاشة متابعة الدخول المدرسي مع الإحصائيات
+                    document.getElementById('filterSection').style.display = 'none';
+                    document.getElementById('searchContainer').style.display = 'none';
+                    document.getElementById('tableWrapper').style.display = 'none';
+                    document.getElementById('notAvailableSection').style.display = 'none';
+                    document.getElementById('statsSection').style.display = 'block';
+                    renderStats();
+                } else if (tabIndex === 2) {
+                    // متابعة حجز النقاط والاستدراك (غير متاحة حالياً)
+                    document.getElementById('filterSection').style.display = 'none';
+                    document.getElementById('searchContainer').style.display = 'none';
+                    document.getElementById('tableWrapper').style.display = 'none';
+                    document.getElementById('statsSection').style.display = 'none';
+                    document.getElementById('notAvailableSection').style.display = 'block';
+                } else {
+                    // التبويبات القياسية للجداول
+                    document.getElementById('filterSection').style.display = 'flex';
+                    document.getElementById('searchContainer').style.display = 'flex';
+                    document.getElementById('tableWrapper').style.display = 'block';
+                    document.getElementById('statsSection').style.display = 'none';
+                    document.getElementById('notAvailableSection').style.display = 'none';
+                    filterTable();
+                }
+            }, 2000);
+        }
+
+        // بناء رأس الجدول ديناميكياً حسب القسم المختار
         function renderTableHeader() {
             const thead = document.getElementById('tableHeader');
             thead.innerHTML = '';
 
-            let headerHTML = `<tr>`;
+            let headerHTML = '<tr>';
+            headerHTML += '<th>رقم التعريف</th>';
+            headerHTML += '<th>اللقب</th>';
+            headerHTML += '<th>الاسم</th>';
+            headerHTML += '<th>تاريخ الميلاد</th>';
 
-            if (currentTab === 5) { // التسجيل البيداغوجي
-                headerHTML += `
-                    <th>رقم التعريف</th>
-                    <th>اللقب</th>
-                    <th>الاسم</th>
-                    <th>تاريخ الميلاد</th>
-                    <th>العنوان</th>
-                    <th>مكان الميلاد</th>
-                    <th>حالة الدفع</th>
-                    <th>عمليات</th>
-                `;
-            } else if (currentTab === 6) { // شهادة التعليم المتوسط
-                headerHTML += `
-                    <th>رقم التعريف</th>
-                    <th>اللقب</th>
-                    <th>الاسم</th>
-                    <th>تاريخ الميلاد</th>
-                    <th>المعدل السنوي</th>
-                    <th>معدل الشهادة</th>
-                    <th>معدل القبول</th>
-                    <th>التقديرات</th>
-                    <th>عمليات</th>
-                `;
-            } else { // باقي التبويبات القياسية
-                headerHTML += `
-                    <th>رقم التعريف</th>
-                    <th>اللقب</th>
-                    <th>الاسم</th>
-                    <th>الجنس</th>
-                    <th>تاريخ الميلاد</th>
-                    <th>العنوان</th>
-                    <th>مكان الميلاد</th>
-                    <th>المستوى</th>
-                    <th>رقم الفوج</th>
-                `;
-                if (currentTab === 3) {
-                    headerHTML += `<th>الصفة</th>`;
-                } else if (currentTab === 4) {
-                    headerHTML += `<th>حالة التسجيل في الامتحان الرسمي</th>`;
-                } else {
-                    headerHTML += `<th>الصفة</th>`;
+            if (currentTab === 5) {
+                // التسجيل البيداغوجي
+                headerHTML += '<th>العنوان</th>';
+                headerHTML += '<th>مكان الميلاد</th>';
+                headerHTML += '<th>حالة الدفع</th>';
+                headerHTML += '<th>عمليات</th>';
+            } else if (currentTab === 6) {
+                // نتائج البيام شهادة التعليم المتوسط
+                headerHTML += '<th>المعدل السنوي</th>';
+                headerHTML += '<th>معدل الشهادة</th>';
+                headerHTML += '<th>معدل القبول</th>';
+                headerHTML += '<th>التقديرات</th>';
+                headerHTML += '<th>عمليات</th>';
+            } else {
+                // بقية الأقسام القياسية
+                headerHTML += '<th>الجنس</th>';
+                headerHTML += '<th>مكان الميلاد</th>';
+                headerHTML += '<th>العنوان</th>';
+                headerHTML += '<th>المستوى</th>';
+                headerHTML += '<th>رقم الفوج</th>';
+                headerHTML += '<th>الصفة</th>';
+                
+                if (currentTab === 4) {
+                    headerHTML += '<th>حالة التسجيل</th>';
                 }
-                headerHTML += `<th>عمليات</th>`;
+                headerHTML += '<th>عمليات</th>';
             }
 
-            headerHTML += `</tr>`;
+            headerHTML += '</tr>';
             thead.innerHTML = headerHTML;
         }
 
-        // رندر البيانات والتحكم بظهور الأزرار حسب التبويبات
+        // بناء وعرض جسم الجدول والبيانات
         function renderTable(filteredStudents) {
+            renderTableHeader();
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
-            
-            // إدارة الأزرار لتبويب الدخول المدرسي فقط والتبويبات الأخرى
-            const actionArea = document.getElementById('actionButtonsArea');
-            if (currentTab === 0) {
-                actionArea.innerHTML = `
-                    <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="importExcel(event)">
-                    <button class="btn btn-import" onclick="document.getElementById('fileInput').click()">
-                        <i class="fas fa-file-import"></i> استيراد بيانات اكسيل
-                    </button>
-                    <button class="btn btn-export" onclick="exportTable()">
-                        <i class="fas fa-file-export"></i> تصدير إكسيل
-                    </button>
-                `;
-            } else {
-                actionArea.innerHTML = `
-                    <button class="btn btn-export" onclick="exportTable()">
-                        <i class="fas fa-file-export"></i> تصدير إكسيل
-                    </button>
-                `;
-            }
 
-            // التحكم في عرض التنبيه العلوي
-            const navyBox = document.getElementById('navyAlertBox');
-            if (currentTab === 0 || currentTab === 3) {
-                navyBox.style.display = 'flex';
-            } else {
-                navyBox.style.display = 'none';
-            }
-
-            // شاشة الأقسام غير المتاحة حالياً
-            const mainDisplay = document.getElementById('mainDisplayArea');
-            const searchBar = document.getElementById('searchBarContainer');
-            const filterSec = document.getElementById('filterSection');
-
-            searchBar.style.display = 'flex';
-            filterSec.style.display = 'flex';
-            mainDisplay.style.backgroundColor = 'var(--faint-blue)';
-
-            if (currentTab === 2) { // متابعة حجز النقاط والاستدراك غير متاحة
-                searchBar.style.display = 'none';
-                filterSec.style.display = 'none';
-                mainDisplay.innerHTML = `
-                    <div style="text-align:center; padding:50px; background-color:#fff3cd; border:1px solid #ffeeba; border-radius:8px;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 40px; color:#856404; margin-bottom:15px;"></i>
-                        <h3 style="color:#856404; margin:0;">خدمة متابعة حجز النقاط والاستدراك غير متاحة حالياً بطلب من الإدارة</h3>
-                    </div>
-                `;
-                return;
-            }
-
-            if (currentTab === 6) { // نتائج التعليم المتوسط غير متاحة حالياً لكن الجدول مطلوب كأثر مرئي
-                searchBar.style.display = 'flex';
-                filterSec.style.display = 'flex';
-            }
-
-            // تطبيق الترقيم وحسابات الصفحات
-            renderTableHeader();
-            
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageData = filteredStudents.slice(start, end);
-
-            if (pageData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:20px; font-weight:bold;">لا توجد بيانات حالياً بالمنصة. يرجى استيراد ملف إكسيل أولاً.</td></tr>`;
+            if (filteredStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #999;">لا توجد بيانات متاحة في الجدول حالياً. يرجى استيراد البيانات أولاً.</td></tr>';
                 renderPagination(0);
                 return;
             }
 
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredStudents.slice(start, end);
+
             pageData.forEach((student, idx) => {
-                const globalIndex = students.indexOf(student); 
+                const globalIndex = students.indexOf(student);
                 const tr = document.createElement('tr');
 
-                if (currentTab === 5) { // التسجيل البيداغوجي ودفع الرسوم
-                    const payStatus = student.paymentStatus || 'pending';
-                    let statusLabel = '';
-                    if (payStatus === 'pending') {
-                        statusLabel = `<span class="pay-pending">قيد الانتظار</span>`;
-                    } else {
-                        statusLabel = `<span class="pay-confirmed">تم تأكيد الدفع</span>`;
+                let rowHTML = `
+                    <td>${student.id || ''}</td>
+                    <td>${student.lastName || ''}</td>
+                    <td>${student.firstName || ''}</td>
+                    <td>${student.birthDate || ''}</td>
+                `;
+
+                if (currentTab === 5) {
+                    // التسجيل البيداغوجي
+                    let payStatusHTML = '';
+                    if (!student.paymentStatus || student.paymentStatus === 'pending') {
+                        payStatusHTML = '<span class="status-orange">قيد الانتظار</span>';
+                    } else if (student.paymentStatus === 'confirmed') {
+                        payStatusHTML = '<span class="status-blue-box">تم دفع حقوق التسجيل</span>';
                     }
 
-                    tr.innerHTML = `
-                        <td>${student.id || ''}</td>
-                        <td>${student.lastName || ''}</td>
-                        <td>${student.firstName || ''}</td>
-                        <td>${student.birthDate || ''}</td>
+                    rowHTML += `
                         <td>${student.address || ''}</td>
                         <td>${student.birthPlace || ''}</td>
-                        <td>${statusLabel}</td>
+                        <td>${payStatusHTML}</td>
                         <td>
-                            <button class="btn btn-check" onclick="openPedagogicModal(${globalIndex})">
-                                <i class="fas fa-receipt"></i> تأكد من التسجيل
+                            <button class="btn btn-update" style="background-color: var(--main-blue);" onclick="openPedagogicConfirmModal(${globalIndex})">
+                                <i class="fas fa-check-circle"></i> تأكد من التسجيل
                             </button>
                         </td>
                     `;
-                } else if (currentTab === 6) { // نتائج شهادة التعليم المتوسط (خانات فارغة كطلبك)
-                    tr.innerHTML = `
-                        <td>${student.id || ''}</td>
-                        <td>${student.lastName || ''}</td>
-                        <td>${student.firstName || ''}</td>
-                        <td>${student.birthDate || ''}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><span style="color:#888;">العملية غير متاحة حالياً</span></td>
+                } else if (currentTab === 6) {
+                    // نتائج شهادة التعليم المتوسط (الخانات فارغة حالياً)
+                    rowHTML += `
+                        <td>${student.annualAvg || ''}</td>
+                        <td>${student.examAvg || ''}</td>
+                        <td>${student.admissionAvg || ''}</td>
+                        <td>${student.appreciation || ''}</td>
                         <td>
-                            <button class="btn" style="background:#6c757d; color:white; font-size:12px;" disabled>
-                                <i class="fas fa-lock"></i> مقفل
+                            <button class="btn btn-update" onclick="editBemMarks(${globalIndex})">
+                                <i class="fas fa-edit"></i> حجز المعدل
                             </button>
                         </td>
                     `;
-                } else { // باقي التبويبات المعتادة
-                    let statusCell = '';
-                    let operations = '';
-
-                    if (currentTab === 4) {
-                        const regStatus = student.registrationStatus || 'غير مسجل';
-                        const statusClass = regStatus === 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات' ? 'status-registered' : 'status-not-registered';
-                        statusCell = `<td><span class="${statusClass}">${regStatus === 'غير مسجل' ? 'غير مسجل' : 'مسجل'}</span></td>`;
-                        operations = `
-                            <button class="btn btn-register" onclick="openExamRegisterModal(${globalIndex})">
-                                <i class="fas fa-clipboard-check"></i> تسجيل رسمي
-                            </button>
-                        `;
-                    } else if (currentTab === 3) {
-                        operations = `
-                            <button class="btn btn-update" onclick="openEditModal(${globalIndex})">
-                                <i class="fas fa-edit"></i> تحيين البيانات
-                            </button>
-                        `;
-                        statusCell = `<td>${student.status || 'خارجي'}</td>`;
-                    } else {
-                        statusCell = `<td>${student.status || 'خارجي'}</td>`;
-                        operations = `<span style="color:#777;">متاح للمشاهدة فقط</span>`;
-                    }
-
-                    tr.innerHTML = `
-                        <td>${student.id || ''}</td>
-                        <td>${student.lastName || ''}</td>
-                        <td>${student.firstName || ''}</td>
+                } else {
+                    // التبويبات العامة الأخرى
+                    rowHTML += `
                         <td>${student.gender || ''}</td>
-                        <td>${student.birthDate || ''}</td>
-                        <td>${student.address || ''}</td>
                         <td>${student.birthPlace || ''}</td>
+                        <td>${student.address || ''}</td>
                         <td>${student.level || ''}</td>
                         <td>${student.group || ''}</td>
-                        ${statusCell}
-                        <td>${operations}</td>
+                        <td>${student.status || 'خارجي'}</td>
                     `;
+
+                    if (currentTab === 4) {
+                        const reg = student.examRegistration || 'غير مسجل';
+                        const regClass = (reg === 'غير مسجل') ? 'status-dark-red' : 'status-registered';
+                        rowHTML += `<td><span class="${regClass}">${reg}</span></td>`;
+                    }
+
+                    // عمود العمليات
+                    let ops = '';
+                    if (currentTab === 3) {
+                        ops = `
+                            <button class="btn btn-update" onclick="openEditModal(${globalIndex})">
+                                <i class="fas fa-edit"></i> تحيين
+                            </button>
+                        `;
+                    } else if (currentTab === 4) {
+                        ops = `
+                            <button class="btn btn-register" onclick="openExamRegisterModal(${globalIndex})">
+                                <i class="fas fa-clipboard-check"></i> تسجيل
+                            </button>
+                        `;
+                    } else {
+                        ops = `<span style="color:#aaa;">مؤمنة</span>`;
+                    }
+                    rowHTML += `<td>${ops}</td>`;
                 }
 
+                tr.innerHTML = rowHTML;
                 tbody.appendChild(tr);
             });
 
             renderPagination(filteredStudents.length);
         }
 
-        // معالجة مشكلة أزرار التنقل وحساب الصفحات لتجاوز الخلل القديم
+        // أرقام الصفحات الحقيقية والفعالة للتنقل بسلاسة وبدون أخطاء
         function renderPagination(totalItems) {
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             const pagination = document.getElementById('pagination');
             pagination.innerHTML = '';
 
-            // زر السابق
-            const prevBtn = document.createElement('button');
-            prevBtn.className = 'page-btn';
-            prevBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-            prevBtn.disabled = currentPage === 1;
-            prevBtn.onclick = () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    filterTable();
-                }
-            };
-            pagination.appendChild(prevBtn);
-
-            // أزرار أرقام الصفحات (تم إصلاح تشغيلها بكفاءة كاملة)
             for (let i = 1; i <= totalPages; i++) {
                 const btn = document.createElement('button');
                 btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
                 btn.textContent = i;
                 btn.onclick = () => {
                     currentPage = i;
-                    filterTable();
+                    // تصفية وعرض الصفحة المستهدفة بدقة
+                    const currentFiltered = getFilteredList();
+                    renderTable(currentFiltered);
                 };
                 pagination.appendChild(btn);
             }
-
-            // زر التالي
-            const nextBtn = document.createElement('button');
-            nextBtn.className = 'page-btn';
-            nextBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-            nextBtn.disabled = currentPage === totalPages;
-            nextBtn.onclick = () => {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    filterTable();
-                }
-            };
-            pagination.appendChild(nextBtn);
         }
 
-        // فلترة دقيقة ومتطابقة
-        function filterTable() {
+        // جلب قائمة التلاميذ المصفاة بناء على خيارات الفلترة المتاحة بكافة التبويبات
+        function getFilteredList() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
             const level = document.getElementById('filterLevel').value;
             const group = document.getElementById('filterGroup').value;
 
-            const filtered = students.filter(s => {
+            return students.filter(s => {
                 const matchesSearch = !searchTerm || 
                     (s.lastName && s.lastName.toLowerCase().includes(searchTerm)) || 
                     (s.firstName && s.firstName.toLowerCase().includes(searchTerm)) ||
@@ -997,185 +895,14 @@
 
                 return matchesSearch && matchesLevel && matchesGroup;
             });
+        }
 
+        function filterTable() {
+            const filtered = getFilteredList();
             renderTable(filtered);
         }
 
-        // تأثير التنقل الفوري المريح Processing لمده ثانيتين
-        function switchTab(tabIndex) {
-            const loader = document.getElementById('processing-loader');
-            loader.style.display = 'flex';
-
-            setTimeout(() => {
-                loader.style.display = 'none';
-                currentTab = tabIndex;
-                
-                document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-                    btn.classList.toggle('active', i === tabIndex);
-                });
-
-                // تعديل المسميات والعرض حسب التبويب
-                const sectionTitle = document.getElementById('sectionTitle');
-                const mainDisplay = document.getElementById('mainDisplayArea');
-                
-                currentPage = 1;
-
-                if (tabIndex === 1) {
-                    sectionTitle.textContent = "متابعة الدخول المدرسي (الإحصائيات والرسومات البيانية)";
-                    renderDashboard();
-                } else if (tabIndex === 7) {
-                    sectionTitle.textContent = "نسبة ملف التسجيل البيداغوجي ودفع الحقوق المدرسية";
-                    renderPedagogicRatio();
-                } else {
-                    if (tabIndex === 0) sectionTitle.textContent = "الدخول المدرسي الأساسي";
-                    if (tabIndex === 2) sectionTitle.textContent = "متابعة حجز النقاط والاستدراك";
-                    if (tabIndex === 3) sectionTitle.textContent = "تحيين بيانات التلاميذ";
-                    if (tabIndex === 4) sectionTitle.textContent = "تسجيلات الامتحانات المدرسية";
-                    if (tabIndex === 5) sectionTitle.textContent = "التسجيل البيداغوجي وتأكيد حقوق السنة الدراسية";
-                    if (tabIndex === 6) sectionTitle.textContent = "نتائج شهادة التعليم المتوسط (غير متاحة حالياً)";
-                    
-                    // استعادة منطقة الجداول
-                    mainDisplay.innerHTML = `
-                        <table id="studentsTable">
-                            <thead id="tableHeader"></thead>
-                            <tbody id="tableBody"></tbody>
-                        </table>
-                        <div class="pagination" id="pagination"></div>
-                    `;
-                    filterTable();
-                }
-            }, 2000); // ثانيتان كاملتان
-        }
-
-        // تبويب 1: بناء لوحة إحصائيات الدخول المدرسي
-        function renderDashboard() {
-            const mainDisplay = document.getElementById('mainDisplayArea');
-            document.getElementById('searchBarContainer').style.display = 'none';
-            document.getElementById('filterSection').style.display = 'none';
-
-            const total = students.length;
-            const maleCount = students.filter(s => s.gender === 'ذكر').length;
-            const femaleCount = students.filter(s => s.gender === 'أنثى').length;
-            const registeredExams = students.filter(s => s.registrationStatus === 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات').length;
-            const paidFees = students.filter(s => s.paymentStatus === 'confirmed').length;
-
-            const malePercent = total ? Math.round((maleCount / total) * 100) : 0;
-            const femalePercent = total ? Math.round((femaleCount / total) * 100) : 0;
-            const payPercent = total ? Math.round((paidFees / total) * 100) : 0;
-
-            mainDisplay.innerHTML = `
-                <div class="dashboard-grid">
-                    <div class="card">
-                        <h3>إجمالي التلاميذ المسجلين بالمنصة</h3>
-                        <div class="value">${total} تلميذ</div>
-                    </div>
-                    <div class="card success">
-                        <h3>تعداد الذكور</h3>
-                        <div class="value">${maleCount} (${malePercent}%)</div>
-                    </div>
-                    <div class="card warning">
-                        <h3>تعداد الإناث</h3>
-                        <div class="value">${femaleCount} (${femalePercent}%)</div>
-                    </div>
-                    <div class="card danger">
-                        <h3>المسجلين في الامتحانات الرسمية</h3>
-                        <div class="value">${registeredExams} / ${total}</div>
-                    </div>
-                </div>
-
-                <div class="chart-mockup">
-                    <h3 style="margin-top:0; color:var(--header-blue);">مستويات الدخول المدرسي - تمثيل بياني إحصائي</h3>
-                    <div class="bar-container">
-                        <div class="bar" style="height: ${malePercent * 2}px;" title="نسبة الذكور">${malePercent}% ذكور</div>
-                        <div class="bar" style="height: ${femalePercent * 2}px; background-color: #e83e8c;" title="نسبة الإناث">${femalePercent}% إناث</div>
-                        <div class="bar" style="height: ${payPercent * 2}px; background-color: #28a745;" title="نسبة تسوية المستحقات">${payPercent}% تسديد</div>
-                    </div>
-                    <p style="margin-top: 15px; font-size:12px; color:#666;">ملاحظة: يتم تحديث هذه البيانات والأعمدة البيانية تلقائياً وبشكل نهائي فور حفظ وتعديل معلومات التلاميذ بالمنصة.</p>
-                </div>
-            `;
-        }
-
-        // تبويب 7: إحصائيات ملفات التسجيل والدفع
-        function renderPedagogicRatio() {
-            const mainDisplay = document.getElementById('mainDisplayArea');
-            document.getElementById('searchBarContainer').style.display = 'none';
-            document.getElementById('filterSection').style.display = 'none';
-
-            const total = students.length;
-            const paid = students.filter(s => s.paymentStatus === 'confirmed').length;
-            const unpaid = total - paid;
-            const ratio = total ? Math.round((paid / total) * 100) : 0;
-
-            mainDisplay.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 8px; border:1px solid #ddd; text-align:center;">
-                    <h2 style="color: var(--header-blue); margin-bottom: 20px;">تقرير دفع الحقوق المدرسية وملفات التلاميذ البيداغوجية</h2>
-                    <div style="font-size: 80px; font-weight: bold; color: var(--success-green); margin-bottom: 10px;">${ratio}%</div>
-                    <p style="font-size: 18px; font-weight: bold;">نسبة الملفات البيداغوجية المكتملة الدفع</p>
-                    
-                    <div style="display:flex; justify-content: space-around; max-width:600px; margin: 30px auto; border-top: 1px solid #eee; padding-top:20px;">
-                        <div>
-                            <div style="font-size:24px; font-weight:bold; color:#0056b3;">${paid}</div>
-                            <div style="color:#555;">ملفات مدفوعة</div>
-                        </div>
-                        <div>
-                            <div style="font-size:24px; font-weight:bold; color:var(--pending-orange);">${unpaid}</div>
-                            <div style="color:#555;">قيد الانتظار وتثبيت الدفع</div>
-                        </div>
-                        <div>
-                            <div style="font-size:24px; font-weight:bold; color:#333;">${total}</div>
-                            <div style="color:#555;">العدد الإجمالي</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // فتح النافذة البيداغوجية الموسعة والتحكم في الخيارات
-        function openPedagogicModal(index) {
-            currentPedIndex = index;
-            const student = students[index];
-            const modal = document.getElementById('pedagogicModal');
-            
-            const detailArea = document.getElementById('pedagogicStudentDetail');
-            detailArea.innerHTML = `
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:15px; font-size:15px;">
-                    <div><strong>رقم التعريف:</strong> ${student.id}</div>
-                    <div><strong>اللقب والاسم:</strong> ${student.lastName} ${student.firstName}</div>
-                    <div><strong>تاريخ ومكان الميلاد:</strong> ${student.birthDate} بـ ${student.birthPlace}</div>
-                    <div><strong>العنوان المسجل:</strong> ${student.address}</div>
-                </div>
-            `;
-
-            const currentStatusText = student.paymentStatus === 'confirmed' ? 'تم تأكيد الدفع (أزرق)' : 'قيد الانتظار (برتقالي)';
-            document.getElementById('currentModalPayStatus').textContent = currentStatusText;
-            document.getElementById('payDecisionSelect').value = student.paymentStatus || 'pending';
-
-            modal.style.display = 'flex';
-        }
-
-        // معالجة خيارات زر "حجز" وزر "إلغاء" وحفظها بقاعدة البيانات
-        function savePedagogicDecision(action) {
-            if (currentPedIndex === -1) return;
-            const selectValue = document.getElementById('payDecisionSelect').value;
-
-            if (action === 'confirm') {
-                students[currentPedIndex].paymentStatus = 'confirmed';
-                Swal.fire('تم التسجيل!', 'تم تثبيت دفع الحقوق المدرسية بنجاح.', 'success');
-            } else if (action === 'cancel') {
-                students[currentPedIndex].paymentStatus = 'pending';
-                Swal.fire('تم إلغاء التسجيل!', 'تم إلغاء تأكيد الدفع وتحويل الحالة لقيد الانتظار.', 'warning');
-            }
-
-            saveToDatabase();
-            closePedagogicModal();
-            filterTable();
-        }
-
-        function closePedagogicModal() {
-            document.getElementById('pedagogicModal').style.display = 'none';
-        }
-
-        // استيراد ملف Excel
+        // استيراد ملف Excel مخصص للدخول المدرسي فقط
         function importExcel(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1189,8 +916,8 @@
                     const worksheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-                    const imported = jsonData.map((row, idx) => ({
-                        id: String(row['رقم التعريف'] || row['ID'] || (20260000 + idx + 1)),
+                    students = jsonData.map((row, index) => ({
+                        id: String(row['رقم التعريف'] || row['ID'] || (20260000 + index + 1)),
                         lastName: row['اللقب'] || row['LastName'] || '',
                         firstName: row['الاسم'] || row['FirstName'] || '',
                         gender: row['الجنس'] || 'ذكر',
@@ -1198,74 +925,77 @@
                         address: row['العنوان'] || '',
                         birthPlace: row['مكان الميلاد'] || 'الجزائر',
                         level: row['المستوى'] || 'رابعة',
-                        group: String(row['رقم الفوج'] || 1),
+                        group: String(row['رقم الفوج'] || '1'),
                         status: row['الصفة'] || 'خارجي',
-                        registrationStatus: 'غير مسجل', // القيمة التلقائية المطلوبة باللون الأحمر الداكن
-                        paymentStatus: 'pending' // القيمة التلقائية للبيداغوجي (قيد الانتظار البرتقالي)
+                        examRegistration: row['حالة التسجيل'] || 'غير مسجل',
+                        paymentStatus: row['حالة الدفع'] || 'pending',
+                        annualAvg: '',
+                        examAvg: '',
+                        admissionAvg: '',
+                        appreciation: ''
                     }));
 
-                    students = imported;
                     saveToDatabase();
-                    Swal.fire('تم بنجاح!', `تم استيراد ${imported.length} تلميذ بنجاح وحفظهم في قاعدة البيانات.`, 'success');
+                    Swal.fire('تم الاستيراد!', 'تم تحميل قاعدة بيانات التلاميذ بنجاح.', 'success');
+                    currentPage = 1;
                     filterTable();
                 } catch (err) {
-                    Swal.fire('خطأ!', 'فشل استيراد الملف، تأكد من مطابقة مسميات الأعمدة في الإكسيل.', 'error');
+                    Swal.fire('خطأ', 'فشل في قراءة الملف، يرجى التحقق من بنية الإكسيل.', 'error');
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // تصدير البيانات إلى ملف Excel منظم ومعطيات المؤسسة
-        function exportTable() {
+        // تصدير ملفات Excel مخصصة ومنظمة بكافة المعطيات ومعلومات المؤسسة
+        function exportExcelFile() {
             if (students.length === 0) {
-                Swal.fire('تحذير', 'لا توجد بيانات متاحة للتصدير حالياً بالمنصة', 'warning');
+                Swal.fire('تنبيه', 'لا توجد بيانات متاحة للتصدير حالياً.', 'warning');
                 return;
             }
 
-            // تجهيز البيانات لتكون متناسقة ومنظمة
-            const exportData = students.map(s => ({
-                'رقم التعريف المدرسي': s.id,
-                'اللقب': s.lastName,
-                'الاسم': s.firstName,
-                'الجنس': s.gender,
-                'تاريخ الميلاد': s.birthDate,
-                'مكان الميلاد': s.birthPlace,
-                'العنوان الشخصي': s.address,
-                'المستوى التعليمي': s.level,
-                'رقم الفوج': s.group,
-                'الصفة': s.status,
-                'حالة التسجيل بالامتحان': s.registrationStatus === 'غير مسجل' ? 'غير مسجل' : 'مسجل',
-                'حالة الدفع البيداغوجي': s.paymentStatus === 'confirmed' ? 'تم الدفع وتثبيت التسجيل بيداغوجياً' : 'قيد الانتظار'
+            const headerInfo = [
+                ["الجمهورية الجزائرية الديمقراطية الشعبية"],
+                ["وزارة التربية الوطنية"],
+                ["مديرية التربية للجزائر غرب - متوسطة الشهيد خالد مكاوي سطاوالي"],
+                ["تقرير البيانات المصدرة للسنة الدراسية: 2026-2027"],
+                []
+            ];
+
+            const currentFiltered = getFilteredList();
+            const wsData = currentFiltered.map(s => ({
+                "رقم التعريف": s.id,
+                "اللقب": s.lastName,
+                "الاسم": s.firstName,
+                "تاريخ الميلاد": s.birthDate,
+                "مكان الميلاد": s.birthPlace,
+                "العنوان": s.address,
+                "الجنس": s.gender,
+                "المستوى": s.level,
+                "الفوج": s.group,
+                "الصفة": s.status,
+                "حالة التسجيل بالامتحانات": s.examRegistration || 'غير مسجل',
+                "حقوق التسجيل البيداغوجي": s.paymentStatus === 'confirmed' ? 'مؤكدة' : 'قيد الانتظار'
             }));
 
-            const ws = XLSX.utils.json_to_sheet(exportData);
-            
-            // إضافة سطر لمعلومات المؤسسة في أعلى الملف لتنظيمه بشكل احترافي
-            XLSX.utils.sheet_add_aoa(ws, [
-                ["الجمهورية الجزائرية الديمقراطية الشعبية"],
-                ["وزارة التربية الوطنية - مديرية التربية للجزائر غرب"],
-                ["متوسطة الشهيد خالد مكاوي (سطاوالي) - جدول معطيات التلاميذ المنظم"],
-                []
-            ], { origin: "A1" });
+            const ws = XLSX.utils.json_to_sheet([]);
+            XLSX.utils.sheet_add_aoa(ws, headerInfo, { origin: "A1" });
+            XLSX.utils.sheet_add_json(ws, wsData, { origin: "A6", skipHeader: false });
 
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "قائمة التلاميذ الإجمالية");
-            XLSX.writeFile(wb, "المنصة_الرقمية_بيانات_التلاميذ_المؤسسة.xlsx");
-            
-            Swal.fire('نجاح التصدير', 'تم استخراج ملف إكسيل منظم ومتناسق بالكامل.', 'success');
+            XLSX.utils.book_append_sheet(wb, ws, "التقرير الرقمي");
+            XLSX.writeFile(wb, "التقرير_الرقمي_المؤسسة_2026.xlsx");
         }
 
         // تحيين البيانات (Tab 3)
         function openEditModal(index) {
             currentEditIndex = index;
             const student = students[index];
-            const modal = document.getElementById('updateModal');
             const formContainer = document.getElementById('modalForm');
             
             formContainer.innerHTML = `
                 <div class="form-group">
                     <label>رقم التعريف</label>
-                    <input type="text" id="editId" value="${student.id || ''}" readonly style="background:#f0f0f0;">
+                    <input type="text" id="editId" value="${student.id || ''}">
                 </div>
                 <div class="form-group">
                     <label>اللقب</label>
@@ -1310,25 +1040,25 @@
                     </select>
                 </div>
             `;
-
-            modal.style.display = 'flex';
+            document.getElementById('updateModal').style.display = 'flex';
         }
 
         function confirmUpdate() {
             if (currentEditIndex === -1) return;
-            const student = students[currentEditIndex];
+            const s = students[currentEditIndex];
 
-            student.lastName = document.getElementById('editLast').value;
-            student.firstName = document.getElementById('editFirst').value;
-            student.gender = document.getElementById('editGender').value;
-            student.birthDate = document.getElementById('editBirth').value;
-            student.address = document.getElementById('editAddress').value;
-            student.birthPlace = document.getElementById('editBirthPlace').value;
-            student.group = document.getElementById('editGroup').value;
+            s.id = document.getElementById('editId').value;
+            s.lastName = document.getElementById('editLast').value;
+            s.firstName = document.getElementById('editFirst').value;
+            s.gender = document.getElementById('editGender').value;
+            s.birthDate = document.getElementById('editBirth').value;
+            s.address = document.getElementById('editAddress').value;
+            s.birthPlace = document.getElementById('editBirthPlace').value;
+            s.group = document.getElementById('editGroup').value;
 
             saveToDatabase();
             closeModal();
-            Swal.fire('تم التحيين!', 'تم حفظ وتحديث بيانات التلميذ بقاعدة البيانات.', 'success');
+            Swal.fire('نجاح التحيين', 'تم تعديل بيانات التلميذ وتأكيدها نهائياً.', 'success');
             filterTable();
         }
 
@@ -1336,46 +1066,34 @@
             document.getElementById('updateModal').style.display = 'none';
         }
 
-        // تسجيل الامتحانات الرسمية (Tab 4)
+        // امتحانات رسمية (Tab 4)
         function openExamRegisterModal(index) {
             currentExamIndex = index;
             const student = students[index];
-            const modal = document.getElementById('examRegisterModal');
             
             document.getElementById('studentInfoSection').innerHTML = `
-                <div style="text-align:center; margin-bottom:20px;">
-                    <h3>تفاصيل تلميذ شهادة رابعة متوسط</h3>
-                    <div class="info-box">
-                        ${student.lastName || ''} ${student.firstName || ''}
-                    </div>
-                </div>
-                <div class="student-info-grid">
-                    <div><strong>رقم التعريف الوطني:</strong> ${student.id}</div>
-                    <div><strong>تاريخ الميلاد:</strong> ${student.birthDate || ''}</div>
-                    <div><strong>مكان الإقامة والبلدية:</strong> ${student.address || ''}</div>
+                <div style="background: var(--faint-blue); padding: 15px; border-radius: 6px; text-align: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: var(--header-blue);">${student.lastName} ${student.firstName}</h3>
                 </div>
             `;
-
             document.getElementById('fatherName').value = '';
             document.getElementById('motherName').value = '';
             document.getElementById('registrationSelect').value = '';
-
-            modal.style.display = 'flex';
+            document.getElementById('examRegisterModal').style.display = 'flex';
         }
 
         function confirmExamRegistration() {
             if (currentExamIndex === -1) return;
-            const selectValue = document.getElementById('registrationSelect').value;
-            
-            if (!selectValue) {
-                Swal.fire('تنبيه هام', 'يرجى تأكيد حالة التسجيل من القائمة الاختيارية أولاً لإرسال الملف للديوان.', 'error');
+            const sel = document.getElementById('registrationSelect').value;
+            if (!sel) {
+                Swal.fire('خطأ', 'يرجى اختيار حالة التسجيل المعتمدة.', 'error');
                 return;
             }
 
-            students[currentExamIndex].registrationStatus = 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات';
+            students[currentExamIndex].examRegistration = 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات';
             saveToDatabase();
             closeExamModal();
-            Swal.fire('مبارك التسجيل!', 'تم قيد التلميذ بنجاح في امتحانات شهادة التعليم المتوسط بالديوان الوطني.', 'success');
+            Swal.fire('تم التسجيل', 'تم إدراج وتثبيت التلميذ بملف الامتحانات بنجاح.', 'success');
             filterTable();
         }
 
@@ -1383,9 +1101,348 @@
             document.getElementById('examRegisterModal').style.display = 'none';
         }
 
-        // تشغيل المنصة عند التحميل
-        window.onload = function() {
+        // العمليات البيداغوجية المتداخلة (Tab 5)
+        function openPedagogicConfirmModal(index) {
+            currentPedagogicIndex = index;
+            const s = students[index];
+            document.getElementById('nestedStudentName').innerText = `${s.lastName} ${s.firstName}`;
+            document.getElementById('nestedPaymentState').innerText = s.paymentStatus === 'confirmed' ? 'تم الدفع بنجاح' : 'قيد الانتظار';
+            document.getElementById('pedagogicActionSelect').value = '';
+            document.getElementById('pedagogicConfirmModal').style.display = 'flex';
+        }
+
+        function executePedagogicAction() {
+            if (currentPedagogicIndex === -1) return;
+            const action = document.getElementById('pedagogicActionSelect').value;
+            
+            if (action === 'confirm') {
+                students[currentPedagogicIndex].paymentStatus = 'confirmed';
+                Swal.fire('تم التأكيد', 'تم تأكيد حجز دفع حقوق التسجيل بصفة رسمية.', 'success');
+            } else if (action === 'cancel') {
+                students[currentPedagogicIndex].paymentStatus = 'pending';
+                Swal.fire('تم الإلغاء', 'تم إلغاء حجز الدفع وإرجاع التلميذ لقيد الانتظار.', 'warning');
+            } else {
+                Swal.fire('تنبه', 'يرجى تحديد عملية الحجز أو الإلغاء للمواصلة.', 'info');
+                return;
+            }
+
+            saveToDatabase();
+            closePedagogicModal();
             filterTable();
+        }
+
+        function closePedagogicModal() {
+            document.getElementById('pedagogicConfirmModal').style.display = 'none';
+        }
+
+        function registerAllStudents() {
+            if (students.length === 0) return;
+            students.forEach(s => s.paymentStatus = 'confirmed');
+            saveToDatabase();
+            Swal.fire('مكتمل', 'تم تسجيل وتأكيد الدفع لكافة تلاميذ المؤسسة بنجاح.', 'success');
+            filterTable();
+        }
+
+        function unregisterAllStudents() {
+            if (students.length === 0) return;
+            students.forEach(s => s.paymentStatus = 'pending');
+            saveToDatabase();
+            Swal.fire('مكتمل', 'تم إلغاء تسجيل وتصفير حقوق دفع كافة تلاميذ المؤسسة بصفة مؤقتة.', 'warning');
+            filterTable();
+        }
+
+        // حجز نتائج البيام (Tab 6)
+        function editBemMarks(index) {
+            const s = students[index];
+            Swal.fire({
+                title: 'حجز معدلات التلميذ',
+                html: `
+                    <div style="text-align: right; direction: rtl;">
+                        <label>المعدل السنوي:</label>
+                        <input type="number" step="0.01" id="bemAnnual" class="swal2-input" value="${s.annualAvg || ''}">
+                        <label>معدل الشهادة:</label>
+                        <input type="number" step="0.01" id="bemExam" class="swal2-input" value="${s.examAvg || ''}">
+                    </div>
+                `,
+                confirmButtonText: 'حفظ العلامات',
+                showCancelButton: true,
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const ann = parseFloat(document.getElementById('bemAnnual').value) || 0;
+                    const exm = parseFloat(document.getElementById('bemExam').value) || 0;
+                    const adm = parseFloat(((ann + exm) / 2).toFixed(2));
+
+                    students[index].annualAvg = ann;
+                    students[index].examAvg = exm;
+                    students[index].admissionAvg = adm;
+                    students[index].appreciation = adm >= 10 ? 'مقبول' : 'مرفوض';
+
+                    saveToDatabase();
+                    filterTable();
+                    Swal.fire('تم الحفظ', 'تم تقييد وحفظ كشوف المعدلات بنجاح.', 'success');
+                }
+            });
+        }
+
+        // التفويج الآلي الصارم والنهائي (35 تلميذ بكل فوج، مع إضافة تلميذين للفوج الأول ليكون 37)
+        function applyAutoGrouping() {
+            if (students.length === 0) {
+                Swal.fire('تنبيه', 'لا توجد معطيات للتلاميذ لتفويجهم.', 'warning');
+                return;
+            }
+
+            // خوارزمية توزيع التلاميذ على 3 أفواج ثابتة
+            students.forEach((s, idx) => {
+                if (idx < 37) {
+                    s.group = "1"; // فوج 1 يحتوي على 37 تلميذاً كحد أقصى بزيادة تلميذين
+                } else if (idx < 37 + 35) {
+                    s.group = "2"; // فوج 2 يحتوي على 35 تلميذاً
+                } else {
+                    s.group = "3"; // الفوج المتبقي (35 تلميذاً أو البقية)
+                }
+            });
+
+            saveToDatabase();
+            Swal.fire('تم التفويج الآلي', 'تم تثبيت التفويج بحدود 35 تلميذاً وتخصيص 37 تلميذاً للفوج الأول بنجاح تام.', 'success');
+            renderStats();
+        }
+
+        // بناء لوحة الإحصائيات والأشكال البيانية الحقيقية التفاعلية
+        function renderStats() {
+            const total = students.length;
+            const g1 = students.filter(s => s.group === '1').length;
+            const g2 = students.filter(s => s.group === '2').length;
+            const g3 = students.filter(s => s.group === '3').length;
+            const other = total - (g1 + g2 + g3);
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statG1').innerText = g1;
+            document.getElementById('statG2').innerText = g2;
+            document.getElementById('statG3').innerText = g3;
+            document.getElementById('statG0').innerText = other;
+
+            const ctx = document.getElementById('chartGroups').getContext('2d');
+            if (chartInstance) { chartInstance.destroy(); }
+
+            chartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['الفوج 1', 'الفوج 2', 'الفوج 3', 'غير مفوج'],
+                    datasets: [{
+                        data: [g1, g2, g3, other],
+                        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // طباعة القوائم البيداغوجية المتكاملة مع وزارة التربية الوطنية بخط Droid Arabic Kufi
+        function printPedagogicList() {
+            const level = document.getElementById('filterLevel').value;
+            const group = document.getElementById('filterGroup').value;
+            const currentFiltered = getFilteredList();
+
+            let printWindow = window.open('', '_blank');
+            let rowsHTML = '';
+            currentFiltered.forEach((s, index) => {
+                rowsHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${s.id || ''}</td>
+                        <td>${s.lastName || ''}</td>
+                        <td>${s.firstName || ''}</td>
+                        <td>${s.gender || ''}</td>
+                        <td>${s.birthDate || ''}</td>
+                        <td>${s.birthPlace || ''}</td>
+                        <td>${s.level || ''}</td>
+                        <td>${s.group || ''}</td>
+                        <td>${s.status || 'خارجي'}</td>
+                    </tr>
+                `;
+            });
+
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>قوائم التلاميذ البيداغوجية</title>
+                    <style>
+                        body {
+                            font-family: 'Droid Arabic Kufi', 'Noto Kufi Arabic', sans-serif;
+                            direction: rtl;
+                            padding: 20px;
+                        }
+                        .header-print {
+                            text-align: center;
+                            line-height: 1.8;
+                            margin-bottom: 20px;
+                        }
+                        .institution-info {
+                            float: right;
+                            text-align: right;
+                            font-size: 13px;
+                        }
+                        .clear { clear: both; }
+                        h2 { text-align: center; margin-top: 15px; font-size: 18px; }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                        }
+                        th, td {
+                            border: 1px solid #000;
+                            padding: 6px;
+                            text-align: center;
+                            font-size: 11px;
+                        }
+                        th { background-color: #f2f2f2; }
+                    </style>
+                </head>
+                <body onload="window.print()">
+                    <div class="header-print">
+                        <strong>الجمهورية الجزائرية الديمقراطية الشعبية</strong><br>
+                        <strong>وزارة التربية الوطنية</strong>
+                    </div>
+                    <div class="institution-info">
+                        مديرية التربية للجزائر غرب<br>
+                        متوسطة الشهيد خالد مكاوي سطاوالي<br>
+                        المستوى المختار: ${level} | الفوج المختار: ${group}
+                    </div>
+                    <div class="clear"></div>
+                    <h2>قوائم التلاميذ للسنة الدراسية 2026-2027</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 4%">رقم</th>
+                                <th>رقم التعريف</th>
+                                <th>اللقب</th>
+                                <th>الاسم</th>
+                                <th>الجنس</th>
+                                <th>تاريخ الميلاد</th>
+                                <th>مكان الميلاد</th>
+                                <th>المستوى</th>
+                                <th>الفوج</th>
+                                <th>الصفة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHTML}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // طباعة نتائج شهادة التعليم المتوسط بخط Droid Arabic Kufi المنسق
+        function printBemResults() {
+            const currentFiltered = getFilteredList();
+            let printWindow = window.open('', '_blank');
+            let rowsHTML = '';
+            
+            currentFiltered.forEach((s, index) => {
+                rowsHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${s.id || ''}</td>
+                        <td>${s.lastName || ''}</td>
+                        <td>${s.firstName || ''}</td>
+                        <td>${s.birthDate || ''}</td>
+                        <td>${s.annualAvg || ''}</td>
+                        <td>${s.examAvg || ''}</td>
+                        <td>${s.admissionAvg || ''}</td>
+                        <td>${s.appreciation || ''}</td>
+                    </tr>
+                `;
+            });
+
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>نتائج شهادة التعليم المتوسط</title>
+                    <style>
+                        body {
+                            font-family: 'Droid Arabic Kufi', 'Noto Kufi Arabic', sans-serif;
+                            direction: rtl;
+                            padding: 20px;
+                        }
+                        .header-print {
+                            text-align: center;
+                            line-height: 1.8;
+                            margin-bottom: 20px;
+                        }
+                        .institution-info {
+                            float: right;
+                            text-align: right;
+                            font-size: 13px;
+                        }
+                        .clear { clear: both; }
+                        h2 { text-align: center; margin-top: 15px; font-size: 18px; }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                        }
+                        th, td {
+                            border: 1px solid #000;
+                            padding: 8px;
+                            text-align: center;
+                            font-size: 12px;
+                        }
+                        th { background-color: #f2f2f2; }
+                    </style>
+                </head>
+                <body onload="window.print()">
+                    <div class="header-print">
+                        <strong>الجمهورية الجزائرية الديمقراطية الشعبية</strong><br>
+                        <strong>وزارة التربية الوطنية</strong>
+                    </div>
+                    <div class="institution-info">
+                        مديرية التربية للجزائر غرب<br>
+                        متوسطة الشهيد خالد مكاوي سطاوالي
+                    </div>
+                    <div class="clear"></div>
+                    <h2>نتائج ومعدلات شهادة التعليم المتوسط للسنة الدراسية 2026-2027</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">رقم</th>
+                                <th>رقم التعريف</th>
+                                <th>اللقب</th>
+                                <th>الاسم</th>
+                                <th>تاريخ الميلاد</th>
+                                <th>المعدل السنوي</th>
+                                <th>معدل الشهادة</th>
+                                <th>معدل القبول</th>
+                                <th>التقديرات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHTML}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // بدء تشغيل المنصة واسترجاع الجداول تلقائياً
+        window.onload = function() {
+            renderTableHeader();
+            filterTable();
+            Swal.fire({
+                title: 'تأكيد الاتصال والمزامنة',
+                text: 'تم تفعيل قاعدة البيانات وتطبيق الرزنامة لغاية 2026-2027.',
+                icon: 'success',
+                timer: 3000
+            });
         };
     </script>
 </body>
