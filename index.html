@@ -634,7 +634,7 @@
     </div>
 
     <script>
-        // إعداد قاعدة البيانات واسترجاعها نهائياً من الـ localStorage
+        // إعداد قاعدة البيانات واسترجاعها نهائياً من الـ localStorage لضمان عدم الضياع
         let students = JSON.parse(localStorage.getItem('students_db')) || [];
         let chartInstance = null;
 
@@ -730,12 +730,11 @@
                 headerHTML += '<th>حالة الدفع</th>';
                 headerHTML += '<th>عمليات</th>';
             } else if (currentTab === 6) {
-                // نتائج البيام شهادة التعليم المتوسط
+                // نتائج شهادة التعليم المتوسط
                 headerHTML += '<th>المعدل السنوي</th>';
                 headerHTML += '<th>معدل الشهادة</th>';
                 headerHTML += '<th>معدل القبول</th>';
                 headerHTML += '<th>التقديرات</th>';
-                headerHTML += '<th>عمليات</th>';
             } else {
                 // بقية الأقسام القياسية
                 headerHTML += '<th>الجنس</th>';
@@ -802,17 +801,12 @@
                         </td>
                     `;
                 } else if (currentTab === 6) {
-                    // نتائج شهادة التعليم المتوسط (الخانات فارغة حالياً)
+                    // نتائج شهادة التعليم المتوسط (تم إلغاء زر حجز المعدل بناءً على طلبك)
                     rowHTML += `
                         <td>${student.annualAvg || ''}</td>
                         <td>${student.examAvg || ''}</td>
                         <td>${student.admissionAvg || ''}</td>
                         <td>${student.appreciation || ''}</td>
-                        <td>
-                            <button class="btn btn-update" onclick="editBemMarks(${globalIndex})">
-                                <i class="fas fa-edit"></i> حجز المعدل
-                            </button>
-                        </td>
                     `;
                 } else {
                     // التبويبات العامة الأخرى
@@ -1149,40 +1143,6 @@
             saveToDatabase();
             Swal.fire('مكتمل', 'تم إلغاء تسجيل وتصفير حقوق دفع كافة تلاميذ المؤسسة بصفة مؤقتة.', 'warning');
             filterTable();
-        }
-
-        // حجز نتائج البيام (Tab 6)
-        function editBemMarks(index) {
-            const s = students[index];
-            Swal.fire({
-                title: 'حجز معدلات التلميذ',
-                html: `
-                    <div style="text-align: right; direction: rtl;">
-                        <label>المعدل السنوي:</label>
-                        <input type="number" step="0.01" id="bemAnnual" class="swal2-input" value="${s.annualAvg || ''}">
-                        <label>معدل الشهادة:</label>
-                        <input type="number" step="0.01" id="bemExam" class="swal2-input" value="${s.examAvg || ''}">
-                    </div>
-                `,
-                confirmButtonText: 'حفظ العلامات',
-                showCancelButton: true,
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const ann = parseFloat(document.getElementById('bemAnnual').value) || 0;
-                    const exm = parseFloat(document.getElementById('bemExam').value) || 0;
-                    const adm = parseFloat(((ann + exm) / 2).toFixed(2));
-
-                    students[index].annualAvg = ann;
-                    students[index].examAvg = exm;
-                    students[index].admissionAvg = adm;
-                    students[index].appreciation = adm >= 10 ? 'مقبول' : 'مرفوض';
-
-                    saveToDatabase();
-                    filterTable();
-                    Swal.fire('تم الحفظ', 'تم تقييد وحفظ كشوف المعدلات بنجاح.', 'success');
-                }
-            });
         }
 
         // التفويج الآلي الصارم والنهائي (35 تلميذ بكل فوج، مع إضافة تلميذين للفوج الأول ليكون 37)
