@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- مكتبات لتوليد الكود بار والـ QR Code رقمياً بالشهادة المدرسية بدون إطارات -->
+    <!-- مكتبات لتوليد الكود بار والـ QR Code رقمياً بالشهادة المدرسية وبطاقة التوجيه بدون إطارات -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -250,6 +250,7 @@
         .btn-register { background-color: #007bff; color: white; font-size: 12px; padding: 4px 8px; }
         .btn-print { background-color: #6c757d; color: white; }
         .btn-school-cert { background-color: #ff8c00; color: white; font-size: 12px; padding: 4px 8px; }
+        .btn-guidance { background-color: #6f42c1; color: white; font-size: 12px; padding: 4px 8px; }
         .btn-auto-group { background-color: #6f42c1; color: white; }
 
         .status-dark-red {
@@ -387,7 +388,7 @@
 
     <div id="loadingOverlay">
         <div class="spinner"></div>
-        <div class="loading-text">Processing...</div>
+        <div class="loading-text">جاري المعالجة الرقمية...</div>
     </div>
 
     <header class="top-navbar">
@@ -415,7 +416,8 @@
                     <button class="tab-btn" onclick="switchTab(3)">تحيين بيانات التلاميذ</button>
                     <button class="tab-btn" onclick="switchTab(4)">تسجيلات الامتحانات الرسمية</button>
                     <button class="tab-btn" onclick="switchTab(5)">التسجيل البيداغوجي</button>
-                    <button class="tab-btn" onclick="switchTab(6)">نتائج شهادة التعليم المتوسط</button>
+                    <button class="tab-btn" onclick="switchTab(6)">حجز التوجيه المسبق والنهائي</button>
+                    <button class="tab-btn" onclick="switchTab(7)">نتائج شهادة التعليم المتوسط</button>
                 </div>
 
                 <div id="schoolAlert" class="alert-message" style="display: none;">
@@ -529,6 +531,7 @@
         </div>
     </div>
 
+    <!-- نافذة تحيين بيانات التلميذ -->
     <div id="updateModal" class="modal">
         <div class="modal-content-wide">
             <div class="modal-header">تحيين بيانات التلميذ</div>
@@ -542,7 +545,7 @@
         </div>
     </div>
 
-    <!-- نافذة تسجيل الامتحانات الرسمية المحدثة بقوائم مديرية التربية ومركز الإجراء -->
+    <!-- نافذة تسجيل الامتحانات الرسمية -->
     <div id="examRegisterModal" class="modal">
         <div class="modal-content-wide">
             <div class="modal-header">تسجيل التلميذ في الامتحانات الرسمية</div>
@@ -606,6 +609,112 @@
             <div class="modal-footer">
                 <button class="btn" style="background:#28a745; color:white;" onclick="confirmExamRegistration()">تأكيد التسجيل</button>
                 <button class="btn" style="background:#dc3545; color:white;" onclick="closeExamModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة حجز التوجيه (المسبق والنهائي) وبطاقة المتابعة -->
+    <div id="guidanceModal" class="modal">
+        <div class="modal-content-wide">
+            <div class="modal-header">حجز التوجيه المسبق والنهائي وإعداد بطاقة المتابعة</div>
+            <div class="modal-body">
+                <div id="guidanceStudentTitle" style="font-weight:bold; color:var(--header-blue); margin-bottom:15px; font-size:16px;"></div>
+                
+                <h4 style="color:var(--main-blue); border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:10px;">1. الرغبات والمقترحات (التوجيه المسبق والنهائي)</h4>
+                <div class="form-grid" style="margin-top:10px;">
+                    <div class="form-group">
+                        <label>الرغبة الأولى</label>
+                        <select id="pref1">
+                            <option value="">--اختر--</option>
+                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
+                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
+                            <option value="تكوين مهني">تكوين مهني</option>
+                            <option value="تعليم مهني">تعليم مهني</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الرغبة الثانية</label>
+                        <select id="pref2">
+                            <option value="">--اختر--</option>
+                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
+                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
+                            <option value="تكوين مهني">تكوين مهني</option>
+                            <option value="تعليم مهني">تعليم مهني</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الرغبة الثالثة</label>
+                        <select id="pref3">
+                            <option value="">--اختر--</option>
+                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
+                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
+                            <option value="تكوين مهني">تكوين مهني</option>
+                            <option value="تعليم مهني">تعليم مهني</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid" style="margin-top:10px;">
+                    <div class="form-group">
+                        <label>الرغبة الرابعة</label>
+                        <select id="pref4">
+                            <option value="">--اختر--</option>
+                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
+                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
+                            <option value="تكوين مهني">تكوين مهني</option>
+                            <option value="تعليم مهني">تعليم مهني</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>اقتراح مجلس القسم</label>
+                        <select id="councilProposal">
+                            <option value="">--اختر--</option>
+                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
+                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
+                            <option value="تكوين مهني">تكوين مهني</option>
+                            <option value="تعليم مهني">تعليم مهني</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>قرار التوجيه النهائي</label>
+                        <select id="finalGuidance">
+                            <option value="">--اختر--</option>
+                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
+                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
+                            <option value="تكوين مهني">تكوين مهني</option>
+                            <option value="تعليم مهني">تعليم مهني</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h4 style="color:var(--main-blue); border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">2. معلومات ولي الأمر والعنوان</h4>
+                <div class="form-grid" style="margin-top:10px;">
+                    <div class="form-group"><label>اسم ولقب ولي الأمر</label><input type="text" id="guardianName" placeholder="اسم ولي الأمر"></div>
+                    <div class="form-group"><label>صلة القرابة</label><input type="text" id="guardianRelation" placeholder="أب / أم / ولي"></div>
+                    <div class="form-group"><label>المهنة</label><input type="text" id="guardianJob" placeholder="مهنة ولي الأمر"></div>
+                    <div class="form-group"><label>رقم الهاتف</label><input type="text" id="guardianPhone" placeholder="رقم الهاتف"></div>
+                </div>
+
+                <h4 style="color:var(--main-blue); border-bottom:1px solid #ddd; padding-bottom:5px; margin-top:20px;">3. المواظبة والسلوك</h4>
+                <div class="form-grid" style="margin-top:10px;">
+                    <div class="form-group"><label>الغيابات المبررة</label><input type="number" id="absMbr" value="0"></div>
+                    <div class="form-group"><label>الغيابات غير المبررة</label><input type="number" id="absGhr" value="0"></div>
+                    <div class="form-group"><label>التأخرات</label><input type="number" id="takh" value="0"></div>
+                    <div class="form-group">
+                        <label>السلوك العام</label>
+                        <select id="generalBehavior">
+                            <option value="ممتاز">ممتاز</option>
+                            <option value="جيد جداً">جيد جداً</option>
+                            <option value="جيد" selected>جيد</option>
+                            <option value="مقبول">مقبول</option>
+                            <option value="يحتاج متابعة">يحتاج متابعة</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background:#28a745; color:white;" onclick="saveGuidanceData()">حفظ التوجيهات والمتابعة</button>
+                <button class="btn" style="background:#6f42c1; color:white;" onclick="printFollowUpCard()"><i class="fas fa-print"></i> طباعة بطاقة المتابعة والتوجيه (صفحتان)</button>
+                <button class="btn" style="background:#dc3545; color:white;" onclick="closeGuidanceModal()">إغلاق</button>
             </div>
         </div>
     </div>
@@ -706,6 +815,7 @@
         let currentEditIndex = -1;
         let currentExamIndex = -1;
         let currentPedagogicIndex = -1;
+        let currentGuidanceIndex = -1;
         let currentTab = 0;
         let analyticsChartInstance = null;
         let certSerialNumber = parseInt(localStorage.getItem('cert_serial_number')) || 100;
@@ -782,7 +892,6 @@
             printWindow.document.close();
         }
 
-        // دالة طباعة الشهادة المدرسية 100% رقمية مع باركود و QR وبخط Droid Arabic Kufi
         function printSchoolCertificate(index) {
             const student = students[index];
             certSerialNumber++;
@@ -885,7 +994,6 @@
             printWindow.document.close();
         }
 
-        // دالة طباعة وصل تسجيل الامتحانات الرسمية مع الـ QR Code والباركود بخط Droid Arabic Kufi
         function printExamReceipt(index) {
             const student = students[index];
             const printWindow = window.open('', '_blank');
@@ -978,6 +1086,158 @@
             printWindow.document.close();
         }
 
+        function printFollowUpCard() {
+            if (currentGuidanceIndex === -1) return;
+            const student = students[currentGuidanceIndex];
+            const printWindow = window.open('', '_blank');
+
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>بطاقة المتابعة والتوجيه المدرسي - ${student.lastName} ${student.firstName}</title>
+                    <style>
+                        @page { size: A4 portrait; margin: 10mm; }
+                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; background-color: #ffffff; color: #000000; margin: 0; padding: 0; font-size: 11px; line-height: 1.5; }
+                        .page { width: 100%; height: 277mm; box-sizing: border-box; page-break-after: always; position: relative; padding: 5mm; }
+                        .page:last-child { page-break-after: avoid; }
+                        .national-header { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+                        .sub-header { text-align: center; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
+                        .section-title { background-color: #f0f0f0; padding: 4px 8px; font-weight: bold; font-size: 12px; margin-top: 10px; border-right: 3px solid #0056b3; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 5px; }
+                        th, td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 11px; }
+                        th { background-color: #f9f9f9; }
+                        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+                        .info-row { margin-bottom: 4px; }
+                        .checkbox-box { display: inline-block; width: 10px; height: 10px; border: 1px solid #000; margin-left: 4px; text-align: center; line-height: 10px; font-size: 9px; }
+                    </style>
+                </head>
+                <body>
+                    <!-- الصفحة الأولى -->
+                    <div class="page">
+                        <div class="national-header">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التربية الوطنية</div>
+                        <div class="sub-header">بطاقة المتابعة والتوجيه المدرسي</div>
+                        <div style="text-align: left; font-weight: bold; margin-bottom: 10px;">السنة الدراسية: 2026-2027</div>
+
+                        <div class="section-title">أولاً: معلومات التلميذ</div>
+                        <div class="grid-2" style="margin-top: 5px;">
+                            <div class="info-row">الاسم واللقب: <strong>${student.lastName || ''} ${student.firstName || ''}</strong></div>
+                            <div class="info-row">رقم التعريف المدرسي: <strong>${student.id || ''}</strong></div>
+                            <div class="info-row">تاريخ ومكان الميلاد: <strong>${student.birthDate || ''} بـ ${student.birthPlace || ''}</strong></div>
+                            <div class="info-row">المؤسسة التعليمية: <strong>متوسطة الشهيد خالد مكاوي (سطاوالي)</strong></div>
+                            <div class="info-row">الجنس: <strong>${student.gender || 'ذكر'}</strong></div>
+                            <div class="info-row">الولاية: الجزائر غرب | الدائرة: زرالدة</div>
+                            <div class="info-row">المستوى: رابعة متوسطة | القسم: الفوج ${student.group || '1'}</div>
+                            <div class="info-row">النظام: <span class="checkbox-box">X</span> خارجي</div>
+                        </div>
+
+                        <div class="section-title">ثانياً: معلومات ولي الأمر</div>
+                        <div class="grid-2" style="margin-top: 5px;">
+                            <div class="info-row">الاسم واللقب: <strong>${student.guardianName || '..................................'}</strong></div>
+                            <div class="info-row">صلة القرابة: <strong>${student.guardianRelation || 'أب'}</strong></div>
+                            <div class="info-row">المهنة: <strong>${student.guardianJob || '..................................'}</strong></div>
+                            <div class="info-row">رقم الهاتف: <strong>${student.guardianPhone || '..................................'}</strong></div>
+                            <div class="info-row" style="grid-column: span 2;">العنوان: <strong>${student.address || '..................................'}</strong></div>
+                        </div>
+
+                        <div class="section-title">ثالثاً: النتائج الدراسية (معدلات الفصول)</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>المادة</th>
+                                    <th>الفصل الأول</th>
+                                    <th>الفصل الثاني</th>
+                                    <th>الفصل الثالث</th>
+                                    <th>المعدل السنوي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>اللغة العربية</td><td>12.00</td><td>13.00</td><td>-</td><td>12.50</td></tr>
+                                <tr><td>الرياضيات</td><td>14.00</td><td>14.50</td><td>-</td><td>14.25</td></tr>
+                                <tr><td>اللغة الفرنسية</td><td>13.50</td><td>13.00</td><td>-</td><td>13.25</td></tr>
+                                <tr><td>اللغة الإنجليزية</td><td>15.00</td><td>15.50</td><td>-</td><td>15.25</td></tr>
+                                <tr><td>العلوم الطبيعية</td><td>14.00</td><td>13.50</td><td>-</td><td>13.75</td></tr>
+                                <tr><td>العلوم الفيزيائية</td><td>13.00</td><td>14.00</td><td>-</td><td>13.50</td></tr>
+                            </tbody>
+                        </table>
+                        <div style="font-weight: bold; text-align: left; margin-top: 5px;">المعدل العام: 13.75 &nbsp;&nbsp;&nbsp;&nbsp; الرتبة: 03 / 35</div>
+
+                        <div class="section-title">رابعاً: المواظبة والانضباط</div>
+                        <div class="grid-2" style="margin-top: 5px;">
+                            <div class="info-row">الغيابات المبررة: <strong>${student.absMbr || 0}</strong></div>
+                            <div class="info-row">الغيابات غير المبررة: <strong>${student.absGhr || 0}</strong></div>
+                            <div class="info-row">التأخرات: <strong>${student.takh || 0}</strong></div>
+                            <div class="info-row">السلوك العام: <strong>${student.generalBehavior || 'جيد'}</strong></div>
+                        </div>
+                    </div>
+
+                    <!-- الصفحة الثانية -->
+                    <div class="page">
+                        <div class="section-title">خامساً: تقييم القدرات</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>المعيار</th>
+                                    <th>ممتاز</th>
+                                    <th>جيد جداً</th>
+                                    <th>جيد</th>
+                                    <th>مقبول</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>الفهم والاستيعاب</td><td></td><td>X</td><td></td><td></td></tr>
+                                <tr><td>سرعة التعلم</td><td></td><td></td><td>X</td><td></td></tr>
+                                <tr><td>التركيز</td><td></td><td>X</td><td></td><td></td></tr>
+                                <tr><td>العمل الجماعي</td><td>X</td><td></td><td></td><td></td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="section-title">سادساً: الميول الدراسية والمهنية</div>
+                        <div class="info-row" style="margin-top: 5px;">المواد المفضلة: الرياضيات، العلوم الفيزيائية، الإنجليزية</div>
+                        <div class="info-row">المهن التي يرغب فيها: مهندس إعلام آلي / باحث علمي</div>
+
+                        <div class="section-title">سابعاً: مقابلات مستشار التوجيه</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>موضوع المقابلة</th>
+                                    <th>التوصيات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>15-01-2026</td><td>توجيه مسبق واختيار الرغبات</td><td>تثبيت الخيار المناسب</td></tr>
+                                <tr><td>10-05-2026</td><td>متابعة التحصيل الدراسي</td><td>الحفاظ على مستوى الأداء المتميز</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div class="section-title">ثامناً: التوجيه (المسبق والنهائي)</div>
+                        <div class="info-row" style="margin-top: 5px;">الرغبة الأولى: <strong>${student.pref1 || 'غير محدد'}</strong></div>
+                        <div class="info-row">الرغبة الثانية: <strong>${student.pref2 || 'غير محدد'}</strong></div>
+                        <div class="info-row">الرغبة الثالثة: <strong>${student.pref3 || 'غير محدد'}</strong></div>
+                        <div class="info-row">الرغبة الرابعة: <strong>${student.pref4 || 'غير محدد'}</strong></div>
+                        <div class="info-row">اقتراح مجلس القسم: <strong>${student.councilProposal || 'غير محدد'}</strong></div>
+                        <div class="info-row" style="background:#e8f4fd; padding:5px; margin-top:5px;">قرار التوجيه النهائي: <strong>${student.finalGuidance || 'غير محدد'}</strong></div>
+
+                        <div class="section-title" style="margin-top: 20px;">تاسعاً: الملاحظات والإمضاءات</div>
+                        <div style="margin-top: 10px; font-size: 11px;">
+                            ملاحظات مستشار التوجيه: تلميذ منضبط ومجتهد، مؤهل للتوجه نحو المسار المناسب.<br>
+                            ملاحظات مدير المؤسسة: موافق على مقترح مجلس القسم.
+                        </div>
+
+                        <table style="width: 100%; margin-top: 40px; border: none;">
+                            <tr>
+                                <td style="border: none; text-align: center;">مستشار التوجيه<br><br><br>التوقيع:</td>
+                                <td style="border: none; text-align: center;">الأستاذ الرئيسي<br><br><br>التوقيع:</td>
+                                <td style="border: none; text-align: center;">مدير المؤسسة<br><br><br>الختم والتوقيع:</td>
+                            </tr>
+                        </table>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
         function switchTab(tabIndex) {
             const overlay = document.getElementById('loadingOverlay');
             overlay.style.display = 'flex';
@@ -989,7 +1249,7 @@
                     btn.classList.toggle('active', i === tabIndex);
                 });
                 
-                const tabTitles = ["الدخول المدرسي", "متابعة الإحصائيات الدقيقة", "متابعة حجز النقاط والاستدراك", "تحيين بيانات التلاميذ", "تسجيلات الامتحانات الرسمية", "التسجيل البيداغوجي", "نتائج شهادة التعليم المتوسط"];
+                const tabTitles = ["الدخول المدرسي", "متابعة الإحصائيات الدقيقة", "متابعة حجز النقاط والاستدراك", "تحيين بيانات التلاميذ", "تسجيلات الامتحانات الرسمية", "التسجيل البيداغوجي", "حجز التوجيه المسبق والنهائي", "نتائج شهادة التعليم المتوسط"];
                 document.getElementById('currentSectionTitle').innerText = tabTitles[tabIndex];
 
                 document.getElementById('schoolAlert').style.display = (tabIndex === 0 || tabIndex === 3) ? 'flex' : 'none';
@@ -1002,7 +1262,7 @@
                 document.getElementById('btnPrintPedagogic').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
                 document.getElementById('btnRegisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
                 document.getElementById('btnUnregisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
-                document.getElementById('btnPrintBem').style.display = (tabIndex === 6) ? 'inline-flex' : 'none';
+                document.getElementById('btnPrintBem').style.display = (tabIndex === 7) ? 'inline-flex' : 'none';
 
                 if (tabIndex === 1) {
                     document.getElementById('filterSection').style.display = 'none';
@@ -1064,6 +1324,8 @@
             if (currentTab === 5) {
                 headerHTML += '<th>العنوان</th><th>مكان الميلاد</th><th>حالة الدفع</th><th>عمليات</th>';
             } else if (currentTab === 6) {
+                headerHTML += '<th>الفوج</th><th>الرغبة الأولى</th><th>اقتراح مجلس القسم</th><th>التوجيه النهائي</th><th>عمليات التوجيه</th>';
+            } else if (currentTab === 7) {
                 headerHTML += '<th>المعدل السنوي</th><th>معدل الشهادة</th><th>معدل القبول</th><th>التقديرات</th>';
             } else {
                 headerHTML += '<th>الجنس</th><th>مكان الميلاد</th><th>العنوان</th><th>المستوى</th><th>رقم الفوج</th><th>الصفة</th>';
@@ -1099,6 +1361,12 @@
                     let payStatusHTML = student.paymentStatus === 'confirmed' ? '<span class="status-blue-box">تم دفع حقوق التسجيل</span>' : '<span class="status-orange">قيد الانتظار</span>';
                     rowHTML += `<td>${student.address || ''}</td><td>${student.birthPlace || ''}</td><td>${payStatusHTML}</td><td><button class="btn btn-update" style="background-color: var(--main-blue);" onclick="openPedagogicConfirmModal(${globalIndex})"><i class="fas fa-check-circle"></i> تأكد من التسجيل</button></td>`;
                 } else if (currentTab === 6) {
+                    rowHTML += `<td>${student.group || '1'}</td>
+                                <td>${student.pref1 || 'غير محدد'}</td>
+                                <td>${student.councilProposal || 'غير مقترح'}</td>
+                                <td><span class="${student.finalGuidance ? 'status-blue-box' : 'status-orange'}">${student.finalGuidance || 'قيد الانتظار'}</span></td>
+                                <td><button class="btn btn-guidance" onclick="openGuidanceModal(${globalIndex})"><i class="fas fa-compass"></i> حجز وطباعة البطاقة</button></td>`;
+                } else if (currentTab === 7) {
                     rowHTML += `<td>${student.annualAvg || ''}</td><td>${student.examAvg || ''}</td><td>${student.admissionAvg || ''}</td><td>${student.appreciation || ''}</td>`;
                 } else {
                     rowHTML += `<td>${student.gender || ''}</td><td>${student.birthPlace || ''}</td><td>${student.address || ''}</td><td>${student.level || ''}</td><td>${student.group || ''}</td><td>${student.status || 'خارجي'}</td>`;
@@ -1249,135 +1517,59 @@
 
         function closeModal() { document.getElementById('updateModal').style.display = 'none'; }
 
-        function openExamRegisterModal(index) { 
-            currentExamIndex = index; 
-            const student = students[index]; 
-            document.getElementById('studentInfoSection').innerHTML = `<div style="background: var(--faint-blue); padding: 15px; border-radius: 6px; text-align: center; margin-bottom: 20px;"><h3 style="margin: 0; color: var(--header-blue);">${student.lastName} ${student.firstName}</h3></div>`; 
+        function openGuidanceModal(index) {
+            currentGuidanceIndex = index;
+            const s = students[index];
+            document.getElementById('guidanceStudentTitle').innerText = `التلميذ(ة): ${s.lastName || ''} ${s.firstName || ''} - رقم التعريف: ${s.id || ''}`;
             
-            const examWilayaSelect = document.getElementById('examWilaya');
-            examWilayaSelect.innerHTML = '<option value="">-- اختر الولاية --</option>';
-            Object.keys(geoData).forEach(code => {
-                const opt = document.createElement('option');
-                opt.value = code;
-                opt.textContent = `${code} - ${geoData[code].name}`;
-                examWilayaSelect.appendChild(opt);
-            });
-
-            document.getElementById('examCommune').innerHTML = '<option value="">-- اختر البلدية --</option>';
-            document.getElementById('fatherName').value = student.fatherName || ''; 
-            document.getElementById('motherName').value = student.motherName || ''; 
-            document.getElementById('registrationSelect').value = student.examRegistration === 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات' ? 'registered' : ''; 
+            document.getElementById('pref1').value = s.pref1 || '';
+            document.getElementById('pref2').value = s.pref2 || '';
+            document.getElementById('pref3').value = s.pref3 || '';
+            document.getElementById('pref4').value = s.pref4 || '';
+            document.getElementById('councilProposal').value = s.councilProposal || '';
+            document.getElementById('finalGuidance').value = s.finalGuidance || '';
             
-            if(student.examDirectorate) document.getElementById('examDirectorate').value = student.examDirectorate;
-            if(student.examCenter) document.getElementById('examCenter').value = student.examCenter;
-
-            if(student.examWilayaCode) {
-                examWilayaSelect.value = student.examWilayaCode;
-                updateExamCommuneDropdown();
-                document.getElementById('examCommune').value = student.examCommuneName || '';
-            }
-
-            document.getElementById('examRegisterModal').style.display = 'flex'; 
-        }
-
-        function updateExamCommuneDropdown() {
-            const wCode = document.getElementById('examWilaya').value;
-            const comSelect = document.getElementById('examCommune');
-            comSelect.innerHTML = '<option value="">-- اختر البلدية --</option>';
-            if (wCode && geoData[wCode]) {
-                geoData[wCode].communes.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c; opt.textContent = c; comSelect.appendChild(opt);
-                });
-            }
-        }
-
-        function confirmExamRegistration() { 
-            if (currentExamIndex === -1) return; 
-            const sel = document.getElementById('registrationSelect').value; 
-            const wCode = document.getElementById('examWilaya').value;
-            const cName = document.getElementById('examCommune').value;
-            const directorate = document.getElementById('examDirectorate').value;
-            const center = document.getElementById('examCenter').value;
-
-            if (!sel || !wCode || !cName || !directorate || !center) { 
-                Swal.fire('خطأ', 'يرجى اختيار مديرية التربية، مركز الإجراء، ولاية وبلدية الامتحان وحالة التسجيل.', 'error'); 
-                return; 
-            } 
+            document.getElementById('guardianName').value = s.guardianName || '';
+            document.getElementById('guardianRelation').value = s.guardianRelation || 'أب';
+            document.getElementById('guardianJob').value = s.guardianJob || '';
+            document.getElementById('guardianPhone').value = s.guardianPhone || '';
             
-            let s = students[currentExamIndex];
-            s.examRegistration = 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات'; 
-            s.examDirectorate = directorate;
-            s.examCenter = center;
-            s.examWilayaCode = wCode;
-            s.examWilayaName = geoData[wCode].name;
-            s.examCommuneName = cName;
-            s.fatherName = document.getElementById('fatherName').value;
-            s.motherName = document.getElementById('motherName').value;
+            document.getElementById('absMbr').value = s.absMbr || 0;
+            document.getElementById('absGhr').value = s.absGhr || 0;
+            document.getElementById('takh').value = s.takh || 0;
+            document.getElementById('generalBehavior').value = s.generalBehavior || 'جيد';
 
-            saveToDatabase(); 
-            closeExamModal(); 
-            Swal.fire('تم التسجيل', 'تم تثبيت التلميذ بملف الامتحانات الرسمية مع تعيين مديرية التربية ومركز الإجراء بنجاح.', 'success'); 
-            filterTable(); 
+            document.getElementById('guidanceModal').style.display = 'flex';
         }
 
-        function closeExamModal() { document.getElementById('examRegisterModal').style.display = 'none'; }
-        function openPedagogicConfirmModal(index) { currentPedagogicIndex = index; const s = students[index]; document.getElementById('nestedStudentName').innerText = `${s.lastName} ${s.firstName}`; document.getElementById('nestedPaymentState').innerText = s.paymentStatus === 'confirmed' ? 'تم الدفع بنجاح' : 'قيد الانتظار'; document.getElementById('pedagogicActionSelect').value = ''; document.getElementById('pedagogicConfirmModal').style.display = 'flex'; }
-        function executePedagogicAction() { if (currentPedagogicIndex === -1) return; const action = document.getElementById('pedagogicActionSelect').value; if (action === 'confirm') { students[currentPedagogicIndex].paymentStatus = 'confirmed'; Swal.fire('تم التأكيد', 'تم تأكيد حجز دفع حقوق التسجيل.', 'success'); } else if (action === 'cancel') { students[currentPedagogicIndex].paymentStatus = 'pending'; Swal.fire('تم الإلغاء', 'تم إلغاء حجز الدفع.', 'warning'); } else { Swal.fire('تنبيه', 'يرجى تحديد الإجراء للمواصلة.', 'info'); return; } saveToDatabase(); closePedagogicModal(); filterTable(); }
-        function closePedagogicModal() { document.getElementById('pedagogicConfirmModal').style.display = 'none'; }
-        function registerAllStudents() { if (students.length === 0) return; students.forEach(s => s.paymentStatus = 'confirmed'); saveToDatabase(); Swal.fire('مكتمل', 'تم تأكيد الدفع لكافة التلاميذ بنجاح.', 'success'); filterTable(); }
-        function unregisterAllStudents() { if (students.length === 0) return; students.forEach(s => s.paymentStatus = 'pending'); saveToDatabase(); Swal.fire('مكتمل', 'تم إلغاء حجز الدفع للجميع بصفة مؤقتة.', 'warning'); filterTable(); }
+        function saveGuidanceData() {
+            if (currentGuidanceIndex === -1) return;
+            const s = students[currentGuidanceIndex];
+            
+            s.pref1 = document.getElementById('pref1').value;
+            s.pref2 = document.getElementById('pref2').value;
+            s.pref3 = document.getElementById('pref3').value;
+            s.pref4 = document.getElementById('pref4').value;
+            s.councilProposal = document.getElementById('councilProposal').value;
+            s.finalGuidance = document.getElementById('finalGuidance').value;
+            
+            s.guardianName = document.getElementById('guardianName').value;
+            s.guardianRelation = document.getElementById('guardianRelation').value;
+            s.guardianJob = document.getElementById('guardianJob').value;
+            s.guardianPhone = document.getElementById('guardianPhone').value;
+            
+            s.absMbr = document.getElementById('absMbr').value;
+            s.absGhr = document.getElementById('absGhr').value;
+            s.takh = document.getElementById('takh').value;
+            s.generalBehavior = document.getElementById('generalBehavior').value;
 
-        function importExcel(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                try {
-                    const data = new Uint8Array(ev.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[sheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-                    students = jsonData.map((row, index) => ({
-                        id: String(row['رقم التعريف'] || row['ID'] || (20260000 + index + 1)),
-                        lastName: row['اللقب'] || row['LastName'] || '',
-                        firstName: row['الاسم'] || row['FirstName'] || '',
-                        gender: row['الجنس'] || 'ذكر',
-                        birthDate: row['تاريخ الميلاد'] || '',
-                        address: row['العنوان'] || '',
-                        birthPlace: row['مكان الميلاد'] || 'الجزائر',
-                        firstNameLatin: row['الاسم باللاتينية'] || row['FirstNameLatin'] || '',
-                        lastNameLatin: row['اللقب باللاتينية'] || row['LastNameLatin'] || '',
-                        level: row['المستوى'] || 'رابعة',
-                        group: String(row['رقم الفوج'] || '1'),
-                        status: row['الصفة'] || 'خارجي',
-                        examRegistration: row['حالة التسجيل'] || 'غير مسجل',
-                        paymentStatus: row['حالة الدفع'] || 'pending'
-                    }));
-                    saveToDatabase();
-                    Swal.fire('تم الاستيراد!', 'تم تحميل قاعدة بيانات بنجاح.', 'success');
-                    currentPage = 1;
-                    filterTable();
-                } catch (err) { Swal.fire('خطأ', 'فشل في قراءة الملف.', 'error'); }
-            };
-            reader.readAsArrayBuffer(file);
+            saveToDatabase();
+            closeGuidanceModal();
+            Swal.fire('تم الحفظ', 'تم حفظ بيانات التوجيه المسبق والنهائي وبطاقة المتابعة بنجاح.', 'success');
+            filterTable();
         }
 
-        function exportExcelFile() {
-            if (students.length === 0) { Swal.fire('تنبيه', 'لا توجد بيانات متاحة للتصدير حالياً.', 'warning'); return; }
-            const headerInfo = [["الجمهورية الجزائرية الديمقراطية الشعبية"], ["وزارة التربية الوطنية"], ["تقرير البيانات المصدرة للسنة الدراسية: 2026-2027"], []];
-            const wsData = students.map(s => ({ "رقم التعريف": s.id, "اللقب": s.lastName, "الاسم": s.firstName, "تاريخ الميلاد": s.birthDate, "مكان الميلاد": s.birthPlace, "العنوان": s.address, "الجنس": s.gender, "المستوى": s.level, "الفوج": s.group, "حالة التسجيل": s.examRegistration }));
-            const ws = XLSX.utils.json_to_sheet([]);
-            XLSX.utils.sheet_add_aoa(ws, headerInfo, { origin: "A1" });
-            XLSX.utils.sheet_add_json(ws, wsData, { origin: "A5", skipHeader: false });
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "التقرير الرقمي");
-            XLSX.writeFile(wb, "التقرير_الرقمي_المؤسسة_2026.xlsx");
-        }
-
-        window.onload = function() { filterTable(); };
+        function closeGuidanceModal() { document.getElementById('guidanceModal').style.display = 'none'; }
     </script>
 </body>
 </html>
