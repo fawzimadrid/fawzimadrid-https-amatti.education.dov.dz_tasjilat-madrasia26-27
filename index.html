@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- مكتبات لتوليد الكود بار والـ QR Code رقمياً بالشهادة المدرسية وبطاقة التوجيه بدون إطارات -->
+    <!-- مكتبات لتوليد الكود بار والـ QR Code رقمياً -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -253,6 +253,7 @@
         .btn-school-cert { background-color: #ff8c00; color: white; font-size: 12px; padding: 4px 8px; }
         .btn-guidance { background-color: #6f42c1; color: white; font-size: 12px; padding: 4px 8px; }
         .btn-auto-group { background-color: #6f42c1; color: white; }
+        .btn-digital-cert { background-color: #17a2b8; color: white; font-size: 12px; padding: 4px 8px; }
 
         .status-dark-green {
             background-color: #198754;
@@ -309,7 +310,7 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
         }
 
         .pagination {
@@ -411,6 +412,30 @@
             height: 250px;
             width: 250px;
         }
+
+        .decree-card {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .decree-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--header-blue);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .decree-body {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -447,6 +472,7 @@
                     <button class="tab-btn" onclick="switchTab(5)">التسجيل البيداغوجي</button>
                     <button class="tab-btn" onclick="switchTab(6)">حجز التوجيه المسبق والنهائي</button>
                     <button class="tab-btn" onclick="switchTab(7)">نتائج شهادة التعليم المتوسط</button>
+                    <button class="tab-btn" onclick="switchTab(8)">القرارات الوزارية</button>
                 </div>
 
                 <div id="schoolAlert" class="alert-message" style="display: none;">
@@ -547,6 +573,22 @@
                                 <canvas id="analyticsPieChart"></canvas>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div id="decreeSection" style="display: none;">
+                    <div class="decree-card">
+                        <div class="decree-header">
+                            <i class="fas fa-file-pdf" style="color: #dc3545; font-size: 24px;"></i>
+                            قرار رقم 18 مؤرخ في 12 صفر عام 1448 الموافق لـ 27 جويلية سنة 2026
+                        </div>
+                        <div class="decree-body">
+                            <strong>الموضوع:</strong> معدل القرار رقم 37 المؤرخ في 13 رمضان عام 1443 الموافق لـ 14 أفريل سنة 2022 المحدد لشعب التعليم الثانوي العام والتكنولوجي.<br>
+                            يحدد هذا القرار الهيكلة الجديدة لشعب التعليم الثانوي وتوزيع الرغبات المتاحة للطلاب في مرحلة التوجيه المدرسي.
+                        </div>
+                        <button class="btn btn-export" onclick="downloadDecreePDF()">
+                            <i class="fas fa-download"></i> تحميل القرار الوزاري (PDF)
+                        </button>
                     </div>
                 </div>
 
@@ -653,65 +695,29 @@
                 <div class="form-grid" style="margin-top:10px;">
                     <div class="form-group">
                         <label>الرغبة الأولى</label>
-                        <select id="pref1">
-                            <option value="">--اختر--</option>
-                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
-                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
-                            <option value="تكوين مهني">تكوين مهني</option>
-                            <option value="تعليم مهني">تعليم مهني</option>
-                        </select>
+                        <select id="pref1" class="guidance-stream-select"><option value="">--اختر--</option></select>
                     </div>
                     <div class="form-group">
                         <label>الرغبة الثانية</label>
-                        <select id="pref2">
-                            <option value="">--اختر--</option>
-                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
-                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
-                            <option value="تكوين مهني">تكوين مهني</option>
-                            <option value="تعليم مهني">تعليم مهني</option>
-                        </select>
+                        <select id="pref2" class="guidance-stream-select"><option value="">--اختر--</option></select>
                     </div>
                     <div class="form-group">
                         <label>الرغبة الثالثة</label>
-                        <select id="pref3">
-                            <option value="">--اختر--</option>
-                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
-                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
-                            <option value="تكوين مهني">تكوين مهني</option>
-                            <option value="تعليم مهني">تعليم مهني</option>
-                        </select>
+                        <select id="pref3" class="guidance-stream-select"><option value="">--اختر--</option></select>
                     </div>
                 </div>
                 <div class="form-grid" style="margin-top:10px;">
                     <div class="form-group">
                         <label>الرغبة الرابعة</label>
-                        <select id="pref4">
-                            <option value="">--اختر--</option>
-                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
-                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
-                            <option value="تكوين مهني">تكوين مهني</option>
-                            <option value="تعليم مهني">تعليم مهني</option>
-                        </select>
+                        <select id="pref4" class="guidance-stream-select"><option value="">--اختر--</option></select>
                     </div>
                     <div class="form-group">
                         <label>اقتراح مجلس القسم</label>
-                        <select id="councilProposal">
-                            <option value="">--اختر--</option>
-                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
-                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
-                            <option value="تكوين مهني">تكوين مهني</option>
-                            <option value="تعليم مهني">تعليم مهني</option>
-                        </select>
+                        <select id="councilProposal" class="guidance-stream-select"><option value="">--اختر--</option></select>
                     </div>
                     <div class="form-group">
                         <label>قرار التوجيه النهائي</label>
-                        <select id="finalGuidance">
-                            <option value="">--اختر--</option>
-                            <option value="جدع مشترك آداب">جدع مشترك آداب</option>
-                            <option value="جدع مشترك علوم وتكنولوجيا">جدع مشترك علوم وتكنولوجيا</option>
-                            <option value="تكوين مهني">تكوين مهني</option>
-                            <option value="تعليم مهني">تعليم مهني</option>
-                        </select>
+                        <select id="finalGuidance" class="guidance-stream-select"><option value="">--اختر--</option></select>
                     </div>
                 </div>
 
@@ -778,6 +784,21 @@
     </div>
 
     <script>
+        const streamOptions = [
+            "رياضيات",
+            "علوم تجريبية",
+            "معلوماتية",
+            "هندسة مدنية",
+            "هندسة كهربائية",
+            "هندسة ميكانيكية",
+            "هندسة الطرائق",
+            "اسبانية",
+            "ألمانية",
+            "إيطالية",
+            "آداب وفلسفة",
+            "تسيير واقتصاد"
+        ];
+
         const geoData = {
             "01": { name: "أدرار", communes: ["أدرار", "بودة", "أولاد أحمد تيمي", "رقان", "سالي", "السبع", "تسابيت", "إن زغمير", "زاوية كنتة", "اقبلي", "أولف", "تيمقتن", "تيت", "فنوغيل", "تامنطيط", "تامست"] },
             "02": { name: "الشلف", communes: ["الشلف", "أم الدروع", "سنجاس", "سيدي عبد الرحمن", "سيدي عكاشة", "تنس", "بني بوعتاب", "الكريمية", "حرشون", "الظهرة", "تاوقريت", "بني حواء", "بريرة", "وادي قوسين", "الشطية", "الأبيض مجاجة", "أولاد فارس", "بوقادير", "وادي سلي", "الصْبحة", "بنايرية", "بوزغاية", "الزبوجة", "أبو الحسن", "تاجنة", "تلعصة", "المرسى", "مصدق", "بني راشد", "وادي الفضة", "أولاد عباس", "الحجاج", "أولاد بن عبد القادر", "عين مران", "الهرانفة"] },
@@ -850,8 +871,30 @@
         let analyticsChartInstance = null;
         let certSerialNumber = parseInt(localStorage.getItem('cert_serial_number')) || 100;
 
+        function initStreamSelects() {
+            const selectElements = document.querySelectorAll('.guidance-stream-select');
+            selectElements.forEach(select => {
+                let optionsHTML = '<option value="">--اختر--</option>';
+                streamOptions.forEach(opt => {
+                    optionsHTML += `<option value="${opt}">${opt}</option>`;
+                });
+                select.innerHTML = optionsHTML;
+            });
+        }
+
         function saveToDatabase() {
             localStorage.setItem('students_db', JSON.stringify(students));
+        }
+
+        function updateExamCommuneDropdown() {
+            const wilayaCode = document.getElementById('examWilaya').value;
+            const communeSelect = document.getElementById('examCommune');
+            communeSelect.innerHTML = '<option value="">-- اختر البلدية --</option>';
+            if (wilayaCode && geoData[wilayaCode]) {
+                geoData[wilayaCode].communes.forEach(c => {
+                    communeSelect.innerHTML += `<option value="${c}">${c}</option>`;
+                });
+            }
         }
 
         function runAutoGrouping() {
@@ -1018,6 +1061,93 @@
                         });
                         window.setTimeout(function() { window.print(); window.close(); }, 500);
                     <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        function printDigitalCert(index) {
+            const student = students[index];
+            const printWindow = window.open('', '_blank');
+            const todayDate = new Date().toLocaleDateString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>شهادة تسجيل 100% رقمية - ${student.lastName} ${student.firstName}</title>
+                    <style>
+                        @page { size: A4 portrait; margin: 15mm; }
+                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; background-color: #ffffff; color: #000000; padding: 20px; line-height: 2; }
+                        .cert-box { border: 3px double #0056b3; padding: 30px; border-radius: 10px; }
+                        .header { text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 25px; }
+                        .title { text-align: center; font-size: 22px; color: #0056b3; margin: 25px 0; font-weight: bold; text-decoration: underline; }
+                        .field { font-size: 16px; margin-bottom: 12px; }
+                        .qr-area { text-align: center; margin-top: 30px; }
+                        .footer { margin-top: 40px; display: flex; justify-content: space-between; font-weight: bold; }
+                    </style>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                </head>
+                <body>
+                    <div class="cert-box">
+                        <div class="header">
+                            الجمهورية الجزائرية الديمقراطية الشعبية<br>
+                            وزارة التربية الوطنية - الأرضية الرقمية 100%
+                        </div>
+                        <div class="title">شهادة تسجيل رقمية مؤكدة</div>
+                        <div class="field">رقم التسجيل البيداغوجي: <strong>${student.id || ''}</strong></div>
+                        <div class="field">لقب و اسم التلميذ: <strong>${student.lastName || ''} ${student.firstName || ''}</strong></div>
+                        <div class="field">تاريخ ومكان الميلاد: <strong>${student.birthDate || ''} بـ ${student.birthPlace || ''}</strong></div>
+                        <div class="field">المستوى الدراسي: <strong>رابعة متوسط - الفوج ${student.group || '1'}</strong></div>
+                        <div class="field">حالة التسجيل البيداغوجي: <strong style="color: green;">مكتمل ومؤكد رقمياً</strong></div>
+                        <div class="field">تاريخ الاستخراج: <strong>${todayDate}</strong></div>
+                        
+                        <div class="qr-area">
+                            <div id="digitalCertQr" style="display:inline-block;"></div>
+                            <p style="font-size:12px; color:#555;">وثيقة رسمية صادرة آلياً وموثقة عبر الأرضية الرقمية</p>
+                        </div>
+
+                        <div class="footer">
+                            <span>التوقيع والختم الرقمي للمؤسسة</span>
+                            <span>مصادق عليه إلكترونياً</span>
+                        </div>
+                    </div>
+                    <script>
+                        new QRCode(document.getElementById("digitalCertQr"), {
+                            text: "شهادة تسجيل رقمية 100% | الرقم: ${student.id} | التلميذ: ${student.lastName} ${student.firstName}",
+                            width: 110, height: 110
+                        });
+                        window.setTimeout(function() { window.print(); window.close(); }, 500);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        function printRegistrationForm(index) {
+            const student = students[index];
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>استمارة التسجيل البيداغوجي - ${student.lastName} ${student.firstName}</title>
+                    <style>
+                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; padding: 25px; line-height: 1.8; }
+                        h2 { text-align: center; color: #0056b3; }
+                        .box { border: 1px solid #ccc; padding: 15px; border-radius: 5px; margin-top: 15px; }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <h2>استمارة التسجيل البيداغوجي للسنة الدراسية 2026-2027</h2>
+                    <div class="box">
+                        <p><strong>رقم التعريف المدرسي:</strong> ${student.id || ''}</p>
+                        <p><strong>اللقب والاسم:</strong> ${student.lastName || ''} ${student.firstName || ''}</p>
+                        <p><strong>تاريخ ومكان الميلاد:</strong> ${student.birthDate || ''} - ${student.birthPlace || ''}</p>
+                        <p><strong>العنوان:</strong> ${student.address || ''}</p>
+                        <p><strong>الفوج التربوي:</strong> الفوج ${student.group || '1'}</p>
+                        <p><strong>حالة الحقوق:</strong> ${student.paymentStatus === 'confirmed' ? 'تم الدفع' : 'قيد الانتظار'}</p>
+                    </div>
                 </body>
                 </html>
             `);
@@ -1279,7 +1409,7 @@
                     btn.classList.toggle('active', i === tabIndex);
                 });
                 
-                const tabTitles = ["الدخول المدرسي", "متابعة الإحصائيات الدقيقة", "متابعة حجز النقاط والاستدراك", "تحيين بيانات التلاميذ", "تسجيلات الامتحانات الرسمية", "التسجيل البيداغوجي", "حجز التوجيه المسبق والنهائي", "نتائج شهادة التعليم المتوسط"];
+                const tabTitles = ["الدخول المدرسي", "متابعة الإحصائيات الدقيقة", "متابعة حجز النقاط والاستدراك", "تحيين بيانات التلاميذ", "تسجيلات الامتحانات الرسمية", "التسجيل البيداغوجي", "حجز التوجيه المسبق والنهائي", "نتائج شهادة التعليم المتوسط", "القرارات الوزارية"];
                 document.getElementById('currentSectionTitle').innerText = tabTitles[tabIndex];
 
                 document.getElementById('schoolAlert').style.display = (tabIndex === 0 || tabIndex === 3) ? 'flex' : 'none';
@@ -1299,6 +1429,7 @@
                     document.getElementById('searchContainer').style.display = 'none';
                     document.getElementById('tableWrapper').style.display = 'none';
                     document.getElementById('notAvailableSection').style.display = 'none';
+                    document.getElementById('decreeSection').style.display = 'none';
                     document.getElementById('statsSection').style.display = 'block';
                     renderAnalyticsDashboard();
                 } else if (tabIndex === 2) {
@@ -1306,12 +1437,21 @@
                     document.getElementById('searchContainer').style.display = 'none';
                     document.getElementById('tableWrapper').style.display = 'none';
                     document.getElementById('statsSection').style.display = 'none';
+                    document.getElementById('decreeSection').style.display = 'none';
                     document.getElementById('notAvailableSection').style.display = 'block';
+                } else if (tabIndex === 8) {
+                    document.getElementById('filterSection').style.display = 'none';
+                    document.getElementById('searchContainer').style.display = 'none';
+                    document.getElementById('tableWrapper').style.display = 'none';
+                    document.getElementById('statsSection').style.display = 'none';
+                    document.getElementById('notAvailableSection').style.display = 'none';
+                    document.getElementById('decreeSection').style.display = 'block';
                 } else {
                     document.getElementById('filterSection').style.display = 'flex';
                     document.getElementById('searchContainer').style.display = 'flex';
                     document.getElementById('tableWrapper').style.display = 'block';
                     document.getElementById('statsSection').style.display = 'none';
+                    document.getElementById('decreeSection').style.display = 'none';
                     document.getElementById('notAvailableSection').style.display = 'none';
                     filterTable();
                 }
@@ -1352,11 +1492,11 @@
             let headerHTML = '<tr><th>رقم التعريف</th><th>اللقب</th><th>الاسم</th><th>تاريخ الميلاد</th>';
 
             if (currentTab === 5) {
-                headerHTML += '<th>العنوان</th><th>مكان الميلاد</th><th>حالة الدفع</th><th>عمليات</th>';
+                headerHTML += '<th>العنوان</th><th>مكان الميلاد</th><th>حالة الدفع</th><th>عمليات التسجيل البيداغوجي</th>';
             } else if (currentTab === 6) {
                 headerHTML += '<th>الفوج</th><th>الرغبة الأولى</th><th>اقتراح مجلس القسم</th><th>التوجيه النهائي</th><th>عمليات التوجيه</th>';
             } else if (currentTab === 7) {
-                headerHTML += '<th>المعدل السنوي</th><th>معدل الشهادة (BEM)</th><th>معدل القبول (السنوي + الشهادة / 2)[cite: 1]</th><th>التقديرات والقرار</th>';
+                headerHTML += '<th>المعدل السنوي</th><th>معدل الشهادة (BEM)</th><th>معدل القبول (السنوي + الشهادة / 2)</th><th>التقديرات والقرار</th>';
             } else {
                 headerHTML += '<th>الجنس</th><th>مكان الميلاد</th><th>العنوان</th><th>المستوى</th><th>رقم الفوج</th><th>الصفة</th>';
                 if (currentTab === 4) headerHTML += '<th>مركز الإجراء / الولاية</th><th>حالة التسجيل</th>';
@@ -1389,7 +1529,14 @@
 
                 if (currentTab === 5) {
                     let payStatusHTML = student.paymentStatus === 'confirmed' ? '<span class="status-blue-box">تم دفع حقوق التسجيل</span>' : '<span class="status-orange">قيد الانتظار</span>';
-                    rowHTML += `<td>${student.address || ''}</td><td>${student.birthPlace || ''}</td><td>${payStatusHTML}</td><td><button class="btn btn-update" style="background-color: var(--main-blue);" onclick="openPedagogicConfirmModal(${globalIndex})"><i class="fas fa-check-circle"></i> تأكد من التسجيل</button></td>`;
+                    rowHTML += `<td>${student.address || ''}</td><td>${student.birthPlace || ''}</td><td>${payStatusHTML}</td>
+                    <td>
+                        <div class="actions-cell-flex">
+                            <button class="btn btn-update" style="background-color: var(--main-blue);" onclick="openPedagogicConfirmModal(${globalIndex})"><i class="fas fa-check-circle"></i> تأكد من التسجيل</button>
+                            <button class="btn btn-digital-cert" onclick="printDigitalCert(${globalIndex})"><i class="fas fa-certificate"></i> شهادة تسجيل 100% رقمية</button>
+                            <button class="btn btn-print" onclick="printRegistrationForm(${globalIndex})"><i class="fas fa-file-alt"></i> استمارة التسجيل</button>
+                        </div>
+                    </td>`;
                 } else if (currentTab === 6) {
                     rowHTML += `<td>${student.group || '1'}</td>
                                 <td>${student.pref1 || 'غير محدد'}</td>
@@ -1462,8 +1609,8 @@
 
             const filtered = students.filter(s => {
                 const matchesSearch = !searchTerm || (s.lastName && s.lastName.toLowerCase().includes(searchTerm)) || (s.firstName && s.firstName.toLowerCase().includes(searchTerm)) || (s.id && s.id.includes(searchTerm));
-                const matchesLevel = level === 'all' || s.level === level;
-                const matchesGroup = group === 'all' || s.group === group;
+                const matchesLevel = level === 'all' || (s.level || 'رابعة') === level;
+                const matchesGroup = group === 'all' || (s.group || '1') === group;
                 return matchesSearch && matchesLevel && matchesGroup;
             });
 
@@ -1526,90 +1673,46 @@
             document.getElementById('examRegisterModal').style.display = 'flex';
         }
 
-        function updateExamCommuneDropdown() {
-            const wilayaCode = document.getElementById('examWilaya').value;
-            const communeSelect = document.getElementById('examCommune');
-            communeSelect.innerHTML = '<option value="">-- اختر البلدية --</option>';
-            if (wilayaCode && geoData[wilayaCode]) {
-                geoData[wilayaCode].communes.forEach(c => {
-                    communeSelect.innerHTML += `<option value="${c}">${c}</option>`;
-                });
-            }
-        }
-
-        function confirmExamRegistration() {
-            if (currentExamIndex === -1) return;
-            const regVal = document.getElementById('registrationSelect').value;
-            if (!regVal) {
-                Swal.fire('تنبيه', 'يرجى اختيار حالة التسجيل أولاً.', 'warning');
-                return;
-            }
-
-            const student = students[currentExamIndex];
-            student.examRegistration = 'مسجل في الديوان الوطني للامتحانات والمسابقات';
-            student.examDirectorate = document.getElementById('examDirectorate').value;
-            student.examCenter = document.getElementById('examCenter').value;
-            
-            const wCode = document.getElementById('examWilaya').value;
-            student.examWilayaName = geoData[wCode] ? geoData[wCode].name : 'الجزائر';
-            student.examCommuneName = document.getElementById('examCommune').value || 'سطاوالي';
-            student.fatherName = document.getElementById('fatherName').value;
-            student.motherName = document.getElementById('motherName').value;
-
-            saveToDatabase();
-            closeExamModal();
-            filterTable();
-            Swal.fire('تم التسجيل', 'تم تسجيل التلميذ في الامتحانات الرسمية بنجاح.', 'success');
-        }
-
         function closeExamModal() {
             document.getElementById('examRegisterModal').style.display = 'none';
         }
 
-        function openPedagogicConfirmModal(index) {
-            currentPedagogicIndex = index;
-            const student = students[index];
-            document.getElementById('nestedStudentName').innerText = `${student.lastName} ${student.firstName}`;
-            document.getElementById('nestedPaymentState').innerText = student.paymentStatus === 'confirmed' ? 'تم دفع حقوق التسجيل' : 'قيد الانتظار';
-            document.getElementById('pedagogicActionSelect').value = student.paymentStatus === 'confirmed' ? 'confirm' : '';
-            document.getElementById('pedagogicConfirmModal').style.display = 'flex';
-        }
+        function confirmExamRegistration() {
+            if (currentExamIndex === -1) return;
+            const wilayaCode = document.getElementById('examWilaya').value;
+            const student = students[currentExamIndex];
+            student.examDirectorate = document.getElementById('examDirectorate').value;
+            student.examCenter = document.getElementById('examCenter').value;
+            student.examWilayaCode = wilayaCode;
+            student.examWilayaName = wilayaCode ? geoData[wilayaCode].name : '';
+            student.examCommuneName = document.getElementById('examCommune').value;
+            student.fatherName = document.getElementById('fatherName').value;
+            student.motherName = document.getElementById('motherName').value;
+            student.examRegistration = 'مسجل في قاعدة بيانات الديوان الوطني للامتحانات والمسابقات';
 
-        function executePedagogicAction() {
-            if (currentPedagogicIndex === -1) return;
-            const action = document.getElementById('pedagogicActionSelect').value;
-            if (action === 'confirm') {
-                students[currentPedagogicIndex].paymentStatus = 'confirmed';
-            } else if (action === 'cancel') {
-                students[currentPedagogicIndex].paymentStatus = 'pending';
-            }
             saveToDatabase();
-            closePedagogicModal();
+            closeExamModal();
             filterTable();
-            Swal.fire('عملية ناجحة', 'تم تحديث حالة التسجيل والدفع البيداغوجي بنجاح.', 'success');
-        }
-
-        function closePedagogicModal() {
-            document.getElementById('pedagogicConfirmModal').style.display = 'none';
+            Swal.fire('تم التسجيل', 'تم إتمام التسجيل بنجاح في الامتحانات الرسمية.', 'success');
         }
 
         function openGuidanceModal(index) {
             currentGuidanceIndex = index;
             const student = students[index];
-            document.getElementById('guidanceStudentTitle').innerText = `التلميذ(ة): ${student.lastName} ${student.firstName} (رقم التعريف: ${student.id || ''})`;
-            
+            document.getElementById('guidanceStudentTitle').innerText = `التلميذ: ${student.lastName} ${student.firstName} (رقم التعريف: ${student.id || ''})`;
+
             document.getElementById('pref1').value = student.pref1 || '';
             document.getElementById('pref2').value = student.pref2 || '';
             document.getElementById('pref3').value = student.pref3 || '';
             document.getElementById('pref4').value = student.pref4 || '';
             document.getElementById('councilProposal').value = student.councilProposal || '';
             document.getElementById('finalGuidance').value = student.finalGuidance || '';
-            
+
             document.getElementById('guardianName').value = student.guardianName || '';
             document.getElementById('guardianRelation').value = student.guardianRelation || 'أب';
             document.getElementById('guardianJob').value = student.guardianJob || '';
             document.getElementById('guardianPhone').value = student.guardianPhone || '';
-            
+
             document.getElementById('absMbr').value = student.absMbr || 0;
             document.getElementById('absGhr').value = student.absGhr || 0;
             document.getElementById('takh').value = student.takh || 0;
@@ -1618,89 +1721,126 @@
             document.getElementById('guidanceModal').style.display = 'flex';
         }
 
+        function closeGuidanceModal() {
+            document.getElementById('guidanceModal').style.display = 'none';
+        }
+
         function saveGuidanceData() {
             if (currentGuidanceIndex === -1) return;
             const student = students[currentGuidanceIndex];
-            
             student.pref1 = document.getElementById('pref1').value;
             student.pref2 = document.getElementById('pref2').value;
             student.pref3 = document.getElementById('pref3').value;
             student.pref4 = document.getElementById('pref4').value;
             student.councilProposal = document.getElementById('councilProposal').value;
             student.finalGuidance = document.getElementById('finalGuidance').value;
-            
+
             student.guardianName = document.getElementById('guardianName').value;
             student.guardianRelation = document.getElementById('guardianRelation').value;
             student.guardianJob = document.getElementById('guardianJob').value;
             student.guardianPhone = document.getElementById('guardianPhone').value;
-            
+
             student.absMbr = document.getElementById('absMbr').value;
             student.absGhr = document.getElementById('absGhr').value;
             student.takh = document.getElementById('takh').value;
             student.generalBehavior = document.getElementById('generalBehavior').value;
 
             saveToDatabase();
-            closeGuidanceModal();
+            Swal.fire('تم الحفظ', 'تم حفظ قرارات التوجيه والمتابعة بنجاح.', 'success');
             filterTable();
-            Swal.fire('حفظ بنجاح', 'تم حفظ بيانات التوجيه وبطاقة المتابعة بنجاح.', 'success');
         }
 
-        function closeGuidanceModal() {
-            document.getElementById('guidanceModal').style.display = 'none';
+        function openPedagogicConfirmModal(index) {
+            currentPedagogicIndex = index;
+            const student = students[index];
+            document.getElementById('nestedStudentName').innerText = `${student.lastName} ${student.firstName}`;
+            document.getElementById('nestedPaymentState').innerText = student.paymentStatus === 'confirmed' ? 'تم الدفع' : 'قيد الانتظار';
+            document.getElementById('pedagogicConfirmModal').style.display = 'flex';
+        }
+
+        function closePedagogicModal() {
+            document.getElementById('pedagogicConfirmModal').style.display = 'none';
+        }
+
+        function executePedagogicAction() {
+            if (currentPedagogicIndex === -1) return;
+            const action = document.getElementById('pedagogicActionSelect').value;
+            if (!action) {
+                Swal.fire('تنبيه', 'يرجى اختيار الإجراء أولاً.', 'warning');
+                return;
+            }
+            if (action === 'confirm') {
+                students[currentPedagogicIndex].paymentStatus = 'confirmed';
+            } else {
+                students[currentPedagogicIndex].paymentStatus = 'pending';
+            }
+            saveToDatabase();
+            closePedagogicModal();
+            filterTable();
+            Swal.fire('نجاح', 'تم تحديث حالة التسجيل البيداغوجي.', 'success');
         }
 
         function registerAllStudents() {
             students.forEach(s => s.paymentStatus = 'confirmed');
             saveToDatabase();
             filterTable();
-            Swal.fire('تأكيد جماعي', 'تم تسجيل ودفع الحقوق لكل التلاميذ بنجاح.', 'success');
+            Swal.fire('تم التسجيل', 'تم تأكيد تسجيل ودفع حقوق جميع التلاميذ.', 'success');
         }
 
         function unregisterAllStudents() {
             students.forEach(s => s.paymentStatus = 'pending');
             saveToDatabase();
             filterTable();
-            Swal.fire('إلغاء جماعي', 'تم إلغاء تسجيل ودفع الحقوق لكل التلاميذ.', 'info');
+            Swal.fire('تم الإلغاء', 'تم إلغاء حجز الدفع لجميع التلاميذ.', 'info');
         }
 
-        function importExcel(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-                
-                if (jsonData.length > 1) {
-                    students = [];
-                    for (let i = 1; i < jsonData.length; i++) {
-                        let row = jsonData[i];
-                        if (row && row.length > 0) {
-                            students.push({
-                                id: String(row[0] || ('20260' + i)),
-                                lastName: String(row[1] || 'لقب ' + i),
-                                firstName: String(row[2] || 'اسم ' + i),
-                                birthDate: String(row[3] || '2012-01-01'),
-                                birthPlace: String(row[4] || 'الجزائر'),
-                                gender: String(row[5] || 'ذكر'),
-                                address: String(row[6] || 'سطاوالي'),
-                                level: 'رابعة',
-                                group: String((i % 4) + 1),
-                                status: 'خارجي',
-                                paymentStatus: 'pending',
-                                annualAvg: (10 + Math.random() * 6).toFixed(2),
-                                examAvg: (8 + Math.random() * 8).toFixed(2)
-                            });
-                        }
-                    }
-                    saveToDatabase();
-                    filterTable();
-                    Swal.fire('استيراد ناجح', `تم استيراد ${students.length} تلميذ بنجاح.`, 'success');
-                }
-            };
-            reader.readAsArrayBuffer(file);
+        function printPedagogicList() {
+            printDataPage();
+        }
+
+        function printBemResults() {
+            printDataPage();
+        }
+
+        function downloadDecreePDF() {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>القرار الوزاري رقم 18 المؤرخ في 27 جويلية 2026</title>
+                    <style>
+                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; padding: 30px; line-height: 2; }
+                        h2, h3 { text-align: center; color: #0056b3; }
+                        .content { border: 2px solid #0056b3; padding: 20px; border-radius: 8px; }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <div class="content">
+                        <h2>الجمهورية الجزائرية الديمقراطية الشعبية</h2>
+                        <h3>وزارة التربية الوطنية</h3>
+                        <p style="text-align:center; font-weight:bold;">قرار رقم 18 مؤرخ في 12 صفر عام 1448 الموافق لـ 27 جويلية سنة 2026</p>
+                        <p>يعدل القرار رقم 37 المؤرخ في 13 رمضان عام 1443 الموافق لـ 14 أفريل سنة 2022 المحدد لشعب التعليم الثانوي العام والتكنولوجي.</p>
+                        <hr>
+                        <p><strong>الشعب المعتمدة للتوجيه الثانوي:</strong></p>
+                        <ul>
+                            <li>رياضيات</li>
+                            <li>علوم تجريبية</li>
+                            <li>معلوماتية</li>
+                            <li>هندسة مدنية</li>
+                            <li>هندسة كهربائية</li>
+                            <li>هندسة ميكانيكية</li>
+                            <li>هندسة الطرائق</li>
+                            <li>اسبانية</li>
+                            <li>ألمانية</li>
+                            <li>إيطالية</li>
+                            <li>آداب وفلسفة</li>
+                            <li>تسيير واقتصاد</li>
+                        </ul>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         function exportExcelFile() {
@@ -1711,16 +1851,48 @@
             const worksheet = XLSX.utils.json_to_sheet(students);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "التلاميذ");
-            XLSX.writeFile(workbook, "قائمة_التلاميذ_الأرضية_الرقمية.xlsx");
+            XLSX.writeFile(workbook, "قائمة_التلاميذ_2026_2027.xlsx");
+        }
+
+        function importExcel(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet);
+
+                if (json.length > 0) {
+                    students = json.map((row, idx) => ({
+                        id: String(row.id || row['رقم التعريف'] || '2026' + (1000 + idx)),
+                        lastName: row.lastName || row['اللقب'] || '',
+                        firstName: row.firstName || row['الاسم'] || '',
+                        gender: row.gender || row['الجنس'] || 'ذكر',
+                        birthDate: row.birthDate || row['تاريخ الميلاد'] || '',
+                        birthPlace: row.birthPlace || row['مكان الميلاد'] || '',
+                        address: row.address || row['العنوان'] || '',
+                        level: row.level || row['المستوى'] || 'رابعة',
+                        group: String(row.group || row['الفوج'] || (idx % 4) + 1),
+                        status: row.status || row['الصفة'] || 'خارجي',
+                        paymentStatus: row.paymentStatus || 'pending'
+                    }));
+                    saveToDatabase();
+                    filterTable();
+                    Swal.fire('نجاح', 'تم استيراد البيانات بنجاح من ملف الاكسيل.', 'success');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         window.onload = function() {
+            initStreamSelects();
             if (students.length === 0) {
-                // بيانات تجريبية افتراضية في حال كانت القاعدة فارغة
                 students = [
-                    { id: "20261001", lastName: "بن عيسى", firstName: "محمد أمين", birthDate: "2012-05-12", birthPlace: "سطاوالي", gender: "ذكر", address: "حي 500 مسكن سطاوالي", level: "رابعة", group: "1", status: "خارجي", paymentStatus: "confirmed", annualAvg: "14.50", examAvg: "13.20", fatherName: "عبد القادر", motherName: "فاطمة زهراء" },
-                    { id: "20261002", lastName: "فاطمي", firstName: "مريم", birthDate: "2012-08-20", birthPlace: "الجزائر", gender: "أنثى", address: "شارع الاستقلال سطاوالي", level: "رابعة", group: "2", status: "خارجي", paymentStatus: "pending", annualAvg: "11.00", examAvg: "9.50", fatherName: "الخضر", motherName: "خديجة" },
-                    { id: "20261003", lastName: "بوجمعة", firstName: "إسلام", birthDate: "2012-02-15", birthPlace: "زرالدة", gender: "ذكر", address: "الضلعة زرالدة", level: "رابعة", group: "3", status: "خارجي", paymentStatus: "confirmed", annualAvg: "13.25", examAvg: "12.00", fatherName: "محمد", motherName: "عائشة" }
+                    { id: '20260001', lastName: 'بن علي', firstName: 'أحمد', gender: 'ذكر', birthDate: '2011-03-15', birthPlace: 'سطاوالي', address: 'سطاوالي - الجزائر', level: 'رابعة', group: '1', status: 'خارجي', paymentStatus: 'pending' },
+                    { id: '20260002', lastName: 'مزاهي', firstName: 'فاطمة', gender: 'أنثى', birthDate: '2011-07-22', birthPlace: 'زرالدة', address: 'زرالدة - الجزائر', level: 'رابعة', group: '2', status: 'خارجي', paymentStatus: 'confirmed' }
                 ];
                 saveToDatabase();
             }
