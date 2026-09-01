@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -161,6 +162,12 @@
             font-weight: bold;
         }
 
+        .tab-btn.disabled-tab {
+            color: #aaa;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         .alert-message {
             background-color: var(--custom-teal);
             border: 1px solid #b2dfdb;
@@ -254,6 +261,60 @@
         .btn-guidance { background-color: #6f42c1; color: white; font-size: 12px; padding: 4px 8px; }
         .btn-auto-group { background-color: #6f42c1; color: white; }
         .btn-digital-cert { background-color: #17a2b8; color: white; font-size: 12px; padding: 4px 8px; }
+        .btn-dropdown {
+            background-color: #343a40;
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            position: relative;
+        }
+
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            min-width: 220px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 100;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            right: 0;
+            top: 100%;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            color: #333;
+            padding: 10px 14px;
+            text-decoration: none;
+            display: block;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            background: white;
+            border: none;
+            width: 100%;
+            text-align: right;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown-item i {
+            margin-left: 8px;
+            width: 16px;
+        }
 
         .status-dark-green {
             background-color: #198754;
@@ -313,56 +374,23 @@
             flex-wrap: wrap;
         }
 
-        /* Dropdown for print actions */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #fff;
-            min-width: 220px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            z-index: 100;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            right: 0;
-            text-align: right;
-        }
-        .dropdown-content a, .dropdown-content button {
-            color: #333;
-            padding: 10px 14px;
-            text-decoration: none;
-            display: block;
-            width: 100%;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 13px;
-            text-align: right;
-        }
-        .dropdown-content a:hover, .dropdown-content button:hover {
-            background-color: #f1f1f1;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        .btn-dropdown {
-            background-color: #17a2b8;
-            color: white;
-            font-size: 12px;
-            padding: 4px 10px;
+        /* Pagination with prev/next on sides */
+        .pagination-wrapper {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .pagination {
-            margin-top: 15px;
             display: flex;
             justify-content: center;
             gap: 5px;
             align-items: center;
             flex-wrap: wrap;
+            flex: 1;
         }
 
         .page-btn {
@@ -373,6 +401,7 @@
             cursor: pointer;
             border-radius: 4px;
             min-width: 40px;
+            font-family: 'Noto Kufi Arabic', sans-serif;
         }
 
         .page-btn.active {
@@ -380,7 +409,31 @@
             color: white;
         }
 
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-page-btn {
+            padding: 8px 16px;
+            background: var(--header-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-page-btn:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
         #fileInput { display: none; }
+        #electronicFileInput { display: none; }
 
         .modal {
             display: none;
@@ -456,198 +509,280 @@
             width: 250px;
         }
 
-        .decree-card {
-            background: #fff;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-        .decree-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--header-blue);
-            margin-bottom: 10px;
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0056b3, #007bff);
+            z-index: 10000;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
         }
-        .decree-body {
+
+        .login-box {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 12px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .login-box h2 {
+            color: var(--header-blue);
+            margin-bottom: 10px;
+        }
+
+        .login-box p {
+            color: #666;
             font-size: 14px;
-            color: #475569;
-            line-height: 1.8;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .dzds-btn {
+            background: linear-gradient(90deg, #0056b3, #00a8e8);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .dzds-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,86,179,0.4);
+        }
+
+        .locked-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
+
+    <!-- شاشة الدخول عبر المحافظة السامية للرقمنة (DZDS) -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <img src="https://awlyaa.education.dz/public/assets/images/logo_black.png?v=1.0.2" alt="Logo" style="height:70px; margin-bottom:15px;">
+            <h2>الأرضية الرقمية لوزارة التربية الوطنية</h2>
+            <p>تسجيل الدخول الموحد عبر المحافظة السامية للرقمنة<br><strong>DZDS - Digital High Commission</strong></p>
+            <button class="dzds-btn" onclick="loginViaDZDS()">
+                <i class="fas fa-shield-alt"></i>
+                الدخول عبر منصة DZDS
+            </button>
+            <p style="margin-top:20px; font-size:12px; color:#999;">
+                مرتبط رسمياً بالمحافظة السامية للرقمنة<br>
+                الجمهورية الجزائرية الديمقراطية الشعبية
+            </p>
+        </div>
+    </div>
 
     <div id="loadingOverlay">
         <div class="spinner"></div>
         <div class="loading-text">جاري المعالجة الرقمية...</div>
     </div>
 
-    <header class="top-navbar">
-        <div class="nav-part">
-            <img src="https://awlyaa.education.dz/public/assets/images/logo_black.png?v=1.0.2" alt="Logo" class="logo-img">
-        </div>
-        <div class="nav-part">
-            مديرية التربية للجزائر غرب<br>متوسطة الشهيد خالد مكاوي (سطاوالي)
-        </div>
-        <div class="nav-part">إعلاناتك</div>
-        <div class="nav-part"><i class="fas fa-user-circle"></i> حسابي الشخصي</div>
-    </header>
+    <div id="mainApp" style="display:none;">
+        <header class="top-navbar">
+            <div class="nav-part">
+                <img src="https://awlyaa.education.dz/public/assets/images/logo_black.png?v=1.0.2" alt="Logo" class="logo-img">
+            </div>
+            <div class="nav-part">
+                مديرية التربية للجزائر غرب<br>متوسطة الشهيد خالد مكاوي (سطاوالي)
+            </div>
+            <div class="nav-part">إعلاناتك</div>
+            <div class="nav-part"><i class="fas fa-user-circle"></i> <span id="loggedUser">حسابي الشخصي</span></div>
+        </header>
 
-    <div class="window-outer">
-        <h1 class="main-title">الأرضية الرقمية لوزارة التربية الوطنية</h1>
-        
-        <div class="window-inner">
-            <div class="window-content">
-                <h2 class="sub-title" id="currentSectionTitle">الدخول المدرسي</h2>
+        <div class="window-outer">
+            <h1 class="main-title">الأرضية الرقمية لوزارة التربية الوطنية</h1>
+            
+            <div class="window-inner">
+                <div class="window-content">
+                    <h2 class="sub-title" id="currentSectionTitle">الدخول المدرسي</h2>
 
-                <div class="tabs-container" id="tabs">
-                    <button class="tab-btn active" onclick="switchTab(0)">الدخول المدرسي</button>
-                    <button class="tab-btn" onclick="switchTab(1)">متابعة الإحصائيات الدقيقة</button>
-                    <button class="tab-btn" onclick="switchTab(2)">متابعة حجز النقاط والاستدراك</button>
-                    <button class="tab-btn" onclick="switchTab(3)">تحيين بيانات التلاميذ</button>
-                    <button class="tab-btn" onclick="switchTab(4)">تسجيلات الامتحانات الرسمية</button>
-                    <button class="tab-btn" onclick="switchTab(5)">التسجيل البيداغوجي</button>
-                    <button class="tab-btn" onclick="switchTab(6)">حجز التوجيه المسبق والنهائي</button>
-                    <button class="tab-btn" onclick="switchTab(7)">نتائج شهادة التعليم المتوسط</button>
-                    <button class="tab-btn" onclick="switchTab(8)">متابعة التحويلات</button>
-                    <button class="tab-btn" onclick="switchTab(9)">إدماج التلاميذ المنقطعين عن الدراسة</button>
-                </div>
-
-                <div id="schoolAlert" class="alert-message" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    تنبيه: لا يمكن تعديل بيانات/ معلومات التلميذ، إذا كانت هناك أخطاء يرجى الاتصال بمصلحة التمدرس التابعة لمديرية التربية.
-                </div>
-
-                <div id="pedagogicAlert" class="alert-orange" style="display: none;">
-                    <i class="fas fa-calendar-alt"></i>
-                    سيتم إعادة التسجيل ودفع الحقوق ابتداءً من يوم 17-07-2026. الرجاء التقيد بالرزنامة من أجل تمكين أولياء التلاميذ من إعادة التسجيل بدفع المستحقات الخاصة بهم عبر فضاء الأولياء.
-                </div>
-
-                <div class="filter-section" id="filterSection">
-                    <div>
-                        <label>السنة الدراسية:</label>
-                        <select id="filterYear" onchange="filterTable()">
-                            <option value="all">--جميع السنوات--</option>
-                            <option value="2026-2027" selected>2026-2027</option>
-                        </select>
+                    <div class="tabs-container" id="tabs">
+                        <button class="tab-btn active" onclick="switchTab(0)">الدخول المدرسي</button>
+                        <button class="tab-btn" onclick="switchTab(1)">متابعة الإحصائيات الدقيقة</button>
+                        <button class="tab-btn" onclick="switchTab(2)">متابعة حجز النقاط والاستدراك</button>
+                        <button class="tab-btn" onclick="switchTab(3)">تحيين بيانات التلاميذ</button>
+                        <button class="tab-btn" onclick="switchTab(4)">تسجيلات الامتحانات الرسمية</button>
+                        <button class="tab-btn" onclick="switchTab(5)">التسجيل البيداغوجي</button>
+                        <button class="tab-btn" onclick="switchTab(6)">حجز التوجيه المسبق والنهائي</button>
+                        <button class="tab-btn disabled-tab" onclick="return false;" title="غير مفعل حالياً">نتائج شهادة التعليم المتوسط</button>
+                        <button class="tab-btn" onclick="switchTab(8)">متابعة التحويلات</button>
+                        <button class="tab-btn" onclick="switchTab(9)">إدماج التلاميذ المنقطعين عن الدراسة</button>
                     </div>
-                    <div>
-                        <label>المستوى:</label>
-                        <select id="filterLevel" onchange="filterTable()">
-                            <option value="all">--جميع المستويات--</option>
-                            <option value="رابعة" selected>رابعة</option>
-                        </select>
+
+                    <div id="schoolAlert" class="alert-message" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        تنبيه: لا يمكن تعديل بيانات/ معلومات التلميذ، إذا كانت هناك أخطاء يرجى الاتصال بمصلحة التمدرس التابعة لمديرية التربية.
                     </div>
-                    <div>
-                        <label>رقم الفوج:</label>
-                        <select id="filterGroup" onchange="filterTable()">
-                            <option value="all">--جميع الأفواج--</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
+
+                    <div id="pedagogicAlert" class="alert-orange" style="display: none;">
+                        <i class="fas fa-calendar-alt"></i>
+                        سيتم إعادة التسجيل ودفع الحقوق ابتداءً من يوم 17-07-2026. الرجاء التقيد بالرزنامة من أجل تمكين أولياء التلاميذ من إعادة التسجيل بدفع المستحقات الخاصة بهم عبر فضاء الأولياء.
                     </div>
-                    <div style="margin-right: auto; display: flex; gap: 10px; align-items: flex-end;" id="actionButtons">
-                        <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="importExcel(event)">
-                        
-                        <button class="btn btn-auto-group" id="btnAutoGroup" onclick="runAutoGrouping()">
-                            <i class="fas fa-users-cog"></i> التفويج الآلي
-                        </button>
-                        
-                        <button class="btn btn-import" id="btnImport" onclick="document.getElementById('fileInput').click()">
-                            <i class="fas fa-file-import"></i> استيراد بيانات اكسيل
-                        </button>
-                        
-                        <button class="btn btn-print" id="btnPrintGeneral" onclick="printDataPage()">
-                            <i class="fas fa-print"></i> طباعة القوائم
-                        </button>
 
-                        <button class="btn btn-export" onclick="exportExcelFile()">
-                            <i class="fas fa-file-export"></i> تصدير إكسيل
-                        </button>
-                        <button class="btn btn-print" id="btnPrintPedagogic" onclick="printPedagogicList()" style="display: none;">
-                            <i class="fas fa-print"></i> طباعة القوائم
-                        </button>
-                        <button class="btn btn-print" id="btnPrintBem" onclick="printBemResults()" style="display: none;">
-                            <i class="fas fa-print"></i> طباعة النتائج
-                        </button>
-                        <button class="btn btn-import" id="btnRegisterAll" onclick="registerAllStudents()" style="display: none; background-color:#28a745;">
-                            <i class="fas fa-users-cog"></i> تسجيل كل التلاميذ
-                        </button>
-                        <button class="btn btn-update" id="btnUnregisterAll" onclick="unregisterAllStudents()" style="display: none; background-color:#dc3545;">
-                            <i class="fas fa-user-slash"></i> إلغاء تسجيل الكل
-                        </button>
+                    <div id="dropoutLockedAlert" class="locked-info" style="display: none;">
+                        <i class="fas fa-lock"></i>
+                        تبويب إدماج التلاميذ المنقطعين عن الدراسة سيكون متاحاً ابتداءً من يوم <strong>02 سبتمبر 2026 الساعة 23:38</strong>
                     </div>
-                </div>
 
-                <div id="searchContainer" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="searchBox" placeholder="بحث عن تلميذ..." style="width: 350px;" onkeyup="filterTable()">
-                    <button class="btn btn-search" onclick="filterTable()"><i class="fas fa-search"></i> بحث</button>
-                </div>
-
-                <div class="table-section" id="tableWrapper">
-                    <table id="studentsTable">
-                        <thead id="tableHeader"></thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                    <div class="pagination" id="pagination"></div>
-                </div>
-
-                <div id="statsSection" style="display: none;">
-                    <div class="dashboard-grid">
-                        <div class="dashboard-card">
-                            <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--main-blue); padding-bottom: 10px;"><i class="fas fa-chart-bar"></i> توزيع التعداد البيداغوجي</h3>
-                            <p style="font-size: 15px; margin: 15px 0;">إجمالي التلاميذ بالمنصة: <strong id="statTotal" style="color: var(--main-blue); font-size: 20px;">0</strong> تلميذ</p>
-                            <hr style="border: 0; border-top: 1px solid #eee;">
-                            <p>الفوج 1: <strong id="statG1" style="color:#007bff;">0</strong> تلاميذ</p>
-                            <p>الفوج 2: <strong id="statG2" style="color:#28a745;">0</strong> تلاميذ</p>
-                            <p>الفوج 3: <strong id="statG3" style="color:#ffc107;">0</strong> تلاميذ</p>
-                            <p>الفوج 4: <strong id="statG4" style="color:#dc3545;">0</strong> تلاميذ</p>
+                    <div class="filter-section" id="filterSection">
+                        <div>
+                            <label>السنة الدراسية:</label>
+                            <select id="filterYear" onchange="filterTable()">
+                                <option value="all">--جميع السنوات--</option>
+                                <option value="2026-2027" selected>2026-2027</option>
+                            </select>
                         </div>
-                        <div class="dashboard-card" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
-                            <h3 style="color: var(--header-blue); margin-bottom: 15px;"><i class="fas fa-chart-pie"></i> التمثيل البياني للأفواج</h3>
-                            <div class="chart-container">
-                                <canvas id="analyticsPieChart"></canvas>
+                        <div>
+                            <label>المستوى:</label>
+                            <select id="filterLevel" onchange="filterTable()">
+                                <option value="all">--جميع المستويات--</option>
+                                <option value="رابعة" selected>رابعة</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>رقم الفوج:</label>
+                            <select id="filterGroup" onchange="filterTable()">
+                                <option value="all">--جميع الأفواج--</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div style="margin-right: auto; display: flex; gap: 10px; align-items: flex-end;" id="actionButtons">
+                            <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="importExcel(event)">
+                            <input type="file" id="electronicFileInput" accept=".pdf,.jpg,.png,.jpeg" onchange="handleElectronicFile(event)">
+                            
+                            <button class="btn btn-auto-group" id="btnAutoGroup" onclick="runAutoGrouping()">
+                                <i class="fas fa-users-cog"></i> التفويج الآلي
+                            </button>
+                            
+                            <button class="btn btn-import" id="btnImport" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-file-import"></i> استيراد بيانات اكسيل
+                            </button>
+                            
+                            <button class="btn btn-print" id="btnPrintGeneral" onclick="printDataPage()">
+                                <i class="fas fa-print"></i> طباعة القوائم
+                            </button>
+
+                            <button class="btn btn-export" onclick="exportExcelFile()">
+                                <i class="fas fa-file-export"></i> تصدير إكسيل
+                            </button>
+                            <button class="btn btn-print" id="btnPrintPedagogic" onclick="printPedagogicList()" style="display: none;">
+                                <i class="fas fa-print"></i> طباعة القوائم
+                            </button>
+                            <button class="btn btn-import" id="btnRegisterAll" onclick="registerAllStudents()" style="display: none; background-color:#28a745;">
+                                <i class="fas fa-users-cog"></i> تسجيل كل التلاميذ
+                            </button>
+                            <button class="btn btn-update" id="btnUnregisterAll" onclick="unregisterAllStudents()" style="display: none; background-color:#dc3545;">
+                                <i class="fas fa-user-slash"></i> إلغاء تسجيل الكل
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="searchContainer" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="searchBox" placeholder="بحث عن تلميذ..." style="width: 350px;" onkeyup="filterTable()">
+                        <button class="btn btn-search" onclick="filterTable()"><i class="fas fa-search"></i> بحث</button>
+                    </div>
+
+                    <div class="table-section" id="tableWrapper">
+                        <table id="studentsTable">
+                            <thead id="tableHeader"></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                        <div class="pagination-wrapper">
+                            <button class="nav-page-btn" id="prevPageBtn" onclick="changePage(-1)">
+                                <i class="fas fa-chevron-right"></i> السابق
+                            </button>
+                            <div class="pagination" id="pagination"></div>
+                            <button class="nav-page-btn" id="nextPageBtn" onclick="changePage(1)">
+                                التالي <i class="fas fa-chevron-left"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="statsSection" style="display: none;">
+                        <div class="dashboard-grid">
+                            <div class="dashboard-card">
+                                <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--main-blue); padding-bottom: 10px;"><i class="fas fa-chart-bar"></i> توزيع التعداد البيداغوجي</h3>
+                                <p style="font-size: 15px; margin: 15px 0;">إجمالي التلاميذ بالمنصة: <strong id="statTotal" style="color: var(--main-blue); font-size: 20px;">0</strong> تلميذ</p>
+                                <hr style="border: 0; border-top: 1px solid #eee;">
+                                <p>الفوج 1: <strong id="statG1" style="color:#007bff;">0</strong> تلاميذ</p>
+                                <p>الفوج 2: <strong id="statG2" style="color:#28a745;">0</strong> تلاميذ</p>
+                                <p>الفوج 3: <strong id="statG3" style="color:#ffc107;">0</strong> تلاميذ</p>
+                                <p>الفوج 4: <strong id="statG4" style="color:#dc3545;">0</strong> تلاميذ</p>
+                            </div>
+                            <div class="dashboard-card" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                <h3 style="color: var(--header-blue); margin-bottom: 15px;"><i class="fas fa-chart-pie"></i> التمثيل البياني للأفواج</h3>
+                                <div class="chart-container">
+                                    <canvas id="analyticsPieChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="notAvailableSection" style="display: none; text-align: center; padding: 50px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px;">
-                    <i class="fas fa-ban" style="font-size: 50px; color: var(--danger-red); margin-bottom: 20px;"></i>
-                    <h3 style="color: #333;">هذه الخدمة غير متاحة حالياً</h3>
-                    <p style="color: #666;">سيتم تفعيل المتابعة لاحقاً وفق الرزنامة الرسمية للوزارة.</p>
-                </div>
+                    <div id="notAvailableSection" style="display: none; text-align: center; padding: 50px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px;">
+                        <i class="fas fa-ban" style="font-size: 50px; color: var(--danger-red); margin-bottom: 20px;"></i>
+                        <h3 style="color: #333;">هذه الخدمة غير متاحة حالياً</h3>
+                        <p style="color: #666;">سيتم تفعيل المتابعة لاحقاً وفق الرزنامة الرسمية للوزارة.</p>
+                    </div>
 
-                <!-- قسم متابعة التحويلات -->
-                <div id="transfersSection" style="display: none;">
-                    <div class="alert-message">
-                        <i class="fas fa-exchange-alt"></i>
-                        متابعة التحويلات الواردة والصادرة للتلاميذ. يمكن تسجيل طلبات التحويل ومتابعة حالتها.
+                    <div id="transfersSection" style="display: none;">
+                        <div class="alert-message">
+                            <i class="fas fa-exchange-alt"></i>
+                            تبويب متابعة التحويلات: يتم تسجيل ومتابعة طلبات التحويل بين المؤسسات.
+                        </div>
+                        <div class="table-section">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>رقم التعريف</th>
+                                        <th>اللقب والاسم</th>
+                                        <th>المؤسسة الأصلية</th>
+                                        <th>المؤسسة المستقبلة</th>
+                                        <th>تاريخ الطلب</th>
+                                        <th>الحالة</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transfersBody">
+                                    <tr>
+                                        <td colspan="6" style="text-align:center; color:#999;">لا توجد طلبات تحويل حالياً</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="table-section">
-                        <p style="text-align:center; color:#666; padding:30px;">لا توجد تحويلات مسجلة حالياً. سيتم تفعيل نظام التحويلات الكامل قريباً.</p>
-                    </div>
-                </div>
 
-                <!-- قسم إدماج التلاميذ المنقطعين -->
-                <div id="dropoutSection" style="display: none;">
-                    <div class="alert-orange">
-                        <i class="fas fa-user-plus"></i>
-                        إدماج التلاميذ المنقطعين عن الدراسة وإعادة تسجيلهم وفق الإجراءات الوزارية المعتمدة.
+                    <div id="dropoutSection" style="display: none;">
+                        <div id="dropoutContent"></div>
                     </div>
-                    <div class="table-section">
-                        <p style="text-align:center; color:#666; padding:30px;">لا توجد طلبات إدماج مسجلة حالياً. يمكن إضافة التلاميذ المنقطعين عبر الاستيراد أو التسجيل اليدوي.</p>
-                    </div>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
@@ -911,6 +1046,7 @@
         };
 
         let students = JSON.parse(localStorage.getItem('students_db')) || [];
+        let dropoutStudents = JSON.parse(localStorage.getItem('dropout_students_db')) || [];
         let currentPage = 1;
         const itemsPerPage = 10;
         let currentEditIndex = -1;
@@ -920,6 +1056,36 @@
         let currentTab = 0;
         let analyticsChartInstance = null;
         let certSerialNumber = parseInt(localStorage.getItem('cert_serial_number')) || 100;
+        let currentElectronicIndex = -1;
+        let filteredCache = [];
+
+        // تاريخ فتح تبويب المنقطعين: 02-09-2026 الساعة 23:38
+        const DROPOUT_UNLOCK_DATE = new Date('2026-09-02T23:38:00');
+
+        function isDropoutUnlocked() {
+            return new Date() >= DROPOUT_UNLOCK_DATE;
+        }
+
+        function loginViaDZDS() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = 'flex';
+            document.querySelector('.loading-text').innerText = 'جاري التحقق عبر منصة DZDS...';
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('loggedUser').innerText = 'مستخدم DZDS المعتمد';
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم الدخول بنجاح',
+                    text: 'مرحباً بك في الأرضية الرقمية المرتبطة بالمحافظة السامية للرقمنة (DZDS)',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+                initApp();
+            }, 1800);
+        }
 
         function initStreamSelects() {
             const selectElements = document.querySelectorAll('.guidance-stream-select');
@@ -934,6 +1100,10 @@
 
         function saveToDatabase() {
             localStorage.setItem('students_db', JSON.stringify(students));
+        }
+
+        function saveDropoutDatabase() {
+            localStorage.setItem('dropout_students_db', JSON.stringify(dropoutStudents));
         }
 
         function updateExamCommuneDropdown() {
@@ -1015,7 +1185,7 @@
             printWindow.document.close();
         }
 
-        // شهادة مدرسية محسّنة مع Droid Arabic Kufi + باركود منظم + QR على الجانب
+        // ========== شهادة مدرسية محسّنة (Droid Arabic Kufi + باركود + QR على الجانب) ==========
         function printSchoolCertificate(index) {
             const student = students[index];
             certSerialNumber++;
@@ -1034,6 +1204,7 @@
                     <link href="https://fonts.googleapis.com/css2?family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
                     <style>
                         @page { size: A4 portrait; margin: 12mm; }
+                        * { box-sizing: border-box; }
                         body { 
                             font-family: 'Droid Arabic Kufi', 'Noto Kufi Arabic', serif; 
                             direction: rtl; 
@@ -1041,42 +1212,53 @@
                             color: #000000; 
                             margin: 0; 
                             padding: 0; 
-                            font-size: 15px; 
-                            line-height: 1.9; 
+                            font-size: 14px; 
+                            line-height: 1.9;
                         }
-                        .cert-container { width: 100%; box-sizing: border-box; padding: 5mm; }
-                        .national-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 12px; }
-                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+                        .cert-container { width: 100%; height: 100%; padding: 8mm; position: relative; }
+                        .national-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px; }
+                        
+                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
                         .header-table td { border: none; padding: 0; vertical-align: top; }
-                        .institution-info { text-align: right; font-size: 13px; font-weight: bold; line-height: 1.6; }
-                        .barcode-side { text-align: left; width: 45%; }
+                        
+                        .institution-info { text-align: right; font-size: 13px; font-weight: bold; line-height: 1.7; }
+                        
+                        .barcode-side { text-align: left; width: 240px; }
                         .barcode-title { 
                             font-size: 12px; 
                             font-weight: bold; 
                             margin-bottom: 4px; 
                             text-align: center;
-                            font-family: 'Droid Arabic Kufi', serif;
+                            color: #222;
                         }
                         .barcode-img-container { text-align: center; }
-                        .barcode-img-container svg { max-width: 230px; height: 55px; }
-                        .serial-section { margin-top: 8px; font-size: 14px; font-weight: bold; text-align: right; }
+                        .barcode-img-container svg { max-width: 220px; height: 48px; }
+                        
+                        .serial-section { margin: 12px 0 8px; font-size: 14px; font-weight: bold; }
+                        
                         .title-box { 
                             text-align: center; 
-                            margin: 35px auto 25px; 
+                            margin: 28px auto 22px; 
                             width: 240px; 
                             border: 2px solid #000; 
                             padding: 10px 18px; 
                             font-size: 22px; 
-                            font-weight: bold; 
-                            font-family: 'Droid Arabic Kufi', serif;
+                            font-weight: bold;
+                            letter-spacing: 2px;
                         }
-                        .content-body { text-align: right; margin-top: 15px; font-size: 16px; padding-right: 8px; }
-                        .content-row { margin-bottom: 14px; }
-                        .footer-section { margin-top: 50px; width: 100%; }
+                        
+                        .content-body { text-align: right; margin-top: 18px; font-size: 16px; padding-right: 8px; }
+                        .content-row { margin-bottom: 11px; }
+                        
+                        .footer-section { margin-top: 45px; width: 100%; }
                         .footer-table { width: 100%; border-collapse: collapse; }
-                        .footer-table td { border: none; vertical-align: middle; }
-                        .qr-side { text-align: right; width: 40%; }
-                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 15px; }
+                        .footer-table td { border: none; vertical-align: bottom; }
+                        
+                        .qr-side { text-align: right; width: 130px; }
+                        .qr-container { display: inline-block; }
+                        .qr-label { font-size: 11px; text-align: center; margin-top: 4px; color: #444; }
+                        
+                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 30px; }
                     </style>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
@@ -1112,7 +1294,7 @@
                             <div class="content-row">رقم التسجيل: <strong>${student.id || ''}</strong></div>
                             <div class="content-row">الفوج التربوي: <strong>${student.group || '1'}</strong></div>
                             <div class="content-row">السنة الدراسية: <strong>${currentFullAcademicYear}</strong></div>
-                            <div class="content-row" style="margin-top: 25px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
+                            <div class="content-row" style="margin-top: 22px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
                             <div class="content-row" style="margin-top: 12px; font-family: sans-serif; font-size: 13px; direction: ltr; text-align: right;">Nom et Prénom: ${latinName}</div>
                         </div>
 
@@ -1120,11 +1302,12 @@
                             <table class="footer-table">
                                 <tr>
                                     <td class="qr-side">
-                                        <div id="qrcodeTarget" style="display:inline-block;"></div>
+                                        <div id="qrcodeTarget" class="qr-container"></div>
+                                        <div class="qr-label">رمز التحقق الرقمي</div>
                                     </td>
                                     <td class="signature-container">
-                                        مدير المؤسسة<br><br>
-                                        الختم والإمضاء
+                                        مدير المؤسسة<br><br><br>
+                                        الختم والتوقيع
                                     </td>
                                 </tr>
                             </table>
@@ -1133,12 +1316,12 @@
 
                     <script>
                         JsBarcode("#barcodeTarget", "${student.id || '20260000'}", {
-                            format: "CODE128", width: 1.6, height: 45, displayValue: true, fontSize: 13, 
-                            background: "#ffffff", lineColor: "#000000", margin: 5
+                            format: "CODE128", width: 1.6, height: 42, displayValue: true, fontSize: 13, 
+                            background: "#ffffff", lineColor: "#000000", margin: 4
                         });
-                        const qrData = "التلميذ: ${student.lastName} ${student.firstName}\\nتاريخ الميلاد: ${student.birthDate}\\nرقم التسجيل: ${student.id}\\nالفوج: ${student.group}\\nمؤسسة: متوسطة الشهيد خالد مكاوي";
+                        const qrData = "التلميذ: ${student.lastName} ${student.firstName}\\nتاريخ الميلاد: ${student.birthDate}\\nرقم التسجيل: ${student.id}\\nالفوج: ${student.group}\\nالمؤسسة: متوسطة الشهيد خالد مكاوي";
                         new QRCode(document.getElementById("qrcodeTarget"), {
-                            text: qrData, width: 110, height: 110, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                            text: qrData, width: 105, height: 105, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
                         });
                         window.setTimeout(function() { window.print(); window.close(); }, 600);
                     <\/script>
@@ -1148,7 +1331,7 @@
             printWindow.document.close();
         }
 
-        // شهادة تسجيل (نفس التصميم مع تغيير العنوان والنص)
+        // ========== شهادة تسجيل (نفس التصميم مع تغيير العنوان) ==========
         function printRegistrationCertificate(index) {
             const student = students[index];
             certSerialNumber++;
@@ -1156,7 +1339,7 @@
 
             const printWindow = window.open('', '_blank');
             const currentYear = "2026";
-            const currentFullAcademicYear = "2026-2027";
+            const currentFullAcademicYear = document.getElementById('filterYear').value === 'all' ? '2026-2027' : document.getElementById('filterYear').value;
             const todayDate = new Date().toLocaleDateString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric' });
             const latinName = (student.firstNameLatin || "") + " " + (student.lastNameLatin || "STUDENT");
 
@@ -1167,6 +1350,7 @@
                     <link href="https://fonts.googleapis.com/css2?family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
                     <style>
                         @page { size: A4 portrait; margin: 12mm; }
+                        * { box-sizing: border-box; }
                         body { 
                             font-family: 'Droid Arabic Kufi', 'Noto Kufi Arabic', serif; 
                             direction: rtl; 
@@ -1174,42 +1358,53 @@
                             color: #000000; 
                             margin: 0; 
                             padding: 0; 
-                            font-size: 15px; 
-                            line-height: 1.9; 
+                            font-size: 14px; 
+                            line-height: 1.9;
                         }
-                        .cert-container { width: 100%; box-sizing: border-box; padding: 5mm; }
-                        .national-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 12px; }
-                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+                        .cert-container { width: 100%; height: 100%; padding: 8mm; position: relative; }
+                        .national-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px; }
+                        
+                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
                         .header-table td { border: none; padding: 0; vertical-align: top; }
-                        .institution-info { text-align: right; font-size: 13px; font-weight: bold; line-height: 1.6; }
-                        .barcode-side { text-align: left; width: 45%; }
+                        
+                        .institution-info { text-align: right; font-size: 13px; font-weight: bold; line-height: 1.7; }
+                        
+                        .barcode-side { text-align: left; width: 240px; }
                         .barcode-title { 
                             font-size: 12px; 
                             font-weight: bold; 
                             margin-bottom: 4px; 
                             text-align: center;
-                            font-family: 'Droid Arabic Kufi', serif;
+                            color: #222;
                         }
                         .barcode-img-container { text-align: center; }
-                        .barcode-img-container svg { max-width: 230px; height: 55px; }
-                        .serial-section { margin-top: 8px; font-size: 14px; font-weight: bold; text-align: right; }
+                        .barcode-img-container svg { max-width: 220px; height: 48px; }
+                        
+                        .serial-section { margin: 12px 0 8px; font-size: 14px; font-weight: bold; }
+                        
                         .title-box { 
                             text-align: center; 
-                            margin: 35px auto 25px; 
-                            width: 260px; 
+                            margin: 28px auto 22px; 
+                            width: 280px; 
                             border: 2px solid #000; 
                             padding: 10px 18px; 
-                            font-size: 22px; 
-                            font-weight: bold; 
-                            font-family: 'Droid Arabic Kufi', serif;
+                            font-size: 20px; 
+                            font-weight: bold;
+                            letter-spacing: 1px;
                         }
-                        .content-body { text-align: right; margin-top: 15px; font-size: 16px; padding-right: 8px; }
-                        .content-row { margin-bottom: 14px; }
-                        .footer-section { margin-top: 50px; width: 100%; }
+                        
+                        .content-body { text-align: right; margin-top: 18px; font-size: 16px; padding-right: 8px; }
+                        .content-row { margin-bottom: 11px; }
+                        
+                        .footer-section { margin-top: 45px; width: 100%; }
                         .footer-table { width: 100%; border-collapse: collapse; }
-                        .footer-table td { border: none; vertical-align: middle; }
-                        .qr-side { text-align: right; width: 40%; }
-                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 15px; }
+                        .footer-table td { border: none; vertical-align: bottom; }
+                        
+                        .qr-side { text-align: right; width: 130px; }
+                        .qr-container { display: inline-block; }
+                        .qr-label { font-size: 11px; text-align: center; margin-top: 4px; color: #444; }
+                        
+                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 30px; }
                     </style>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
@@ -1228,7 +1423,7 @@
                                 <td class="barcode-side">
                                     <div class="barcode-title">رقم التعريف المدرسي</div>
                                     <div class="barcode-img-container">
-                                        <svg id="barcodeTargetReg"></svg>
+                                        <svg id="barcodeTarget"></svg>
                                     </div>
                                 </td>
                             </tr>
@@ -1241,11 +1436,11 @@
                         <div class="content-body">
                             <div class="content-row">يشهد مدير المتوسطة أن التلميذ(ة): <strong>${student.lastName || ''} &nbsp;&nbsp;&nbsp; ${student.firstName || ''}</strong></div>
                             <div class="content-row">تاريخ الميلاد: <strong>${student.birthDate || ''}</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; مكان الميلاد: <strong>${student.birthPlace || ''}</strong></div>
-                            <div class="content-row">مسجل في القوائم الاسمية للسنة الدراسية ${currentFullAcademicYear}</div>
+                            <div class="content-row">مسجل في القوائم الاسمية للسنة الدراسية <strong>${currentFullAcademicYear}</strong></div>
                             <div class="content-row">رقم التسجيل: <strong>${student.id || ''}</strong></div>
                             <div class="content-row">الفوج التربوي: <strong>${student.group || '1'}</strong></div>
-                            <div class="content-row">السنة الدراسية: <strong>${currentFullAcademicYear}</strong></div>
-                            <div class="content-row" style="margin-top: 25px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
+                            <div class="content-row">المستوى: <strong>${student.level || 'رابعة متوسط'}</strong></div>
+                            <div class="content-row" style="margin-top: 22px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
                             <div class="content-row" style="margin-top: 12px; font-family: sans-serif; font-size: 13px; direction: ltr; text-align: right;">Nom et Prénom: ${latinName}</div>
                         </div>
 
@@ -1253,11 +1448,12 @@
                             <table class="footer-table">
                                 <tr>
                                     <td class="qr-side">
-                                        <div id="qrcodeTargetReg" style="display:inline-block;"></div>
+                                        <div id="qrcodeTarget" class="qr-container"></div>
+                                        <div class="qr-label">رمز التحقق الرقمي</div>
                                     </td>
                                     <td class="signature-container">
-                                        مدير المؤسسة<br><br>
-                                        الختم والإمضاء
+                                        مدير المؤسسة<br><br><br>
+                                        الختم والتوقيع
                                     </td>
                                 </tr>
                             </table>
@@ -1265,13 +1461,13 @@
                     </div>
 
                     <script>
-                        JsBarcode("#barcodeTargetReg", "${student.id || '20260000'}", {
-                            format: "CODE128", width: 1.6, height: 45, displayValue: true, fontSize: 13, 
-                            background: "#ffffff", lineColor: "#000000", margin: 5
+                        JsBarcode("#barcodeTarget", "${student.id || '20260000'}", {
+                            format: "CODE128", width: 1.6, height: 42, displayValue: true, fontSize: 13, 
+                            background: "#ffffff", lineColor: "#000000", margin: 4
                         });
-                        const qrData = "شهادة تسجيل | التلميذ: ${student.lastName} ${student.firstName}\\nرقم التسجيل: ${student.id}\\nالسنة: ${currentFullAcademicYear}\\nمؤسسة: متوسطة الشهيد خالد مكاوي";
-                        new QRCode(document.getElementById("qrcodeTargetReg"), {
-                            text: qrData, width: 110, height: 110, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                        const qrData = "شهادة تسجيل | التلميذ: ${student.lastName} ${student.firstName}\\nرقم التسجيل: ${student.id}\\nالسنة: ${currentFullAcademicYear}\\nمسجل في القوائم الاسمية";
+                        new QRCode(document.getElementById("qrcodeTarget"), {
+                            text: qrData, width: 105, height: 105, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
                         });
                         window.setTimeout(function() { window.print(); window.close(); }, 600);
                     <\/script>
@@ -1281,106 +1477,53 @@
             printWindow.document.close();
         }
 
-        function printDigitalCert(index) {
-            // تم إلغاء هذا الزر من التسجيل البيداغوجي حسب الطلب
-            Swal.fire('غير متاح', 'تم إلغاء شهادة التسجيل الرقمية 100% من هذا القسم.', 'info');
+        function toggleDropdown(btn) {
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (m !== btn.nextElementSibling) m.classList.remove('show');
+            });
+            btn.nextElementSibling.classList.toggle('show');
         }
 
-        function printRegistrationForm(index) {
-            // تم إلغاء هذا الزر من التسجيل البيداغوجي حسب الطلب
-            Swal.fire('غير متاح', 'تم إلغاء استمارة التسجيل من هذا القسم.', 'info');
+        // إغلاق القوائم عند النقر خارجها
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown-container')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            }
+        });
+
+        function handleElectronicFile(e) {
+            const file = e.target.files[0];
+            if (!file || currentElectronicIndex === -1) return;
+            students[currentElectronicIndex].electronicFile = file.name;
+            saveToDatabase();
+            Swal.fire('تم الإضافة', `تم ربط الملف الإلكتروني "${file.name}" بالتلميذ بنجاح.`, 'success');
+            filterTable();
+            e.target.value = '';
         }
 
-        function printExamReceipt(index) {
-            const student = students[index];
-            const printWindow = window.open('', '_blank');
-            const todayDate = new Date().toLocaleDateString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric' });
+        function addElectronicFile(index) {
+            currentElectronicIndex = index;
+            document.getElementById('electronicFileInput').click();
+        }
 
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>وصل الاستدعاء والتسجيل في الامتحانات الرسمية - ${student.lastName} ${student.firstName}</title>
-                    <style>
-                        @page { size: A4 portrait; margin: 15mm; }
-                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; background-color: #ffffff; color: #000000; margin: 0; padding: 0; font-size: 14px; line-height: 1.8; }
-                        .receipt-container { width: 100%; height: 100%; box-sizing: border-box; }
-                        .national-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 20px; }
-                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
-                        .header-table td { border: none; padding: 0; vertical-align: top; }
-                        .title-box { text-align: center; margin: 30px auto; font-size: 20px; font-weight: bold; }
-                        .content-body { text-align: right; margin-top: 20px; font-size: 16px; }
-                        .content-row { margin-bottom: 12px; }
-                        .footer-section { margin-top: 60px; width: 100%; }
-                        .footer-table { width: 100%; border-collapse: collapse; }
-                        .footer-table td { border: none; vertical-align: top; }
-                        .signature { text-align: left; font-weight: bold; font-size: 15px; padding-left: 20px; }
-                        .barcode-side { text-align: left; }
-                        .barcode-title { font-size: 11px; font-weight: bold; margin-bottom: 2px; }
-                        .barcode-img-container svg { max-width: 220px; height: 50px; }
-                    </style>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-                </head>
-                <body>
-                    <div class="receipt-container">
-                        <div class="national-header">الجمهورية الجزائرية الديمقراطية الشعبية</div>
-                        
-                        <table class="header-table">
-                            <tr>
-                                <td style="text-align: right; font-weight: bold; font-size: 13px;">
-                                    الديوان الوطني للامتحانات والمسابقات<br>
-                                    ${student.examDirectorate || 'مديرية التربية للجزائر غرب'}<br>
-                                    مركز الإجراء: ${student.examCenter || 'متوسطة الشهيد خالد مكاوي'}
-                                </td>
-                                <td class="barcode-side">
-                                    <div class="barcode-title">رقم التسجيل الرسمي (ONEC)</div>
-                                    <div class="barcode-img-container">
-                                        <svg id="examBarcodeTarget"></svg>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <div class="title-box">وصل تسجيــل واختبــار رسمي (BEM)</div>
-
-                        <div class="content-body">
-                            <div class="content-row">اسم ولقب المترشح(ة): <strong>${student.lastName || ''} &nbsp;&nbsp;&nbsp; ${student.firstName || ''}</strong></div>
-                            <div class="content-row">تاريخ ومكان الميلاد: <strong>${student.birthDate || ''}</strong> بـ <strong>${student.birthPlace || ''}</strong></div>
-                            <div class="content-row">اسم الأب: <strong>${student.fatherName || 'غير مسجل'}</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; اسم ولقب الأم: <strong>${student.motherName || 'غير مسجل'}</strong></div>
-                            <div class="content-row">رقم التسجيل الوطني: <strong>${student.id || ''}</strong></div>
-                            <div class="content-row">مكان إجراء الاختبار: <strong>${student.examCenter || 'غير محدد'}</strong></div>
-                            <div class="content-row">ولاية وبلدية الإجراء: <strong>${student.examCommuneName || ''} (${student.examWilayaName || ''})</strong></div>
-                            <div class="content-row">حالة التسجيل: <strong style="color: #0056b3;">${student.examRegistration || 'مسجل'}</strong></div>
-                            <div class="content-row" style="margin-top: 25px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
-                        </div>
-
-                        <div class="footer-section">
-                            <table class="footer-table">
-                                <tr>
-                                    <td style="text-align: right; width: 40%;">
-                                        <div id="examQrcodeTarget" style="display:inline-block;"></div>
-                                    </td>
-                                    <td class="signature" style="text-align: left; width: 60%;">
-                                        ختم وإمضاء مدير المؤسسة
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    <script>
-                        JsBarcode("#examBarcodeTarget", "${student.id || '20260000'}", {
-                            format: "CODE128", width: 1.5, height: 40, displayValue: true, fontSize: 12, background: "#ffffff", lineColor: "#000000"
-                        });
-                        const examQrData = "المترشح: ${student.lastName} ${student.firstName}\\nمركز الإجراء: ${student.examCenter}\\nرقم التسجيل: ${student.id}\\nمديرية التربية: ${student.examDirectorate}";
-                        new QRCode(document.getElementById("examQrcodeTarget"), {
-                            text: examQrData, width: 100, height: 100, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
-                        });
-                        window.setTimeout(function() { window.print(); window.close(); }, 500);
-                    <\/script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
+        function strikeOffStudent(index) {
+            Swal.fire({
+                title: 'تأكيد الشطب',
+                text: 'هل أنت متأكد من شطب هذا التلميذ من القوائم؟',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، اشطب',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#dc3545'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    students[index].status = 'مشطوب';
+                    students[index].struckOff = true;
+                    saveToDatabase();
+                    filterTable();
+                    Swal.fire('تم الشطب', 'تم شطب التلميذ من القوائم.', 'success');
+                }
+            });
         }
 
         function printFollowUpCard() {
@@ -1409,7 +1552,6 @@
                     </style>
                 </head>
                 <body>
-                    <!-- الصفحة الأولى -->
                     <div class="page">
                         <div class="national-header">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التربية الوطنية</div>
                         <div class="sub-header">بطاقة المتابعة والتوجيه المدرسي</div>
@@ -1467,7 +1609,6 @@
                         </div>
                     </div>
 
-                    <!-- الصفحة الثانية -->
                     <div class="page">
                         <div class="section-title">خامساً: تقييم القدرات</div>
                         <table>
@@ -1536,6 +1677,12 @@
         }
 
         function switchTab(tabIndex) {
+            // منع الدخول لنتائج BEM
+            if (tabIndex === 7) {
+                Swal.fire('غير متاح', 'تبويب نتائج شهادة التعليم المتوسط غير مفعل حالياً.', 'info');
+                return;
+            }
+
             const overlay = document.getElementById('loadingOverlay');
             overlay.style.display = 'flex';
             
@@ -1543,25 +1690,38 @@
                 overlay.style.display = 'none';
                 currentTab = tabIndex;
                 document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-                    btn.classList.toggle('active', i === tabIndex);
+                    // نتجاهل الزر المعطل
+                    if (!btn.classList.contains('disabled-tab')) {
+                        btn.classList.toggle('active', parseInt(btn.getAttribute('onclick')?.match(/\d+/)?.[0] || -1) === tabIndex);
+                    }
                 });
                 
-                const tabTitles = [
-                    "الدخول المدرسي", 
-                    "متابعة الإحصائيات الدقيقة", 
-                    "متابعة حجز النقاط والاستدراك", 
-                    "تحيين بيانات التلاميذ", 
-                    "تسجيلات الامتحانات الرسمية", 
-                    "التسجيل البيداغوجي", 
-                    "حجز التوجيه المسبق والنهائي", 
-                    "نتائج شهادة التعليم المتوسط",
-                    "متابعة التحويلات",
-                    "إدماج التلاميذ المنقطعين عن الدراسة"
-                ];
-                document.getElementById('currentSectionTitle').innerText = tabTitles[tabIndex];
+                // تصحيح تفعيل التبويبات حسب الترتيب الجديد
+                const tabMap = {0:0, 1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 8:8, 9:9};
+                document.querySelectorAll('.tab-btn:not(.disabled-tab)').forEach(btn => {
+                    const onclickVal = btn.getAttribute('onclick');
+                    if (onclickVal) {
+                        const idx = parseInt(onclickVal.match(/\d+/)[0]);
+                        btn.classList.toggle('active', idx === tabIndex);
+                    }
+                });
+
+                const tabTitles = {
+                    0: "الدخول المدرسي",
+                    1: "متابعة الإحصائيات الدقيقة",
+                    2: "متابعة حجز النقاط والاستدراك",
+                    3: "تحيين بيانات التلاميذ",
+                    4: "تسجيلات الامتحانات الرسمية",
+                    5: "التسجيل البيداغوجي",
+                    6: "حجز التوجيه المسبق والنهائي",
+                    8: "متابعة التحويلات",
+                    9: "إدماج التلاميذ المنقطعين عن الدراسة"
+                };
+                document.getElementById('currentSectionTitle').innerText = tabTitles[tabIndex] || '';
 
                 document.getElementById('schoolAlert').style.display = (tabIndex === 0 || tabIndex === 3) ? 'flex' : 'none';
                 document.getElementById('pedagogicAlert').style.display = (tabIndex === 5) ? 'flex' : 'none';
+                document.getElementById('dropoutLockedAlert').style.display = 'none';
                 
                 document.getElementById('btnImport').style.display = (tabIndex === 0) ? 'inline-flex' : 'none';
                 document.getElementById('btnAutoGroup').style.display = (tabIndex === 0) ? 'inline-flex' : 'none';
@@ -1570,7 +1730,6 @@
                 document.getElementById('btnPrintPedagogic').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
                 document.getElementById('btnRegisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
                 document.getElementById('btnUnregisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
-                document.getElementById('btnPrintBem').style.display = 'none'; // تم إلغاء تفعيل طباعة نتائج BEM
 
                 // إخفاء كل الأقسام أولاً
                 document.getElementById('filterSection').style.display = 'none';
@@ -1584,13 +1743,13 @@
                 if (tabIndex === 1) {
                     document.getElementById('statsSection').style.display = 'block';
                     renderAnalyticsDashboard();
-                } else if (tabIndex === 2 || tabIndex === 7) {
-                    // متابعة النقاط + نتائج BEM = غير متاح
+                } else if (tabIndex === 2) {
                     document.getElementById('notAvailableSection').style.display = 'block';
                 } else if (tabIndex === 8) {
                     document.getElementById('transfersSection').style.display = 'block';
                 } else if (tabIndex === 9) {
                     document.getElementById('dropoutSection').style.display = 'block';
+                    renderDropoutSection();
                 } else {
                     document.getElementById('filterSection').style.display = 'flex';
                     document.getElementById('searchContainer').style.display = 'flex';
@@ -1598,6 +1757,127 @@
                     filterTable();
                 }
             }, 300);
+        }
+
+        function renderDropoutSection() {
+            const container = document.getElementById('dropoutContent');
+            if (!isDropoutUnlocked()) {
+                container.innerHTML = `
+                    <div class="locked-info">
+                        <i class="fas fa-lock" style="font-size:40px; display:block; margin-bottom:15px;"></i>
+                        <h3>تبويب إدماج التلاميذ المنقطعين عن الدراسة مقفل حالياً</h3>
+                        <p>سيتم فتح هذا التبويب وإظهار قاعدة بيانات التلاميذ المنقطعين<br>
+                        ابتداءً من يوم <strong>02 سبتمبر 2026 الساعة 23:38</strong></p>
+                        <p style="margin-top:15px; font-size:13px;">الوقت الحالي للنظام: ${new Date().toLocaleString('ar-DZ')}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // إذا كان مفتوحاً نعرض التلاميذ
+            if (dropoutStudents.length === 0) {
+                // تهيئة 20 تلميذاً عند الفتح لأول مرة
+                initDropoutStudents();
+            }
+
+            let rows = '';
+            dropoutStudents.forEach((s, i) => {
+                rows += `<tr>
+                    <td>${s.id}</td>
+                    <td>${s.lastName}</td>
+                    <td>${s.firstName}</td>
+                    <td>${s.birthDate}</td>
+                    <td>${s.birthPlace}</td>
+                    <td>${s.lastLevel}</td>
+                    <td>${s.dropoutYear}</td>
+                    <td><span class="status-dark-orange">${s.status}</span></td>
+                    <td>
+                        <button class="btn btn-update" onclick="reintegrateStudent(${i})"><i class="fas fa-user-plus"></i> إدماج</button>
+                    </td>
+                </tr>`;
+            });
+
+            container.innerHTML = `
+                <div class="alert-message">
+                    <i class="fas fa-user-graduate"></i>
+                    قائمة التلاميذ المنقطعين عن الدراسة المرشحين للإدماج - السنة الدراسية 2026-2027
+                </div>
+                <div class="table-section">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم التعريف</th>
+                                <th>اللقب</th>
+                                <th>الاسم</th>
+                                <th>تاريخ الميلاد</th>
+                                <th>مكان الميلاد</th>
+                                <th>آخر مستوى</th>
+                                <th>سنة الانقطاع</th>
+                                <th>الحالة</th>
+                                <th>عمليات</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function initDropoutStudents() {
+            const names = [
+                {l:'بن يوسف', f:'كريم'}, {l:'زروقي', f:'سمية'}, {l:'حاج أحمد', f:'ياسين'},
+                {l:'بوطالب', f:'نورة'}, {l:'عمراني', f:'محمد'}, {l:'سلطاني', f:'فاطمة'},
+                {l:'براهيمي', f:'عبد الرحمن'}, {l:'خليفي', f:'مريم'}, {l:'بن سعيد', f:'أمين'},
+                {l:'شريف', f:'خديجة'}, {l:'مراد', f:'رياض'}, {l:'قاسي', f:'سارة'},
+                {l:'بوزيد', f:'نسيم'}, {l:'لعرابي', f:'إيمان'}, {l:'بن عمر', f:'هشام'},
+                {l:'دحماني', f:'لينة'}, {l:'بوعزة', f:'سيف الدين'}, {l:'حملاوي', f:'رانية'},
+                {l:'مجاهدي', f:'أنس'}, {l:'سعداوي', f:'ياسمين'}
+            ];
+            dropoutStudents = names.map((n, i) => ({
+                id: 'DO2026' + String(100 + i),
+                lastName: n.l,
+                firstName: n.f,
+                birthDate: `200${8 + (i % 4)}-0${(i % 9) + 1}-1${i % 9}`,
+                birthPlace: ['سطاوالي', 'زرالدة', 'الجزائر', 'بئر مراد رايس', 'حسين داي'][i % 5],
+                lastLevel: ['أولى متوسط', 'ثانية متوسط', 'ثالثة متوسط', 'رابعة متوسط'][i % 4],
+                dropoutYear: 2023 + (i % 3),
+                status: 'منقطع'
+            }));
+            saveDropoutDatabase();
+        }
+
+        function reintegrateStudent(idx) {
+            const s = dropoutStudents[idx];
+            Swal.fire({
+                title: 'تأكيد الإدماج',
+                text: `هل تريد إدماج التلميذ ${s.lastName} ${s.firstName} في القوائم الرسمية؟`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، إدماج',
+                cancelButtonText: 'إلغاء'
+            }).then(res => {
+                if (res.isConfirmed) {
+                    students.push({
+                        id: s.id,
+                        lastName: s.lastName,
+                        firstName: s.firstName,
+                        gender: 'ذكر',
+                        birthDate: s.birthDate,
+                        birthPlace: s.birthPlace,
+                        address: s.birthPlace,
+                        level: 'رابعة',
+                        group: String((students.length % 4) + 1),
+                        status: 'مدمج',
+                        paymentStatus: 'pending',
+                        reintegrated: true
+                    });
+                    dropoutStudents[idx].status = 'تم الإدماج';
+                    saveToDatabase();
+                    saveDropoutDatabase();
+                    renderDropoutSection();
+                    Swal.fire('تم الإدماج', 'تم إدماج التلميذ بنجاح في قاعدة البيانات الرئيسية.', 'success');
+                }
+            });
         }
 
         function renderAnalyticsDashboard() {
@@ -1637,9 +1917,6 @@
                 headerHTML += '<th>العنوان</th><th>مكان الميلاد</th><th>حالة الدفع</th><th>عمليات التسجيل البيداغوجي</th>';
             } else if (currentTab === 6) {
                 headerHTML += '<th>الفوج</th><th>الرغبة الأولى</th><th>اقتراح مجلس القسم</th><th>التوجيه النهائي</th><th>عمليات التوجيه</th>';
-            } else if (currentTab === 7) {
-                // تم إلغاء تفعيل جدول نتائج BEM
-                headerHTML += '<th colspan="4">الخدمة غير مفعلة حالياً</th>';
             } else {
                 headerHTML += '<th>الجنس</th><th>مكان الميلاد</th><th>العنوان</th><th>المستوى</th><th>رقم الفوج</th><th>الصفة</th>';
                 if (currentTab === 4) headerHTML += '<th>مركز الإجراء / الولاية</th><th>حالة التسجيل</th>';
@@ -1650,6 +1927,7 @@
         }
 
         function renderTable(filteredStudents) {
+            filteredCache = filteredStudents;
             renderTableHeader();
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -1684,8 +1962,6 @@
                                 <td>${student.councilProposal || 'غير مقترح'}</td>
                                 <td><span class="${student.finalGuidance ? 'status-blue-box' : 'status-orange'}">${student.finalGuidance || 'قيد الانتظار'}</span></td>
                                 <td><button class="btn btn-guidance" onclick="openGuidanceModal(${globalIndex})"><i class="fas fa-compass"></i> حجز وطباعة البطاقة</button></td>`;
-                } else if (currentTab === 7) {
-                    rowHTML += `<td colspan="4" style="color:#999;">الخدمة غير مفعلة حالياً وفق الرزنامة</td>`;
                 } else {
                     rowHTML += `<td>${student.gender || ''}</td><td>${student.birthPlace || ''}</td><td>${student.address || ''}</td><td>${student.level || ''}</td><td>${student.group || ''}</td><td>${student.status || 'خارجي'}</td>`;
                     if (currentTab === 4) {
@@ -1696,24 +1972,19 @@
                     
                     let ops = "";
                     if (currentTab === 0) {
-                        // زر شهادة مدرسية + زر طباعة منسدل
                         ops = `
-                            <div class="actions-cell-flex">
-                                <button class="btn btn-school-cert" onclick="printSchoolCertificate(${globalIndex})">
-                                    <i class="fas fa-print"></i> شهادة مدرسية
-                                </button>
-                                <div class="dropdown">
-                                    <button class="btn btn-dropdown">
-                                        <i class="fas fa-caret-down"></i> طباعة / إجراءات
-                                    </button>
-                                    <div class="dropdown-content">
-                                        <button onclick="openEditModal(${globalIndex})"><i class="fas fa-edit"></i> تعديل المعلومات</button>
-                                        <button onclick="printRegistrationCertificate(${globalIndex})"><i class="fas fa-file-alt"></i> طباعة شهادة تسجيل</button>
-                                        <button onclick="addElectronicFile(${globalIndex})"><i class="fas fa-file-upload"></i> إضافة الملف الإلكتروني</button>
-                                        <button onclick="cancelStudent(${globalIndex})" style="color:#dc3545;"><i class="fas fa-user-slash"></i> الشطب</button>
-                                    </div>
+                        <div class="actions-cell-flex">
+                            <button class="btn btn-school-cert" onclick="printSchoolCertificate(${globalIndex})"><i class="fas fa-print"></i> شهادة مدرسية</button>
+                            <div class="dropdown-container">
+                                <button class="btn btn-dropdown" onclick="toggleDropdown(this)"><i class="fas fa-ellipsis-v"></i> طباعة</button>
+                                <div class="dropdown-menu">
+                                    <button class="dropdown-item" onclick="openEditModal(${globalIndex})"><i class="fas fa-edit"></i> تعديل المعلومات</button>
+                                    <button class="dropdown-item" onclick="printRegistrationCertificate(${globalIndex})"><i class="fas fa-file-alt"></i> طباعة شهادة تسجيل</button>
+                                    <button class="dropdown-item" onclick="addElectronicFile(${globalIndex})"><i class="fas fa-paperclip"></i> إضافة الملف الإلكتروني</button>
+                                    <button class="dropdown-item" style="color:#dc3545;" onclick="strikeOffStudent(${globalIndex})"><i class="fas fa-user-slash"></i> الشطب</button>
                                 </div>
-                            </div>`;
+                            </div>
+                        </div>`;
                     } else if (currentTab === 3) {
                         ops = `<button class="btn btn-update" onclick="openEditModal(${globalIndex})"><i class="fas fa-edit"></i> تحيين</button>`;
                     } else if (currentTab === 4) {
@@ -1737,6 +2008,15 @@
             renderPagination(filteredStudents.length);
         }
 
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredCache.length / itemsPerPage) || 1;
+            const newPage = currentPage + delta;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                filterTable();
+            }
+        }
+
         function renderPagination(totalItems) {
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             const pagination = document.getElementById('pagination');
@@ -1749,6 +2029,9 @@
                 bnt.onclick = () => { currentPage = i; filterTable(); };
                 pagination.appendChild(bnt);
             }
+
+            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
         }
 
         function filterTable() {
@@ -1757,6 +2040,7 @@
             const group = document.getElementById('filterGroup').value;
 
             const filtered = students.filter(s => {
+                if (s.struckOff) return false;
                 const matchesSearch = !searchTerm || (s.lastName && s.lastName.toLowerCase().includes(searchTerm)) || (s.firstName && s.firstName.toLowerCase().includes(searchTerm)) || (s.id && s.id.includes(searchTerm));
                 const matchesLevel = level === 'all' || (s.level || 'رابعة') === level;
                 const matchesGroup = group === 'all' || (s.group || '1') === group;
@@ -1947,50 +2231,96 @@
             printDataPage();
         }
 
-        function printBemResults() {
-            Swal.fire('غير متاح', 'تم إلغاء تفعيل طباعة نتائج شهادة التعليم المتوسط حالياً.', 'info');
-        }
-
-        // إضافة الملف الإلكتروني (محاكاة)
-        function addElectronicFile(index) {
+        function printExamReceipt(index) {
             const student = students[index];
-            Swal.fire({
-                title: 'إضافة الملف الإلكتروني',
-                html: `<p>التلميذ: <strong>${student.lastName} ${student.firstName}</strong></p>
-                       <p>سيتم ربط الملف الإلكتروني (شهادة الميلاد / البطاقة العائلية / صورة) برقم التعريف: <strong>${student.id}</strong></p>
-                       <input type="file" id="elecFile" accept=".pdf,.jpg,.png" style="margin-top:10px;">`,
-                showCancelButton: true,
-                confirmButtonText: 'حفظ الملف',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    students[index].hasElectronicFile = true;
-                    saveToDatabase();
-                    Swal.fire('تم', 'تم إضافة الملف الإلكتروني بنجاح (محاكاة).', 'success');
-                }
-            });
-        }
+            const printWindow = window.open('', '_blank');
+            const todayDate = new Date().toLocaleDateString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric' });
 
-        // الشطب
-        function cancelStudent(index) {
-            const student = students[index];
-            Swal.fire({
-                title: 'تأكيد الشطب',
-                text: `هل تريد شطب التلميذ ${student.lastName} ${student.firstName} من القوائم؟`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'نعم، شطب',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    students[index].status = 'مشطوب';
-                    students[index].canceled = true;
-                    saveToDatabase();
-                    filterTable();
-                    Swal.fire('تم الشطب', 'تم شطب التلميذ من القوائم الاسمية.', 'success');
-                }
-            });
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>وصل الاستدعاء والتسجيل في الامتحانات الرسمية - ${student.lastName} ${student.firstName}</title>
+                    <style>
+                        @page { size: A4 portrait; margin: 15mm; }
+                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; background-color: #ffffff; color: #000000; margin: 0; padding: 0; font-size: 14px; line-height: 1.8; }
+                        .receipt-container { width: 100%; height: 100%; box-sizing: border-box; }
+                        .national-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 20px; }
+                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+                        .header-table td { border: none; padding: 0; vertical-align: top; }
+                        .title-box { text-align: center; margin: 30px auto; font-size: 20px; font-weight: bold; }
+                        .content-body { text-align: right; margin-top: 20px; font-size: 16px; }
+                        .content-row { margin-bottom: 12px; }
+                        .footer-section { margin-top: 60px; width: 100%; }
+                        .footer-table { width: 100%; border-collapse: collapse; }
+                        .footer-table td { border: none; vertical-align: top; }
+                        .signature { text-align: left; font-weight: bold; font-size: 15px; padding-left: 20px; }
+                        .barcode-side { text-align: left; }
+                        .barcode-title { font-size: 11px; font-weight: bold; margin-bottom: 2px; }
+                        .barcode-img-container svg { max-width: 220px; height: 50px; }
+                    </style>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                </head>
+                <body>
+                    <div class="receipt-container">
+                        <div class="national-header">الجمهورية الجزائرية الديمقراطية الشعبية</div>
+                        
+                        <table class="header-table">
+                            <tr>
+                                <td style="text-align: right; font-weight: bold; font-size: 13px;">
+                                    الديوان الوطني للامتحانات والمسابقات<br>
+                                    ${student.examDirectorate || 'مديرية التربية للجزائر غرب'}<br>
+                                    مركز الإجراء: ${student.examCenter || 'متوسطة الشهيد خالد مكاوي'}
+                                </td>
+                                <td class="barcode-side">
+                                    <div class="barcode-title">رقم التسجيل الرسمي (ONEC)</div>
+                                    <div class="barcode-img-container">
+                                        <svg id="examBarcodeTarget"></svg>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="title-box">وصل تسجيــل واختبــار رسمي (BEM)</div>
+
+                        <div class="content-body">
+                            <div class="content-row">اسم ولقب المترشح(ة): <strong>${student.lastName || ''} &nbsp;&nbsp;&nbsp; ${student.firstName || ''}</strong></div>
+                            <div class="content-row">تاريخ ومكان الميلاد: <strong>${student.birthDate || ''}</strong> بـ <strong>${student.birthPlace || ''}</strong></div>
+                            <div class="content-row">اسم الأب: <strong>${student.fatherName || 'غير مسجل'}</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; اسم ولقب الأم: <strong>${student.motherName || 'غير مسجل'}</strong></div>
+                            <div class="content-row">رقم التسجيل الوطني: <strong>${student.id || ''}</strong></div>
+                            <div class="content-row">مكان إجراء الاختبار: <strong>${student.examCenter || 'غير محدد'}</strong></div>
+                            <div class="content-row">ولاية وبلدية الإجراء: <strong>${student.examCommuneName || ''} (${student.examWilayaName || ''})</strong></div>
+                            <div class="content-row">حالة التسجيل: <strong style="color: #0056b3;">${student.examRegistration || 'مسجل'}</strong></div>
+                            <div class="content-row" style="margin-top: 25px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
+                        </div>
+
+                        <div class="footer-section">
+                            <table class="footer-table">
+                                <tr>
+                                    <td style="text-align: right; width: 40%;">
+                                        <div id="examQrcodeTarget" style="display:inline-block;"></div>
+                                    </td>
+                                    <td class="signature" style="text-align: left; width: 60%;">
+                                        ختم وإمضاء مدير المؤسسة
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <script>
+                        JsBarcode("#examBarcodeTarget", "${student.id || '20260000'}", {
+                            format: "CODE128", width: 1.5, height: 40, displayValue: true, fontSize: 12, background: "#ffffff", lineColor: "#000000"
+                        });
+                        const examQrData = "المترشح: ${student.lastName} ${student.firstName}\\nمركز الإجراء: ${student.examCenter}\\nرقم التسجيل: ${student.id}\\nمديرية التربية: ${student.examDirectorate}";
+                        new QRCode(document.getElementById("examQrcodeTarget"), {
+                            text: examQrData, width: 100, height: 100, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                        });
+                        window.setTimeout(function() { window.print(); window.close(); }, 500);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         function exportExcelFile() {
@@ -2037,7 +2367,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        window.onload = function() {
+        function initApp() {
             initStreamSelects();
             if (students.length === 0) {
                 students = [
@@ -2047,7 +2377,10 @@
                 saveToDatabase();
             }
             filterTable();
-        };
+        }
+
+        // لا نبدأ التطبيق إلا بعد الدخول عبر DZDS
+        // window.onload محذوف عمداً ليظهر شاشة الدخول أولاً
     </script>
 </body>
 </html>
