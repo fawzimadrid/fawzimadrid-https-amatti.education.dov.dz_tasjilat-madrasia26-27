@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الأرضية الرقمية لوزارة التربية الوطنية</title>
+    <!-- استدعاء خط Noto Kufi Arabic للواجهات و Droid Arabic Kufi للطباعة -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
+    <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js لأشكال بيانية حقيقية ومتحركة -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- مكتبات لتوليد الكود بار والـ QR Code رقمياً -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -307,6 +313,49 @@
             flex-wrap: wrap;
         }
 
+        /* Dropdown for print actions */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            min-width: 220px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 100;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            right: 0;
+            text-align: right;
+        }
+        .dropdown-content a, .dropdown-content button {
+            color: #333;
+            padding: 10px 14px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 13px;
+            text-align: right;
+        }
+        .dropdown-content a:hover, .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .btn-dropdown {
+            background-color: #17a2b8;
+            color: white;
+            font-size: 12px;
+            padding: 4px 10px;
+        }
+
         .pagination {
             margin-top: 15px;
             display: flex;
@@ -407,49 +456,28 @@
             width: 250px;
         }
 
-        /* Dropdown for print actions */
-        .dropdown {
-            position: relative;
-            display: inline-block;
+        .decree-card {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #fff;
-            min-width: 220px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            z-index: 100;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            right: 0;
-            top: 100%;
-        }
-        .dropdown-content button {
-            width: 100%;
-            text-align: right;
-            padding: 10px 14px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 13px;
-            color: #333;
+        .decree-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--header-blue);
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
-        .dropdown-content button:hover {
-            background-color: #f0f7ff;
-            color: var(--main-blue);
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        .dropdown-btn {
-            background-color: #6c757d;
-            color: white;
-            font-size: 12px;
-            padding: 4px 10px;
+        .decree-body {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -487,6 +515,8 @@
                     <button class="tab-btn" onclick="switchTab(5)">التسجيل البيداغوجي</button>
                     <button class="tab-btn" onclick="switchTab(6)">حجز التوجيه المسبق والنهائي</button>
                     <button class="tab-btn" onclick="switchTab(7)">نتائج شهادة التعليم المتوسط</button>
+                    <button class="tab-btn" onclick="switchTab(8)">متابعة التحويلات</button>
+                    <button class="tab-btn" onclick="switchTab(9)">إدماج التلاميذ المنقطعين عن الدراسة</button>
                 </div>
 
                 <div id="schoolAlert" class="alert-message" style="display: none;">
@@ -545,6 +575,9 @@
                         <button class="btn btn-print" id="btnPrintPedagogic" onclick="printPedagogicList()" style="display: none;">
                             <i class="fas fa-print"></i> طباعة القوائم
                         </button>
+                        <button class="btn btn-print" id="btnPrintBem" onclick="printBemResults()" style="display: none;">
+                            <i class="fas fa-print"></i> طباعة النتائج
+                        </button>
                         <button class="btn btn-import" id="btnRegisterAll" onclick="registerAllStudents()" style="display: none; background-color:#28a745;">
                             <i class="fas fa-users-cog"></i> تسجيل كل التلاميذ
                         </button>
@@ -591,6 +624,28 @@
                     <i class="fas fa-ban" style="font-size: 50px; color: var(--danger-red); margin-bottom: 20px;"></i>
                     <h3 style="color: #333;">هذه الخدمة غير متاحة حالياً</h3>
                     <p style="color: #666;">سيتم تفعيل المتابعة لاحقاً وفق الرزنامة الرسمية للوزارة.</p>
+                </div>
+
+                <!-- قسم متابعة التحويلات -->
+                <div id="transfersSection" style="display: none;">
+                    <div class="alert-message">
+                        <i class="fas fa-exchange-alt"></i>
+                        متابعة التحويلات الواردة والصادرة للتلاميذ. يمكن تسجيل طلبات التحويل ومتابعة حالتها.
+                    </div>
+                    <div class="table-section">
+                        <p style="text-align:center; color:#666; padding:30px;">لا توجد تحويلات مسجلة حالياً. سيتم تفعيل نظام التحويلات الكامل قريباً.</p>
+                    </div>
+                </div>
+
+                <!-- قسم إدماج التلاميذ المنقطعين -->
+                <div id="dropoutSection" style="display: none;">
+                    <div class="alert-orange">
+                        <i class="fas fa-user-plus"></i>
+                        إدماج التلاميذ المنقطعين عن الدراسة وإعادة تسجيلهم وفق الإجراءات الوزارية المعتمدة.
+                    </div>
+                    <div class="table-section">
+                        <p style="text-align:center; color:#666; padding:30px;">لا توجد طلبات إدماج مسجلة حالياً. يمكن إضافة التلاميذ المنقطعين عبر الاستيراد أو التسجيل اليدوي.</p>
+                    </div>
                 </div>
 
             </div>
@@ -679,7 +734,7 @@
         </div>
     </div>
 
-    <!-- نافذة حجز التوجيه -->
+    <!-- نافذة حجز التوجيه (المسبق والنهائي) وبطاقة المتابعة -->
     <div id="guidanceModal" class="modal">
         <div class="modal-content-wide">
             <div class="modal-header">حجز التوجيه المسبق والنهائي وإعداد بطاقة المتابعة</div>
@@ -749,7 +804,7 @@
         </div>
     </div>
 
-    <!-- نافذة تأكيد التسجيل البيداغوجي -->
+    <!-- نافذة تأكيد التسجيل البيداغوجي ودفع الحقوق -->
     <div id="pedagogicConfirmModal" class="modal">
         <div class="modal-content-wide" style="padding: 20px; max-width: 600px;">
             <div class="nested-outer">
@@ -780,9 +835,18 @@
 
     <script>
         const streamOptions = [
-            "رياضيات", "علوم تجريبية", "معلوماتية", "هندسة مدنية", "هندسة كهربائية",
-            "هندسة ميكانيكية", "هندسة الطرائق", "اسبانية", "ألمانية", "إيطالية",
-            "آداب وفلسفة", "تسيير واقتصاد"
+            "رياضيات",
+            "علوم تجريبية",
+            "معلوماتية",
+            "هندسة مدنية",
+            "هندسة كهربائية",
+            "هندسة ميكانيكية",
+            "هندسة الطرائق",
+            "اسبانية",
+            "ألمانية",
+            "إيطالية",
+            "آداب وفلسفة",
+            "تسيير واقتصاد"
         ];
 
         const geoData = {
@@ -951,7 +1015,7 @@
             printWindow.document.close();
         }
 
-        // ===== شهادة مدرسية محسّنة =====
+        // شهادة مدرسية محسّنة مع Droid Arabic Kufi + باركود منظم + QR على الجانب
         function printSchoolCertificate(index) {
             const student = students[index];
             certSerialNumber++;
@@ -977,34 +1041,42 @@
                             color: #000000; 
                             margin: 0; 
                             padding: 0; 
-                            font-size: 14px; 
-                            line-height: 1.75; 
+                            font-size: 15px; 
+                            line-height: 1.9; 
                         }
                         .cert-container { width: 100%; box-sizing: border-box; padding: 5mm; }
-                        .national-header { text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 12px; }
-                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .national-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 12px; }
+                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
                         .header-table td { border: none; padding: 0; vertical-align: top; }
                         .institution-info { text-align: right; font-size: 13px; font-weight: bold; line-height: 1.6; }
                         .barcode-side { text-align: left; width: 45%; }
-                        .barcode-label { font-size: 12px; font-weight: bold; margin-bottom: 4px; display: block; }
-                        .barcode-img-container svg { max-width: 200px; height: 45px; }
-                        .serial-section { margin: 12px 0; font-size: 14px; font-weight: bold; }
+                        .barcode-title { 
+                            font-size: 12px; 
+                            font-weight: bold; 
+                            margin-bottom: 4px; 
+                            text-align: center;
+                            font-family: 'Droid Arabic Kufi', serif;
+                        }
+                        .barcode-img-container { text-align: center; }
+                        .barcode-img-container svg { max-width: 230px; height: 55px; }
+                        .serial-section { margin-top: 8px; font-size: 14px; font-weight: bold; text-align: right; }
                         .title-box { 
                             text-align: center; 
-                            margin: 30px auto 25px; 
+                            margin: 35px auto 25px; 
                             width: 240px; 
                             border: 2px solid #000; 
-                            padding: 8px 12px; 
-                            font-size: 20px; 
+                            padding: 10px 18px; 
+                            font-size: 22px; 
                             font-weight: bold; 
+                            font-family: 'Droid Arabic Kufi', serif;
                         }
-                        .content-body { text-align: right; margin-top: 15px; font-size: 15px; padding-right: 8px; }
-                        .content-row { margin-bottom: 11px; }
-                        .footer-section { margin-top: 45px; width: 100%; }
+                        .content-body { text-align: right; margin-top: 15px; font-size: 16px; padding-right: 8px; }
+                        .content-row { margin-bottom: 14px; }
+                        .footer-section { margin-top: 50px; width: 100%; }
                         .footer-table { width: 100%; border-collapse: collapse; }
-                        .footer-table td { border: none; vertical-align: top; }
+                        .footer-table td { border: none; vertical-align: middle; }
                         .qr-side { text-align: right; width: 40%; }
-                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 15px; width: 60%; }
+                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 15px; }
                     </style>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
@@ -1021,7 +1093,7 @@
                                     متوسطة الشهيد خالد مكاوي (سطاوالي)
                                 </td>
                                 <td class="barcode-side">
-                                    <span class="barcode-label">رقم التعريف المدرسي</span>
+                                    <div class="barcode-title">رقم التعريف المدرسي</div>
                                     <div class="barcode-img-container">
                                         <svg id="barcodeTarget"></svg>
                                     </div>
@@ -1040,7 +1112,7 @@
                             <div class="content-row">رقم التسجيل: <strong>${student.id || ''}</strong></div>
                             <div class="content-row">الفوج التربوي: <strong>${student.group || '1'}</strong></div>
                             <div class="content-row">السنة الدراسية: <strong>${currentFullAcademicYear}</strong></div>
-                            <div class="content-row" style="margin-top: 22px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
+                            <div class="content-row" style="margin-top: 25px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
                             <div class="content-row" style="margin-top: 12px; font-family: sans-serif; font-size: 13px; direction: ltr; text-align: right;">Nom et Prénom: ${latinName}</div>
                         </div>
 
@@ -1050,7 +1122,10 @@
                                     <td class="qr-side">
                                         <div id="qrcodeTarget" style="display:inline-block;"></div>
                                     </td>
-                                    <td class="signature-container">مدير المؤسسة</td>
+                                    <td class="signature-container">
+                                        مدير المؤسسة<br><br>
+                                        الختم والإمضاء
+                                    </td>
                                 </tr>
                             </table>
                         </div>
@@ -1058,11 +1133,12 @@
 
                     <script>
                         JsBarcode("#barcodeTarget", "${student.id || '20260000'}", {
-                            format: "CODE128", width: 1.4, height: 38, displayValue: true, fontSize: 11, background: "#ffffff", lineColor: "#000000", margin: 2
+                            format: "CODE128", width: 1.6, height: 45, displayValue: true, fontSize: 13, 
+                            background: "#ffffff", lineColor: "#000000", margin: 5
                         });
-                        const qrData = "التلميذ: ${student.lastName} ${student.firstName}\\nتاريخ الميلاد: ${student.birthDate}\\nرقم التسجيل: ${student.id}\\nالفوج: ${student.group}";
+                        const qrData = "التلميذ: ${student.lastName} ${student.firstName}\\nتاريخ الميلاد: ${student.birthDate}\\nرقم التسجيل: ${student.id}\\nالفوج: ${student.group}\\nمؤسسة: متوسطة الشهيد خالد مكاوي";
                         new QRCode(document.getElementById("qrcodeTarget"), {
-                            text: qrData, width: 95, height: 95, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                            text: qrData, width: 110, height: 110, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
                         });
                         window.setTimeout(function() { window.print(); window.close(); }, 600);
                     <\/script>
@@ -1072,7 +1148,7 @@
             printWindow.document.close();
         }
 
-        // ===== شهادة تسجيل (نفس التصميم مع تغيير العنوان) =====
+        // شهادة تسجيل (نفس التصميم مع تغيير العنوان والنص)
         function printRegistrationCertificate(index) {
             const student = students[index];
             certSerialNumber++;
@@ -1098,34 +1174,42 @@
                             color: #000000; 
                             margin: 0; 
                             padding: 0; 
-                            font-size: 14px; 
-                            line-height: 1.75; 
+                            font-size: 15px; 
+                            line-height: 1.9; 
                         }
                         .cert-container { width: 100%; box-sizing: border-box; padding: 5mm; }
-                        .national-header { text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 12px; }
-                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .national-header { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 12px; }
+                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
                         .header-table td { border: none; padding: 0; vertical-align: top; }
                         .institution-info { text-align: right; font-size: 13px; font-weight: bold; line-height: 1.6; }
                         .barcode-side { text-align: left; width: 45%; }
-                        .barcode-label { font-size: 12px; font-weight: bold; margin-bottom: 4px; display: block; }
-                        .barcode-img-container svg { max-width: 200px; height: 45px; }
-                        .serial-section { margin: 12px 0; font-size: 14px; font-weight: bold; }
+                        .barcode-title { 
+                            font-size: 12px; 
+                            font-weight: bold; 
+                            margin-bottom: 4px; 
+                            text-align: center;
+                            font-family: 'Droid Arabic Kufi', serif;
+                        }
+                        .barcode-img-container { text-align: center; }
+                        .barcode-img-container svg { max-width: 230px; height: 55px; }
+                        .serial-section { margin-top: 8px; font-size: 14px; font-weight: bold; text-align: right; }
                         .title-box { 
                             text-align: center; 
-                            margin: 30px auto 25px; 
+                            margin: 35px auto 25px; 
                             width: 260px; 
                             border: 2px solid #000; 
-                            padding: 8px 12px; 
-                            font-size: 20px; 
+                            padding: 10px 18px; 
+                            font-size: 22px; 
                             font-weight: bold; 
+                            font-family: 'Droid Arabic Kufi', serif;
                         }
-                        .content-body { text-align: right; margin-top: 15px; font-size: 15px; padding-right: 8px; }
-                        .content-row { margin-bottom: 11px; }
-                        .footer-section { margin-top: 45px; width: 100%; }
+                        .content-body { text-align: right; margin-top: 15px; font-size: 16px; padding-right: 8px; }
+                        .content-row { margin-bottom: 14px; }
+                        .footer-section { margin-top: 50px; width: 100%; }
                         .footer-table { width: 100%; border-collapse: collapse; }
-                        .footer-table td { border: none; vertical-align: top; }
+                        .footer-table td { border: none; vertical-align: middle; }
                         .qr-side { text-align: right; width: 40%; }
-                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 15px; width: 60%; }
+                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 15px; }
                     </style>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
@@ -1142,9 +1226,9 @@
                                     متوسطة الشهيد خالد مكاوي (سطاوالي)
                                 </td>
                                 <td class="barcode-side">
-                                    <span class="barcode-label">رقم التعريف المدرسي</span>
+                                    <div class="barcode-title">رقم التعريف المدرسي</div>
                                     <div class="barcode-img-container">
-                                        <svg id="barcodeTarget"></svg>
+                                        <svg id="barcodeTargetReg"></svg>
                                     </div>
                                 </td>
                             </tr>
@@ -1157,11 +1241,11 @@
                         <div class="content-body">
                             <div class="content-row">يشهد مدير المتوسطة أن التلميذ(ة): <strong>${student.lastName || ''} &nbsp;&nbsp;&nbsp; ${student.firstName || ''}</strong></div>
                             <div class="content-row">تاريخ الميلاد: <strong>${student.birthDate || ''}</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; مكان الميلاد: <strong>${student.birthPlace || ''}</strong></div>
-                            <div class="content-row"><strong>مسجل في القوائم الاسمية للسنة الدراسية ${currentFullAcademicYear}</strong></div>
+                            <div class="content-row">مسجل في القوائم الاسمية للسنة الدراسية ${currentFullAcademicYear}</div>
                             <div class="content-row">رقم التسجيل: <strong>${student.id || ''}</strong></div>
                             <div class="content-row">الفوج التربوي: <strong>${student.group || '1'}</strong></div>
                             <div class="content-row">السنة الدراسية: <strong>${currentFullAcademicYear}</strong></div>
-                            <div class="content-row" style="margin-top: 22px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
+                            <div class="content-row" style="margin-top: 25px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
                             <div class="content-row" style="margin-top: 12px; font-family: sans-serif; font-size: 13px; direction: ltr; text-align: right;">Nom et Prénom: ${latinName}</div>
                         </div>
 
@@ -1169,21 +1253,25 @@
                             <table class="footer-table">
                                 <tr>
                                     <td class="qr-side">
-                                        <div id="qrcodeTarget" style="display:inline-block;"></div>
+                                        <div id="qrcodeTargetReg" style="display:inline-block;"></div>
                                     </td>
-                                    <td class="signature-container">مدير المؤسسة</td>
+                                    <td class="signature-container">
+                                        مدير المؤسسة<br><br>
+                                        الختم والإمضاء
+                                    </td>
                                 </tr>
                             </table>
                         </div>
                     </div>
 
                     <script>
-                        JsBarcode("#barcodeTarget", "${student.id || '20260000'}", {
-                            format: "CODE128", width: 1.4, height: 38, displayValue: true, fontSize: 11, background: "#ffffff", lineColor: "#000000", margin: 2
+                        JsBarcode("#barcodeTargetReg", "${student.id || '20260000'}", {
+                            format: "CODE128", width: 1.6, height: 45, displayValue: true, fontSize: 13, 
+                            background: "#ffffff", lineColor: "#000000", margin: 5
                         });
-                        const qrData = "شهادة تسجيل | التلميذ: ${student.lastName} ${student.firstName}\\nرقم التسجيل: ${student.id}\\nالفوج: ${student.group}\\nالسنة: ${currentFullAcademicYear}";
-                        new QRCode(document.getElementById("qrcodeTarget"), {
-                            text: qrData, width: 95, height: 95, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                        const qrData = "شهادة تسجيل | التلميذ: ${student.lastName} ${student.firstName}\\nرقم التسجيل: ${student.id}\\nالسنة: ${currentFullAcademicYear}\\nمؤسسة: متوسطة الشهيد خالد مكاوي";
+                        new QRCode(document.getElementById("qrcodeTargetReg"), {
+                            text: qrData, width: 110, height: 110, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
                         });
                         window.setTimeout(function() { window.print(); window.close(); }, 600);
                     <\/script>
@@ -1193,54 +1281,14 @@
             printWindow.document.close();
         }
 
-        // ===== الملف الالكتروني للشطب =====
-        function printExpulsionFile(index) {
-            const student = students[index];
-            const printWindow = window.open('', '_blank');
-            const todayDate = new Date().toLocaleDateString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric' });
-
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>الملف الالكتروني للشطب - ${student.lastName} ${student.firstName}</title>
-                    <link href="https://fonts.googleapis.com/css2?family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
-                    <style>
-                        @page { size: A4 portrait; margin: 15mm; }
-                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; padding: 20px; line-height: 1.8; }
-                        .header { text-align: center; font-weight: bold; margin-bottom: 25px; }
-                        .box { border: 2px solid #8b0000; padding: 20px; border-radius: 8px; }
-                        .title { text-align: center; font-size: 20px; color: #8b0000; font-weight: bold; margin: 15px 0; }
-                        .field { margin-bottom: 12px; font-size: 15px; }
-                    </style>
-                </head>
-                <body onload="window.print(); window.close();">
-                    <div class="header">
-                        الجمهورية الجزائرية الديمقراطية الشعبية<br>
-                        وزارة التربية الوطنية<br>
-                        مديرية التربية للجزائر غرب - متوسطة الشهيد خالد مكاوي (سطاوالي)
-                    </div>
-                    <div class="box">
-                        <div class="title">الملف الالكتروني للشطب</div>
-                        <div class="field">رقم التعريف المدرسي: <strong>${student.id || ''}</strong></div>
-                        <div class="field">لقب و اسم التلميذ: <strong>${student.lastName || ''} ${student.firstName || ''}</strong></div>
-                        <div class="field">تاريخ ومكان الميلاد: <strong>${student.birthDate || ''} - ${student.birthPlace || ''}</strong></div>
-                        <div class="field">المستوى / الفوج: <strong>رابعة متوسط - الفوج ${student.group || '1'}</strong></div>
-                        <div class="field">العنوان: <strong>${student.address || ''}</strong></div>
-                        <div class="field" style="margin-top:25px;">تاريخ استخراج الملف: <strong>${todayDate}</strong></div>
-                        <div class="field" style="margin-top:30px; color:#8b0000; font-weight:bold;">ملاحظة: هذا الملف مخصص لإجراءات الشطب الرسمية وفق النصوص التنظيمية المعمول بها.</div>
-                    </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        }
-
         function printDigitalCert(index) {
-            // تم إلغاء استخدامه حسب الطلب
+            // تم إلغاء هذا الزر من التسجيل البيداغوجي حسب الطلب
+            Swal.fire('غير متاح', 'تم إلغاء شهادة التسجيل الرقمية 100% من هذا القسم.', 'info');
         }
 
         function printRegistrationForm(index) {
-            // تم إلغاء استخدامه حسب الطلب
+            // تم إلغاء هذا الزر من التسجيل البيداغوجي حسب الطلب
+            Swal.fire('غير متاح', 'تم إلغاء استمارة التسجيل من هذا القسم.', 'info');
         }
 
         function printExamReceipt(index) {
@@ -1361,6 +1409,7 @@
                     </style>
                 </head>
                 <body>
+                    <!-- الصفحة الأولى -->
                     <div class="page">
                         <div class="national-header">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التربية الوطنية</div>
                         <div class="sub-header">بطاقة المتابعة والتوجيه المدرسي</div>
@@ -1418,6 +1467,7 @@
                         </div>
                     </div>
 
+                    <!-- الصفحة الثانية -->
                     <div class="page">
                         <div class="section-title">خامساً: تقييم القدرات</div>
                         <table>
@@ -1504,7 +1554,9 @@
                     "تسجيلات الامتحانات الرسمية", 
                     "التسجيل البيداغوجي", 
                     "حجز التوجيه المسبق والنهائي", 
-                    "نتائج شهادة التعليم المتوسط"
+                    "نتائج شهادة التعليم المتوسط",
+                    "متابعة التحويلات",
+                    "إدماج التلاميذ المنقطعين عن الدراسة"
                 ];
                 document.getElementById('currentSectionTitle').innerText = tabTitles[tabIndex];
 
@@ -1518,27 +1570,31 @@
                 document.getElementById('btnPrintPedagogic').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
                 document.getElementById('btnRegisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
                 document.getElementById('btnUnregisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
+                document.getElementById('btnPrintBem').style.display = 'none'; // تم إلغاء تفعيل طباعة نتائج BEM
+
+                // إخفاء كل الأقسام أولاً
+                document.getElementById('filterSection').style.display = 'none';
+                document.getElementById('searchContainer').style.display = 'none';
+                document.getElementById('tableWrapper').style.display = 'none';
+                document.getElementById('statsSection').style.display = 'none';
+                document.getElementById('notAvailableSection').style.display = 'none';
+                document.getElementById('transfersSection').style.display = 'none';
+                document.getElementById('dropoutSection').style.display = 'none';
 
                 if (tabIndex === 1) {
-                    document.getElementById('filterSection').style.display = 'none';
-                    document.getElementById('searchContainer').style.display = 'none';
-                    document.getElementById('tableWrapper').style.display = 'none';
-                    document.getElementById('notAvailableSection').style.display = 'none';
                     document.getElementById('statsSection').style.display = 'block';
                     renderAnalyticsDashboard();
                 } else if (tabIndex === 2 || tabIndex === 7) {
-                    // تبويب حجز النقاط + نتائج BEM غير مفعّلين
-                    document.getElementById('filterSection').style.display = 'none';
-                    document.getElementById('searchContainer').style.display = 'none';
-                    document.getElementById('tableWrapper').style.display = 'none';
-                    document.getElementById('statsSection').style.display = 'none';
+                    // متابعة النقاط + نتائج BEM = غير متاح
                     document.getElementById('notAvailableSection').style.display = 'block';
+                } else if (tabIndex === 8) {
+                    document.getElementById('transfersSection').style.display = 'block';
+                } else if (tabIndex === 9) {
+                    document.getElementById('dropoutSection').style.display = 'block';
                 } else {
                     document.getElementById('filterSection').style.display = 'flex';
                     document.getElementById('searchContainer').style.display = 'flex';
                     document.getElementById('tableWrapper').style.display = 'block';
-                    document.getElementById('statsSection').style.display = 'none';
-                    document.getElementById('notAvailableSection').style.display = 'none';
                     filterTable();
                 }
             }, 300);
@@ -1581,6 +1637,9 @@
                 headerHTML += '<th>العنوان</th><th>مكان الميلاد</th><th>حالة الدفع</th><th>عمليات التسجيل البيداغوجي</th>';
             } else if (currentTab === 6) {
                 headerHTML += '<th>الفوج</th><th>الرغبة الأولى</th><th>اقتراح مجلس القسم</th><th>التوجيه النهائي</th><th>عمليات التوجيه</th>';
+            } else if (currentTab === 7) {
+                // تم إلغاء تفعيل جدول نتائج BEM
+                headerHTML += '<th colspan="4">الخدمة غير مفعلة حالياً</th>';
             } else {
                 headerHTML += '<th>الجنس</th><th>مكان الميلاد</th><th>العنوان</th><th>المستوى</th><th>رقم الفوج</th><th>الصفة</th>';
                 if (currentTab === 4) headerHTML += '<th>مركز الإجراء / الولاية</th><th>حالة التسجيل</th>';
@@ -1625,6 +1684,8 @@
                                 <td>${student.councilProposal || 'غير مقترح'}</td>
                                 <td><span class="${student.finalGuidance ? 'status-blue-box' : 'status-orange'}">${student.finalGuidance || 'قيد الانتظار'}</span></td>
                                 <td><button class="btn btn-guidance" onclick="openGuidanceModal(${globalIndex})"><i class="fas fa-compass"></i> حجز وطباعة البطاقة</button></td>`;
+                } else if (currentTab === 7) {
+                    rowHTML += `<td colspan="4" style="color:#999;">الخدمة غير مفعلة حالياً وفق الرزنامة</td>`;
                 } else {
                     rowHTML += `<td>${student.gender || ''}</td><td>${student.birthPlace || ''}</td><td>${student.address || ''}</td><td>${student.level || ''}</td><td>${student.group || ''}</td><td>${student.status || 'خارجي'}</td>`;
                     if (currentTab === 4) {
@@ -1635,19 +1696,21 @@
                     
                     let ops = "";
                     if (currentTab === 0) {
+                        // زر شهادة مدرسية + زر طباعة منسدل
                         ops = `
                             <div class="actions-cell-flex">
                                 <button class="btn btn-school-cert" onclick="printSchoolCertificate(${globalIndex})">
                                     <i class="fas fa-print"></i> شهادة مدرسية
                                 </button>
                                 <div class="dropdown">
-                                    <button class="btn dropdown-btn">
-                                        <i class="fas fa-print"></i> طباعة ▾
+                                    <button class="btn btn-dropdown">
+                                        <i class="fas fa-caret-down"></i> طباعة / إجراءات
                                     </button>
                                     <div class="dropdown-content">
                                         <button onclick="openEditModal(${globalIndex})"><i class="fas fa-edit"></i> تعديل المعلومات</button>
                                         <button onclick="printRegistrationCertificate(${globalIndex})"><i class="fas fa-file-alt"></i> طباعة شهادة تسجيل</button>
-                                        <button onclick="printExpulsionFile(${globalIndex})"><i class="fas fa-file-excel"></i> الملف الالكتروني الشطب</button>
+                                        <button onclick="addElectronicFile(${globalIndex})"><i class="fas fa-file-upload"></i> إضافة الملف الإلكتروني</button>
+                                        <button onclick="cancelStudent(${globalIndex})" style="color:#dc3545;"><i class="fas fa-user-slash"></i> الشطب</button>
                                     </div>
                                 </div>
                             </div>`;
@@ -1882,6 +1945,52 @@
 
         function printPedagogicList() {
             printDataPage();
+        }
+
+        function printBemResults() {
+            Swal.fire('غير متاح', 'تم إلغاء تفعيل طباعة نتائج شهادة التعليم المتوسط حالياً.', 'info');
+        }
+
+        // إضافة الملف الإلكتروني (محاكاة)
+        function addElectronicFile(index) {
+            const student = students[index];
+            Swal.fire({
+                title: 'إضافة الملف الإلكتروني',
+                html: `<p>التلميذ: <strong>${student.lastName} ${student.firstName}</strong></p>
+                       <p>سيتم ربط الملف الإلكتروني (شهادة الميلاد / البطاقة العائلية / صورة) برقم التعريف: <strong>${student.id}</strong></p>
+                       <input type="file" id="elecFile" accept=".pdf,.jpg,.png" style="margin-top:10px;">`,
+                showCancelButton: true,
+                confirmButtonText: 'حفظ الملف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    students[index].hasElectronicFile = true;
+                    saveToDatabase();
+                    Swal.fire('تم', 'تم إضافة الملف الإلكتروني بنجاح (محاكاة).', 'success');
+                }
+            });
+        }
+
+        // الشطب
+        function cancelStudent(index) {
+            const student = students[index];
+            Swal.fire({
+                title: 'تأكيد الشطب',
+                text: `هل تريد شطب التلميذ ${student.lastName} ${student.firstName} من القوائم؟`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'نعم، شطب',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    students[index].status = 'مشطوب';
+                    students[index].canceled = true;
+                    saveToDatabase();
+                    filterTable();
+                    Swal.fire('تم الشطب', 'تم شطب التلميذ من القوائم الاسمية.', 'success');
+                }
+            });
         }
 
         function exportExcelFile() {
