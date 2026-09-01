@@ -4,17 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الأرضية الرقمية لوزارة التربية الوطنية</title>
-    <!-- استدعاء خط Noto Kufi Arabic للواجهات و Droid Arabic Kufi للطباعة -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
-    <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Chart.js لأشكال بيانية حقيقية ومتحركة -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- مكتبات لتوليد الكود بار والـ QR Code رقمياً -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -413,28 +407,49 @@
             width: 250px;
         }
 
-        .decree-card {
-            background: #fff;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        /* Dropdown for print actions */
+        .dropdown {
+            position: relative;
+            display: inline-block;
         }
-        .decree-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--header-blue);
-            margin-bottom: 10px;
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            min-width: 220px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 100;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            right: 0;
+            top: 100%;
+        }
+        .dropdown-content button {
+            width: 100%;
+            text-align: right;
+            padding: 10px 14px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 13px;
+            color: #333;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-        .decree-body {
-            font-size: 14px;
-            color: #475569;
-            line-height: 1.8;
-            margin-bottom: 15px;
+        .dropdown-content button:hover {
+            background-color: #f0f7ff;
+            color: var(--main-blue);
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-btn {
+            background-color: #6c757d;
+            color: white;
+            font-size: 12px;
+            padding: 4px 10px;
         }
     </style>
 </head>
@@ -472,7 +487,6 @@
                     <button class="tab-btn" onclick="switchTab(5)">التسجيل البيداغوجي</button>
                     <button class="tab-btn" onclick="switchTab(6)">حجز التوجيه المسبق والنهائي</button>
                     <button class="tab-btn" onclick="switchTab(7)">نتائج شهادة التعليم المتوسط</button>
-                    <button class="tab-btn" onclick="switchTab(8)">القرارات الوزارية</button>
                 </div>
 
                 <div id="schoolAlert" class="alert-message" style="display: none;">
@@ -531,9 +545,6 @@
                         <button class="btn btn-print" id="btnPrintPedagogic" onclick="printPedagogicList()" style="display: none;">
                             <i class="fas fa-print"></i> طباعة القوائم
                         </button>
-                        <button class="btn btn-print" id="btnPrintBem" onclick="printBemResults()" style="display: none;">
-                            <i class="fas fa-print"></i> طباعة النتائج
-                        </button>
                         <button class="btn btn-import" id="btnRegisterAll" onclick="registerAllStudents()" style="display: none; background-color:#28a745;">
                             <i class="fas fa-users-cog"></i> تسجيل كل التلاميذ
                         </button>
@@ -573,22 +584,6 @@
                                 <canvas id="analyticsPieChart"></canvas>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div id="decreeSection" style="display: none;">
-                    <div class="decree-card">
-                        <div class="decree-header">
-                            <i class="fas fa-file-pdf" style="color: #dc3545; font-size: 24px;"></i>
-                            قرار رقم 18 مؤرخ في 12 صفر عام 1448 الموافق لـ 27 جويلية سنة 2026
-                        </div>
-                        <div class="decree-body">
-                            <strong>الموضوع:</strong> معدل القرار رقم 37 المؤرخ في 13 رمضان عام 1443 الموافق لـ 14 أفريل سنة 2022 المحدد لشعب التعليم الثانوي العام والتكنولوجي.<br>
-                            يحدد هذا القرار الهيكلة الجديدة لشعب التعليم الثانوي وتوزيع الرغبات المتاحة للطلاب في مرحلة التوجيه المدرسي.
-                        </div>
-                        <button class="btn btn-export" onclick="downloadDecreePDF()">
-                            <i class="fas fa-download"></i> تحميل القرار الوزاري (PDF)
-                        </button>
                     </div>
                 </div>
 
@@ -684,7 +679,7 @@
         </div>
     </div>
 
-    <!-- نافذة حجز التوجيه (المسبق والنهائي) وبطاقة المتابعة -->
+    <!-- نافذة حجز التوجيه -->
     <div id="guidanceModal" class="modal">
         <div class="modal-content-wide">
             <div class="modal-header">حجز التوجيه المسبق والنهائي وإعداد بطاقة المتابعة</div>
@@ -754,7 +749,7 @@
         </div>
     </div>
 
-    <!-- نافذة تأكيد التسجيل البيداغوجي ودفع الحقوق -->
+    <!-- نافذة تأكيد التسجيل البيداغوجي -->
     <div id="pedagogicConfirmModal" class="modal">
         <div class="modal-content-wide" style="padding: 20px; max-width: 600px;">
             <div class="nested-outer">
@@ -785,18 +780,9 @@
 
     <script>
         const streamOptions = [
-            "رياضيات",
-            "علوم تجريبية",
-            "معلوماتية",
-            "هندسة مدنية",
-            "هندسة كهربائية",
-            "هندسة ميكانيكية",
-            "هندسة الطرائق",
-            "اسبانية",
-            "ألمانية",
-            "إيطالية",
-            "آداب وفلسفة",
-            "تسيير واقتصاد"
+            "رياضيات", "علوم تجريبية", "معلوماتية", "هندسة مدنية", "هندسة كهربائية",
+            "هندسة ميكانيكية", "هندسة الطرائق", "اسبانية", "ألمانية", "إيطالية",
+            "آداب وفلسفة", "تسيير واقتصاد"
         ];
 
         const geoData = {
@@ -965,6 +951,7 @@
             printWindow.document.close();
         }
 
+        // ===== شهادة مدرسية محسّنة =====
         function printSchoolCertificate(index) {
             const student = students[index];
             certSerialNumber++;
@@ -980,26 +967,44 @@
                 <html>
                 <head>
                     <title>شهادة مدرسية - ${student.lastName} ${student.firstName}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
                     <style>
-                        @page { size: A4 portrait; margin: 15mm; }
-                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; background-color: #ffffff; color: #000000; margin: 0; padding: 0; font-size: 14px; line-height: 1.8; }
-                        .cert-container { width: 100%; height: 100%; box-sizing: border-box; }
-                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        @page { size: A4 portrait; margin: 12mm; }
+                        body { 
+                            font-family: 'Droid Arabic Kufi', 'Noto Kufi Arabic', serif; 
+                            direction: rtl; 
+                            background-color: #ffffff; 
+                            color: #000000; 
+                            margin: 0; 
+                            padding: 0; 
+                            font-size: 14px; 
+                            line-height: 1.75; 
+                        }
+                        .cert-container { width: 100%; box-sizing: border-box; padding: 5mm; }
+                        .national-header { text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 12px; }
+                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
                         .header-table td { border: none; padding: 0; vertical-align: top; }
-                        .institution-info { text-align: right; font-size: 13px; font-weight: bold; }
-                        .barcode-side { text-align: left; }
-                        .barcode-title { font-size: 11px; font-weight: bold; margin-bottom: 2px; }
-                        .barcode-img-container svg { max-width: 220px; height: 50px; }
-                        .serial-section { margin-top: 10px; font-size: 14px; font-weight: bold; }
-                        .title-box { text-align: center; margin: 40px auto; width: 220px; border: none; padding: 8px 15px; font-size: 20px; font-weight: bold; }
-                        .content-body { text-align: right; margin-top: 20px; font-size: 16px; padding-right: 10px; }
-                        .content-row { margin-bottom: 12px; }
-                        .footer-section { margin-top: 60px; width: 100%; }
+                        .institution-info { text-align: right; font-size: 13px; font-weight: bold; line-height: 1.6; }
+                        .barcode-side { text-align: left; width: 45%; }
+                        .barcode-label { font-size: 12px; font-weight: bold; margin-bottom: 4px; display: block; }
+                        .barcode-img-container svg { max-width: 200px; height: 45px; }
+                        .serial-section { margin: 12px 0; font-size: 14px; font-weight: bold; }
+                        .title-box { 
+                            text-align: center; 
+                            margin: 30px auto 25px; 
+                            width: 240px; 
+                            border: 2px solid #000; 
+                            padding: 8px 12px; 
+                            font-size: 20px; 
+                            font-weight: bold; 
+                        }
+                        .content-body { text-align: right; margin-top: 15px; font-size: 15px; padding-right: 8px; }
+                        .content-row { margin-bottom: 11px; }
+                        .footer-section { margin-top: 45px; width: 100%; }
                         .footer-table { width: 100%; border-collapse: collapse; }
                         .footer-table td { border: none; vertical-align: top; }
-                        .qr-container { display: inline-block; }
-                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 20px; }
-                        .national-header { text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 15px; }
+                        .qr-side { text-align: right; width: 40%; }
+                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 15px; width: 60%; }
                     </style>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
@@ -1016,7 +1021,7 @@
                                     متوسطة الشهيد خالد مكاوي (سطاوالي)
                                 </td>
                                 <td class="barcode-side">
-                                    <div class="barcode-title">رقم التعريف المدرسي</div>
+                                    <span class="barcode-label">رقم التعريف المدرسي</span>
                                     <div class="barcode-img-container">
                                         <svg id="barcodeTarget"></svg>
                                     </div>
@@ -1035,17 +1040,17 @@
                             <div class="content-row">رقم التسجيل: <strong>${student.id || ''}</strong></div>
                             <div class="content-row">الفوج التربوي: <strong>${student.group || '1'}</strong></div>
                             <div class="content-row">السنة الدراسية: <strong>${currentFullAcademicYear}</strong></div>
-                            <div class="content-row" style="margin-top: 25px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
-                            <div class="content-row" style="margin-top: 15px; font-family: sans-serif; font-size: 13px; direction: ltr; text-align: right;">Nom et Prénom: ${latinName}</div>
+                            <div class="content-row" style="margin-top: 22px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
+                            <div class="content-row" style="margin-top: 12px; font-family: sans-serif; font-size: 13px; direction: ltr; text-align: right;">Nom et Prénom: ${latinName}</div>
                         </div>
 
                         <div class="footer-section">
                             <table class="footer-table">
                                 <tr>
-                                    <td style="text-align: right; width: 40%;">
-                                        <div id="qrcodeTarget" class="qr-container"></div>
+                                    <td class="qr-side">
+                                        <div id="qrcodeTarget" style="display:inline-block;"></div>
                                     </td>
-                                    <td class="signature-container" style="text-align: left; width: 60%;">مدير المؤسسة</td>
+                                    <td class="signature-container">مدير المؤسسة</td>
                                 </tr>
                             </table>
                         </div>
@@ -1053,13 +1058,13 @@
 
                     <script>
                         JsBarcode("#barcodeTarget", "${student.id || '20260000'}", {
-                            format: "CODE128", width: 1.5, height: 40, displayValue: true, fontSize: 12, background: "#ffffff", lineColor: "#000000"
+                            format: "CODE128", width: 1.4, height: 38, displayValue: true, fontSize: 11, background: "#ffffff", lineColor: "#000000", margin: 2
                         });
                         const qrData = "التلميذ: ${student.lastName} ${student.firstName}\\nتاريخ الميلاد: ${student.birthDate}\\nرقم التسجيل: ${student.id}\\nالفوج: ${student.group}";
                         new QRCode(document.getElementById("qrcodeTarget"), {
-                            text: qrData, width: 100, height: 100, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                            text: qrData, width: 95, height: 95, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
                         });
-                        window.setTimeout(function() { window.print(); window.close(); }, 500);
+                        window.setTimeout(function() { window.print(); window.close(); }, 600);
                     <\/script>
                 </body>
                 </html>
@@ -1067,7 +1072,129 @@
             printWindow.document.close();
         }
 
-        function printDigitalCert(index) {
+        // ===== شهادة تسجيل (نفس التصميم مع تغيير العنوان) =====
+        function printRegistrationCertificate(index) {
+            const student = students[index];
+            certSerialNumber++;
+            localStorage.setItem('cert_serial_number', certSerialNumber);
+
+            const printWindow = window.open('', '_blank');
+            const currentYear = "2026";
+            const currentFullAcademicYear = "2026-2027";
+            const todayDate = new Date().toLocaleDateString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric' });
+            const latinName = (student.firstNameLatin || "") + " " + (student.lastNameLatin || "STUDENT");
+
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>شهادة تسجيل - ${student.lastName} ${student.firstName}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page { size: A4 portrait; margin: 12mm; }
+                        body { 
+                            font-family: 'Droid Arabic Kufi', 'Noto Kufi Arabic', serif; 
+                            direction: rtl; 
+                            background-color: #ffffff; 
+                            color: #000000; 
+                            margin: 0; 
+                            padding: 0; 
+                            font-size: 14px; 
+                            line-height: 1.75; 
+                        }
+                        .cert-container { width: 100%; box-sizing: border-box; padding: 5mm; }
+                        .national-header { text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 12px; }
+                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .header-table td { border: none; padding: 0; vertical-align: top; }
+                        .institution-info { text-align: right; font-size: 13px; font-weight: bold; line-height: 1.6; }
+                        .barcode-side { text-align: left; width: 45%; }
+                        .barcode-label { font-size: 12px; font-weight: bold; margin-bottom: 4px; display: block; }
+                        .barcode-img-container svg { max-width: 200px; height: 45px; }
+                        .serial-section { margin: 12px 0; font-size: 14px; font-weight: bold; }
+                        .title-box { 
+                            text-align: center; 
+                            margin: 30px auto 25px; 
+                            width: 260px; 
+                            border: 2px solid #000; 
+                            padding: 8px 12px; 
+                            font-size: 20px; 
+                            font-weight: bold; 
+                        }
+                        .content-body { text-align: right; margin-top: 15px; font-size: 15px; padding-right: 8px; }
+                        .content-row { margin-bottom: 11px; }
+                        .footer-section { margin-top: 45px; width: 100%; }
+                        .footer-table { width: 100%; border-collapse: collapse; }
+                        .footer-table td { border: none; vertical-align: top; }
+                        .qr-side { text-align: right; width: 40%; }
+                        .signature-container { text-align: left; font-weight: bold; font-size: 15px; padding-left: 15px; width: 60%; }
+                    </style>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                </head>
+                <body>
+                    <div class="cert-container">
+                        <div class="national-header">الجمهورية الجزائرية الديمقراطية الشعبية</div>
+                        
+                        <table class="header-table">
+                            <tr>
+                                <td class="institution-info">
+                                    وزارة التربية الوطنية<br>
+                                    مديرية التربية لجزائر غرب<br>
+                                    متوسطة الشهيد خالد مكاوي (سطاوالي)
+                                </td>
+                                <td class="barcode-side">
+                                    <span class="barcode-label">رقم التعريف المدرسي</span>
+                                    <div class="barcode-img-container">
+                                        <svg id="barcodeTarget"></svg>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="serial-section">الرقم: ${certSerialNumber} / ${currentYear}</div>
+
+                        <div class="title-box">شهادة تسجيل</div>
+
+                        <div class="content-body">
+                            <div class="content-row">يشهد مدير المتوسطة أن التلميذ(ة): <strong>${student.lastName || ''} &nbsp;&nbsp;&nbsp; ${student.firstName || ''}</strong></div>
+                            <div class="content-row">تاريخ الميلاد: <strong>${student.birthDate || ''}</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; مكان الميلاد: <strong>${student.birthPlace || ''}</strong></div>
+                            <div class="content-row"><strong>مسجل في القوائم الاسمية للسنة الدراسية ${currentFullAcademicYear}</strong></div>
+                            <div class="content-row">رقم التسجيل: <strong>${student.id || ''}</strong></div>
+                            <div class="content-row">الفوج التربوي: <strong>${student.group || '1'}</strong></div>
+                            <div class="content-row">السنة الدراسية: <strong>${currentFullAcademicYear}</strong></div>
+                            <div class="content-row" style="margin-top: 22px;">حرر في سطاوالي بتاريخ: <strong>${todayDate}</strong></div>
+                            <div class="content-row" style="margin-top: 12px; font-family: sans-serif; font-size: 13px; direction: ltr; text-align: right;">Nom et Prénom: ${latinName}</div>
+                        </div>
+
+                        <div class="footer-section">
+                            <table class="footer-table">
+                                <tr>
+                                    <td class="qr-side">
+                                        <div id="qrcodeTarget" style="display:inline-block;"></div>
+                                    </td>
+                                    <td class="signature-container">مدير المؤسسة</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <script>
+                        JsBarcode("#barcodeTarget", "${student.id || '20260000'}", {
+                            format: "CODE128", width: 1.4, height: 38, displayValue: true, fontSize: 11, background: "#ffffff", lineColor: "#000000", margin: 2
+                        });
+                        const qrData = "شهادة تسجيل | التلميذ: ${student.lastName} ${student.firstName}\\nرقم التسجيل: ${student.id}\\nالفوج: ${student.group}\\nالسنة: ${currentFullAcademicYear}";
+                        new QRCode(document.getElementById("qrcodeTarget"), {
+                            text: qrData, width: 95, height: 95, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                        });
+                        window.setTimeout(function() { window.print(); window.close(); }, 600);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // ===== الملف الالكتروني للشطب =====
+        function printExpulsionFile(index) {
             const student = students[index];
             const printWindow = window.open('', '_blank');
             const todayDate = new Date().toLocaleDateString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -1075,83 +1202,45 @@
             printWindow.document.write(`
                 <html>
                 <head>
-                    <title>شهادة تسجيل 100% رقمية - ${student.lastName} ${student.firstName}</title>
+                    <title>الملف الالكتروني للشطب - ${student.lastName} ${student.firstName}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Droid+Arabic+Kufi:wght@400;700&display=swap" rel="stylesheet">
                     <style>
                         @page { size: A4 portrait; margin: 15mm; }
-                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; background-color: #ffffff; color: #000000; padding: 20px; line-height: 2; }
-                        .cert-box { border: 3px double #0056b3; padding: 30px; border-radius: 10px; }
-                        .header { text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 25px; }
-                        .title { text-align: center; font-size: 22px; color: #0056b3; margin: 25px 0; font-weight: bold; text-decoration: underline; }
-                        .field { font-size: 16px; margin-bottom: 12px; }
-                        .qr-area { text-align: center; margin-top: 30px; }
-                        .footer { margin-top: 40px; display: flex; justify-content: space-between; font-weight: bold; }
+                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; padding: 20px; line-height: 1.8; }
+                        .header { text-align: center; font-weight: bold; margin-bottom: 25px; }
+                        .box { border: 2px solid #8b0000; padding: 20px; border-radius: 8px; }
+                        .title { text-align: center; font-size: 20px; color: #8b0000; font-weight: bold; margin: 15px 0; }
+                        .field { margin-bottom: 12px; font-size: 15px; }
                     </style>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
                 </head>
-                <body>
-                    <div class="cert-box">
-                        <div class="header">
-                            الجمهورية الجزائرية الديمقراطية الشعبية<br>
-                            وزارة التربية الوطنية - الأرضية الرقمية 100%
-                        </div>
-                        <div class="title">شهادة تسجيل رقمية مؤكدة</div>
-                        <div class="field">رقم التسجيل البيداغوجي: <strong>${student.id || ''}</strong></div>
-                        <div class="field">لقب و اسم التلميذ: <strong>${student.lastName || ''} ${student.firstName || ''}</strong></div>
-                        <div class="field">تاريخ ومكان الميلاد: <strong>${student.birthDate || ''} بـ ${student.birthPlace || ''}</strong></div>
-                        <div class="field">المستوى الدراسي: <strong>رابعة متوسط - الفوج ${student.group || '1'}</strong></div>
-                        <div class="field">حالة التسجيل البيداغوجي: <strong style="color: green;">مكتمل ومؤكد رقمياً</strong></div>
-                        <div class="field">تاريخ الاستخراج: <strong>${todayDate}</strong></div>
-                        
-                        <div class="qr-area">
-                            <div id="digitalCertQr" style="display:inline-block;"></div>
-                            <p style="font-size:12px; color:#555;">وثيقة رسمية صادرة آلياً وموثقة عبر الأرضية الرقمية</p>
-                        </div>
-
-                        <div class="footer">
-                            <span>التوقيع والختم الرقمي للمؤسسة</span>
-                            <span>مصادق عليه إلكترونياً</span>
-                        </div>
+                <body onload="window.print(); window.close();">
+                    <div class="header">
+                        الجمهورية الجزائرية الديمقراطية الشعبية<br>
+                        وزارة التربية الوطنية<br>
+                        مديرية التربية للجزائر غرب - متوسطة الشهيد خالد مكاوي (سطاوالي)
                     </div>
-                    <script>
-                        new QRCode(document.getElementById("digitalCertQr"), {
-                            text: "شهادة تسجيل رقمية 100% | الرقم: ${student.id} | التلميذ: ${student.lastName} ${student.firstName}",
-                            width: 110, height: 110
-                        });
-                        window.setTimeout(function() { window.print(); window.close(); }, 500);
-                    <\/script>
+                    <div class="box">
+                        <div class="title">الملف الالكتروني للشطب</div>
+                        <div class="field">رقم التعريف المدرسي: <strong>${student.id || ''}</strong></div>
+                        <div class="field">لقب و اسم التلميذ: <strong>${student.lastName || ''} ${student.firstName || ''}</strong></div>
+                        <div class="field">تاريخ ومكان الميلاد: <strong>${student.birthDate || ''} - ${student.birthPlace || ''}</strong></div>
+                        <div class="field">المستوى / الفوج: <strong>رابعة متوسط - الفوج ${student.group || '1'}</strong></div>
+                        <div class="field">العنوان: <strong>${student.address || ''}</strong></div>
+                        <div class="field" style="margin-top:25px;">تاريخ استخراج الملف: <strong>${todayDate}</strong></div>
+                        <div class="field" style="margin-top:30px; color:#8b0000; font-weight:bold;">ملاحظة: هذا الملف مخصص لإجراءات الشطب الرسمية وفق النصوص التنظيمية المعمول بها.</div>
+                    </div>
                 </body>
                 </html>
             `);
             printWindow.document.close();
         }
 
+        function printDigitalCert(index) {
+            // تم إلغاء استخدامه حسب الطلب
+        }
+
         function printRegistrationForm(index) {
-            const student = students[index];
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>استمارة التسجيل البيداغوجي - ${student.lastName} ${student.firstName}</title>
-                    <style>
-                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; padding: 25px; line-height: 1.8; }
-                        h2 { text-align: center; color: #0056b3; }
-                        .box { border: 1px solid #ccc; padding: 15px; border-radius: 5px; margin-top: 15px; }
-                    </style>
-                </head>
-                <body onload="window.print(); window.close();">
-                    <h2>استمارة التسجيل البيداغوجي للسنة الدراسية 2026-2027</h2>
-                    <div class="box">
-                        <p><strong>رقم التعريف المدرسي:</strong> ${student.id || ''}</p>
-                        <p><strong>اللقب والاسم:</strong> ${student.lastName || ''} ${student.firstName || ''}</p>
-                        <p><strong>تاريخ ومكان الميلاد:</strong> ${student.birthDate || ''} - ${student.birthPlace || ''}</p>
-                        <p><strong>العنوان:</strong> ${student.address || ''}</p>
-                        <p><strong>الفوج التربوي:</strong> الفوج ${student.group || '1'}</p>
-                        <p><strong>حالة الحقوق:</strong> ${student.paymentStatus === 'confirmed' ? 'تم الدفع' : 'قيد الانتظار'}</p>
-                    </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
+            // تم إلغاء استخدامه حسب الطلب
         }
 
         function printExamReceipt(index) {
@@ -1272,7 +1361,6 @@
                     </style>
                 </head>
                 <body>
-                    <!-- الصفحة الأولى -->
                     <div class="page">
                         <div class="national-header">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التربية الوطنية</div>
                         <div class="sub-header">بطاقة المتابعة والتوجيه المدرسي</div>
@@ -1330,7 +1418,6 @@
                         </div>
                     </div>
 
-                    <!-- الصفحة الثانية -->
                     <div class="page">
                         <div class="section-title">خامساً: تقييم القدرات</div>
                         <table>
@@ -1409,7 +1496,16 @@
                     btn.classList.toggle('active', i === tabIndex);
                 });
                 
-                const tabTitles = ["الدخول المدرسي", "متابعة الإحصائيات الدقيقة", "متابعة حجز النقاط والاستدراك", "تحيين بيانات التلاميذ", "تسجيلات الامتحانات الرسمية", "التسجيل البيداغوجي", "حجز التوجيه المسبق والنهائي", "نتائج شهادة التعليم المتوسط", "القرارات الوزارية"];
+                const tabTitles = [
+                    "الدخول المدرسي", 
+                    "متابعة الإحصائيات الدقيقة", 
+                    "متابعة حجز النقاط والاستدراك", 
+                    "تحيين بيانات التلاميذ", 
+                    "تسجيلات الامتحانات الرسمية", 
+                    "التسجيل البيداغوجي", 
+                    "حجز التوجيه المسبق والنهائي", 
+                    "نتائج شهادة التعليم المتوسط"
+                ];
                 document.getElementById('currentSectionTitle').innerText = tabTitles[tabIndex];
 
                 document.getElementById('schoolAlert').style.display = (tabIndex === 0 || tabIndex === 3) ? 'flex' : 'none';
@@ -1422,36 +1518,26 @@
                 document.getElementById('btnPrintPedagogic').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
                 document.getElementById('btnRegisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
                 document.getElementById('btnUnregisterAll').style.display = (tabIndex === 5) ? 'inline-flex' : 'none';
-                document.getElementById('btnPrintBem').style.display = (tabIndex === 7) ? 'inline-flex' : 'none';
 
                 if (tabIndex === 1) {
                     document.getElementById('filterSection').style.display = 'none';
                     document.getElementById('searchContainer').style.display = 'none';
                     document.getElementById('tableWrapper').style.display = 'none';
                     document.getElementById('notAvailableSection').style.display = 'none';
-                    document.getElementById('decreeSection').style.display = 'none';
                     document.getElementById('statsSection').style.display = 'block';
                     renderAnalyticsDashboard();
-                } else if (tabIndex === 2) {
+                } else if (tabIndex === 2 || tabIndex === 7) {
+                    // تبويب حجز النقاط + نتائج BEM غير مفعّلين
                     document.getElementById('filterSection').style.display = 'none';
                     document.getElementById('searchContainer').style.display = 'none';
                     document.getElementById('tableWrapper').style.display = 'none';
                     document.getElementById('statsSection').style.display = 'none';
-                    document.getElementById('decreeSection').style.display = 'none';
                     document.getElementById('notAvailableSection').style.display = 'block';
-                } else if (tabIndex === 8) {
-                    document.getElementById('filterSection').style.display = 'none';
-                    document.getElementById('searchContainer').style.display = 'none';
-                    document.getElementById('tableWrapper').style.display = 'none';
-                    document.getElementById('statsSection').style.display = 'none';
-                    document.getElementById('notAvailableSection').style.display = 'none';
-                    document.getElementById('decreeSection').style.display = 'block';
                 } else {
                     document.getElementById('filterSection').style.display = 'flex';
                     document.getElementById('searchContainer').style.display = 'flex';
                     document.getElementById('tableWrapper').style.display = 'block';
                     document.getElementById('statsSection').style.display = 'none';
-                    document.getElementById('decreeSection').style.display = 'none';
                     document.getElementById('notAvailableSection').style.display = 'none';
                     filterTable();
                 }
@@ -1495,8 +1581,6 @@
                 headerHTML += '<th>العنوان</th><th>مكان الميلاد</th><th>حالة الدفع</th><th>عمليات التسجيل البيداغوجي</th>';
             } else if (currentTab === 6) {
                 headerHTML += '<th>الفوج</th><th>الرغبة الأولى</th><th>اقتراح مجلس القسم</th><th>التوجيه النهائي</th><th>عمليات التوجيه</th>';
-            } else if (currentTab === 7) {
-                headerHTML += '<th>المعدل السنوي</th><th>معدل الشهادة (BEM)</th><th>معدل القبول (السنوي + الشهادة / 2)</th><th>التقديرات والقرار</th>';
             } else {
                 headerHTML += '<th>الجنس</th><th>مكان الميلاد</th><th>العنوان</th><th>المستوى</th><th>رقم الفوج</th><th>الصفة</th>';
                 if (currentTab === 4) headerHTML += '<th>مركز الإجراء / الولاية</th><th>حالة التسجيل</th>';
@@ -1533,8 +1617,6 @@
                     <td>
                         <div class="actions-cell-flex">
                             <button class="btn btn-update" style="background-color: var(--main-blue);" onclick="openPedagogicConfirmModal(${globalIndex})"><i class="fas fa-check-circle"></i> تأكد من التسجيل</button>
-                            <button class="btn btn-digital-cert" onclick="printDigitalCert(${globalIndex})"><i class="fas fa-certificate"></i> شهادة تسجيل 100% رقمية</button>
-                            <button class="btn btn-print" onclick="printRegistrationForm(${globalIndex})"><i class="fas fa-file-alt"></i> استمارة التسجيل</button>
                         </div>
                     </td>`;
                 } else if (currentTab === 6) {
@@ -1543,17 +1625,6 @@
                                 <td>${student.councilProposal || 'غير مقترح'}</td>
                                 <td><span class="${student.finalGuidance ? 'status-blue-box' : 'status-orange'}">${student.finalGuidance || 'قيد الانتظار'}</span></td>
                                 <td><button class="btn btn-guidance" onclick="openGuidanceModal(${globalIndex})"><i class="fas fa-compass"></i> حجز وطباعة البطاقة</button></td>`;
-                } else if (currentTab === 7) {
-                    let annual = student.annualAvg !== undefined ? parseFloat(student.annualAvg) : 11.50;
-                    let bem = student.examAvg !== undefined ? parseFloat(student.examAvg) : 9.20;
-                    let admissionAvg = Number(((annual + bem) / 2).toFixed(2));
-
-                    let annualBox = annual >= 10 ? `<span class="status-dark-green">${annual}</span>` : `<span class="status-dark-orange">${annual}</span>`;
-                    let bemBox = bem >= 10 ? `<span class="status-dark-green">${bem}</span>` : `<span class="status-dark-orange">${bem}</span>`;
-                    let admissionBox = admissionAvg >= 10 ? `<span class="status-dark-green">${admissionAvg}</span>` : `<span class="status-dark-orange">${admissionAvg}</span>`;
-                    let appreciation = admissionAvg >= 10 ? `<span class="status-dark-green">ناجح ومنتقل للسنة الأولى ثانوي</span>` : `<span class="status-dark-orange">موجّه للاستدراك / تكوين</span>`;
-
-                    rowHTML += `<td>${annualBox}</td><td>${bemBox}</td><td>${admissionBox}</td><td>${appreciation}</td>`;
                 } else {
                     rowHTML += `<td>${student.gender || ''}</td><td>${student.birthPlace || ''}</td><td>${student.address || ''}</td><td>${student.level || ''}</td><td>${student.group || ''}</td><td>${student.status || 'خارجي'}</td>`;
                     if (currentTab === 4) {
@@ -1564,7 +1635,22 @@
                     
                     let ops = "";
                     if (currentTab === 0) {
-                        ops = `<button class="btn btn-school-cert" onclick="printSchoolCertificate(${globalIndex})"><i class="fas fa-print"></i> شهادة مدرسية</button>`;
+                        ops = `
+                            <div class="actions-cell-flex">
+                                <button class="btn btn-school-cert" onclick="printSchoolCertificate(${globalIndex})">
+                                    <i class="fas fa-print"></i> شهادة مدرسية
+                                </button>
+                                <div class="dropdown">
+                                    <button class="btn dropdown-btn">
+                                        <i class="fas fa-print"></i> طباعة ▾
+                                    </button>
+                                    <div class="dropdown-content">
+                                        <button onclick="openEditModal(${globalIndex})"><i class="fas fa-edit"></i> تعديل المعلومات</button>
+                                        <button onclick="printRegistrationCertificate(${globalIndex})"><i class="fas fa-file-alt"></i> طباعة شهادة تسجيل</button>
+                                        <button onclick="printExpulsionFile(${globalIndex})"><i class="fas fa-file-excel"></i> الملف الالكتروني الشطب</button>
+                                    </div>
+                                </div>
+                            </div>`;
                     } else if (currentTab === 3) {
                         ops = `<button class="btn btn-update" onclick="openEditModal(${globalIndex})"><i class="fas fa-edit"></i> تحيين</button>`;
                     } else if (currentTab === 4) {
@@ -1796,51 +1882,6 @@
 
         function printPedagogicList() {
             printDataPage();
-        }
-
-        function printBemResults() {
-            printDataPage();
-        }
-
-        function downloadDecreePDF() {
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>القرار الوزاري رقم 18 المؤرخ في 27 جويلية 2026</title>
-                    <style>
-                        body { font-family: 'Droid Arabic Kufi', serif; direction: rtl; padding: 30px; line-height: 2; }
-                        h2, h3 { text-align: center; color: #0056b3; }
-                        .content { border: 2px solid #0056b3; padding: 20px; border-radius: 8px; }
-                    </style>
-                </head>
-                <body onload="window.print(); window.close();">
-                    <div class="content">
-                        <h2>الجمهورية الجزائرية الديمقراطية الشعبية</h2>
-                        <h3>وزارة التربية الوطنية</h3>
-                        <p style="text-align:center; font-weight:bold;">قرار رقم 18 مؤرخ في 12 صفر عام 1448 الموافق لـ 27 جويلية سنة 2026</p>
-                        <p>يعدل القرار رقم 37 المؤرخ في 13 رمضان عام 1443 الموافق لـ 14 أفريل سنة 2022 المحدد لشعب التعليم الثانوي العام والتكنولوجي.</p>
-                        <hr>
-                        <p><strong>الشعب المعتمدة للتوجيه الثانوي:</strong></p>
-                        <ul>
-                            <li>رياضيات</li>
-                            <li>علوم تجريبية</li>
-                            <li>معلوماتية</li>
-                            <li>هندسة مدنية</li>
-                            <li>هندسة كهربائية</li>
-                            <li>هندسة ميكانيكية</li>
-                            <li>هندسة الطرائق</li>
-                            <li>اسبانية</li>
-                            <li>ألمانية</li>
-                            <li>إيطالية</li>
-                            <li>آداب وفلسفة</li>
-                            <li>تسيير واقتصاد</li>
-                        </ul>
-                    </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
         }
 
         function exportExcelFile() {
