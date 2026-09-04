@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -23,18 +22,21 @@
 
     <style>
         :root {
-            --main-blue: #007bff;
-            --header-blue: #0056b3;
+            --main-blue: #43a047;
+            --header-blue: #2e7d32;
+            --main-green: #43a047;
+            --header-green: #2e7d32;
             --faint-red: #fff5f5;
-            --faint-blue: #f0f7ff;
+            --faint-blue: #e8f5e9;
             --border-color: #ddd;
             --modal-bg: rgba(0, 0, 0, 0.7);
             --success-green: #28a745;
-            --dark-green: #155724;
+            --dark-green: #1b5e20;
             --danger-red: #dc3545;
             --dark-red: #8b0000;
             --dark-orange: #d35400;
             --custom-teal: #e0f2f1;
+            --soft-green: #66bb6a;
         }
 
         body {
@@ -58,7 +60,7 @@
             width: 60px;
             height: 60px;
             border: 6px solid #ccc;
-            border-top-color: var(--main-blue);
+            border-top-color: var(--main-green);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -73,7 +75,7 @@
         }
 
         .top-navbar {
-            background-color: var(--header-blue);
+            background-color: var(--header-green);
             color: white;
             display: flex;
             align-items: center;
@@ -257,7 +259,7 @@
         .btn-export { background-color: #ffc107; color: #333; font-weight: bold; }
         .btn-search { background-color: var(--main-blue); color: white; }
         .btn-update { background-color: #17a2b8; color: white; font-size: 12px; padding: 4px 8px; }
-        .btn-register { background-color: #007bff; color: white; font-size: 12px; padding: 4px 8px; }
+        .btn-register { background-color: var(--main-green); color: white; font-size: 12px; padding: 4px 8px; }
         .btn-print { background-color: #6c757d; color: white; }
         .btn-school-cert { background-color: #ff8c00; color: white; font-size: 12px; padding: 4px 8px; }
         .btn-guidance { background-color: #6f42c1; color: white; font-size: 12px; padding: 4px 8px; }
@@ -359,7 +361,7 @@
         }
 
         .status-blue-box {
-            background-color: #0056b3;
+            background-color: var(--header-green);
             color: white;
             padding: 4px 12px;
             border-radius: 4px;
@@ -514,7 +516,7 @@
         .login-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(145deg, #1a7a4c 0%, #2d9b6a 40%, #3cb371 70%, #4caf7a 100%);
+            background: linear-gradient(135deg, #1b5e20, #43a047, #66bb6a);
             z-index: 10000;
             display: flex;
             align-items: center;
@@ -522,28 +524,28 @@
             flex-direction: column;
             color: white;
             overflow-y: auto;
-            padding: 20px 10px;
+            padding: 20px 0;
         }
 
         .login-box {
             background: white;
             color: #333;
-            padding: 36px 42px 32px;
+            padding: 35px 45px;
             border-radius: 16px;
-            width: 920px;
-            max-width: 96%;
+            width: 720px;
+            max-width: 95%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.25);
             text-align: center;
         }
 
         .login-box h2 {
-            color: #1a7a4c;
+            color: var(--header-green);
             margin-bottom: 8px;
-            font-size: 26px;
+            font-size: 24px;
         }
 
-        .login-box > p {
-            color: #555;
+        .login-box p {
+            color: #666;
             font-size: 14px;
             margin-bottom: 18px;
         }
@@ -551,92 +553,62 @@
         .features-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin: 22px 0 28px;
-            text-align: center;
-        }
-
-        .feature-card {
-            background: linear-gradient(160deg, #1a7a4c, #2d9b6a);
-            border-radius: 12px;
-            padding: 16px 10px 14px;
-            color: white;
-            box-shadow: 0 4px 12px rgba(26, 122, 76, 0.25);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 18px rgba(26, 122, 76, 0.35);
+            gap: 12px;
+            margin: 22px 0 25px;
         }
 
         .feature-icon {
-            width: 42px;
-            height: 42px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            color: #1a7a4c;
-            font-size: 18px;
+            background: #f1f8e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 10px;
+            padding: 14px 8px;
+            text-align: center;
+            transition: 0.25s;
+            cursor: default;
         }
 
-        .feature-card h4 {
-            margin: 0 0 6px;
-            font-size: 13px;
-            font-weight: bold;
-            color: #fff;
+        .feature-icon:hover {
+            background: #e8f5e9;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(46,125,50,0.15);
         }
 
-        .feature-card p {
-            margin: 0;
+        .feature-icon i {
+            font-size: 22px;
+            color: var(--header-green);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .feature-icon span {
             font-size: 11px;
-            line-height: 1.45;
-            color: rgba(255,255,255,0.92);
+            color: #333;
+            font-weight: 600;
+            line-height: 1.3;
+            display: block;
         }
 
         .dzds-btn {
-            background: linear-gradient(90deg, #1a7a4c, #2d9b6a);
+            background: linear-gradient(90deg, #2e7d32, #43a047);
             color: white;
             border: none;
-            padding: 15px 28px;
-            border-radius: 10px;
-            font-size: 17px;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
             font-family: 'Noto Kufi Arabic', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             transition: 0.3s;
-            box-shadow: 0 4px 14px rgba(26, 122, 76, 0.35);
         }
 
         .dzds-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(26, 122, 76, 0.45);
-            background: linear-gradient(90deg, #166b42, #278a5d);
-        }
-
-        @media (max-width: 800px) {
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .login-box {
-                padding: 28px 20px 24px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
+            box-shadow: 0 5px 15px rgba(46,125,50,0.4);
         }
 
         .locked-info {
@@ -649,6 +621,27 @@
             text-align: center;
             font-weight: bold;
         }
+
+        .db-section {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #c8e6c9;
+            margin-top: 15px;
+        }
+
+        .db-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .db-actions .btn {
+            min-width: 180px;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -656,51 +649,42 @@
     <!-- شاشة الدخول عبر المحافظة السامية للرقمنة (DZDS) -->
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
-            <img src="https://awlyaa.education.dz/public/assets/images/logo_black.png?v=1.0.2" alt="Logo" style="height:72px; margin-bottom:12px;">
+            <img src="https://awlyaa.education.dz/public/assets/images/logo_black.png?v=1.0.2" alt="Logo" style="height:70px; margin-bottom:12px;">
             <h2>الأرضية الرقمية لوزارة التربية الوطنية</h2>
             <p>تسجيل الدخول الموحد عبر المحافظة السامية للرقمنة<br><strong>DZDS - Digital High Commission</strong></p>
-
-            <!-- خصائص نظام الأرضية بأيقونات بيضاء منظمة -->
+            
             <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-user-graduate"></i></div>
-                    <h4>الدخول المدرسي</h4>
-                    <p>تسجيل وإدارة قوائم التلاميذ والأفواج</p>
+                <div class="feature-icon">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>إدارة التلاميذ</span>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
-                    <h4>الإحصائيات الدقيقة</h4>
-                    <p>متابعة التعداد والتمثيلات البيانية</p>
+                <div class="feature-icon">
+                    <i class="fas fa-certificate"></i>
+                    <span>شهادات رقمية</span>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-clipboard-list"></i></div>
-                    <h4>حجز النقاط</h4>
-                    <p>متابعة حجز النقاط والاستدراك</p>
+                <div class="feature-icon">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>إحصائيات دقيقة</span>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-edit"></i></div>
-                    <h4>تحيين البيانات</h4>
-                    <p>تحديث معلومات التلاميذ بسهولة</p>
+                <div class="feature-icon">
+                    <i class="fas fa-compass"></i>
+                    <span>التوجيه المدرسي</span>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-file-signature"></i></div>
-                    <h4>الامتحانات الرسمية</h4>
-                    <p>تسجيل BEM ووصلات الاستدعاء</p>
+                <div class="feature-icon">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>امتحانات رسمية</span>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-university"></i></div>
-                    <h4>التسجيل البيداغوجي</h4>
-                    <p>حجز ودفع حقوق التسجيل</p>
+                <div class="feature-icon">
+                    <i class="fas fa-file-import"></i>
+                    <span>استيراد وتصدير</span>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-compass"></i></div>
-                    <h4>التوجيه المدرسي</h4>
-                    <p>حجز التوجيه المسبق والنهائي</p>
+                <div class="feature-icon">
+                    <i class="fas fa-users-cog"></i>
+                    <span>التفويج الآلي</span>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-exchange-alt"></i></div>
-                    <h4>التحويلات والإدماج</h4>
-                    <p>متابعة التحويلات وإدماج المنقطعين</p>
+                <div class="feature-icon">
+                    <i class="fas fa-qrcode"></i>
+                    <span>باركود وQR</span>
                 </div>
             </div>
 
@@ -708,7 +692,7 @@
                 <i class="fas fa-shield-alt"></i>
                 الدخول عبر منصة DZDS
             </button>
-            <p style="margin-top:18px; font-size:12px; color:#888; margin-bottom:0;">
+            <p style="margin-top:18px; font-size:12px; color:#999;">
                 مرتبط رسمياً بالمحافظة السامية للرقمنة<br>
                 الجمهورية الجزائرية الديمقراطية الشعبية
             </p>
@@ -749,7 +733,8 @@
                         <button class="tab-btn" onclick="switchTab(6)">حجز التوجيه المسبق والنهائي</button>
                         <button class="tab-btn disabled-tab" onclick="return false;" title="غير مفعل حالياً">نتائج شهادة التعليم المتوسط</button>
                         <button class="tab-btn" onclick="switchTab(8)">متابعة التحويلات</button>
-                        <button class="tab-btn" onclick="switchTab(9)">إدماج التلاميذ المنقطعين عن الدراسة</button>
+                        <button class="tab-btn disabled-tab" onclick="return false;" title="غير مفعل حالياً">إدماج التلاميذ المنقطعين عن الدراسة</button>
+                        <button class="tab-btn" onclick="switchTab(10)">تصدير واستيراد قاعدة البيانات</button>
                     </div>
 
                     <div id="schoolAlert" class="alert-message" style="display: none;">
@@ -850,7 +835,7 @@
                                 <h3 style="color: var(--header-blue); border-bottom: 2px solid var(--main-blue); padding-bottom: 10px;"><i class="fas fa-chart-bar"></i> توزيع التعداد البيداغوجي</h3>
                                 <p style="font-size: 15px; margin: 15px 0;">إجمالي التلاميذ بالمنصة: <strong id="statTotal" style="color: var(--main-blue); font-size: 20px;">0</strong> تلميذ</p>
                                 <hr style="border: 0; border-top: 1px solid #eee;">
-                                <p>الفوج 1: <strong id="statG1" style="color:#007bff;">0</strong> تلاميذ</p>
+                                <p>الفوج 1: <strong id="statG1" style="color:#43a047;">0</strong> تلاميذ</p>
                                 <p>الفوج 2: <strong id="statG2" style="color:#28a745;">0</strong> تلاميذ</p>
                                 <p>الفوج 3: <strong id="statG3" style="color:#ffc107;">0</strong> تلاميذ</p>
                                 <p>الفوج 4: <strong id="statG4" style="color:#dc3545;">0</strong> تلاميذ</p>
@@ -898,6 +883,32 @@
 
                     <div id="dropoutSection" style="display: none;">
                         <div id="dropoutContent"></div>
+                    </div>
+
+                    <div id="dbSection" style="display: none;">
+                        <div class="alert-message">
+                            <i class="fas fa-database"></i>
+                            تصدير واستيراد قاعدة بيانات التلاميذ بالكامل (يدعم ملفات Excel و JSON وأي ملف بيانات جدولي)
+                        </div>
+                        <div class="db-section">
+                            <h3 style="color: var(--header-green); margin-top:0; text-align:center;"><i class="fas fa-exchange-alt"></i> إدارة قاعدة البيانات</h3>
+                            <p style="text-align:center; color:#555;">يمكنك تصدير قاعدة البيانات الحالية أو استيراد أي قاعدة بيانات (Excel أو JSON) لاستبدال أو دمج البيانات.</p>
+                            <div class="db-actions">
+                                <button class="btn btn-export" onclick="exportFullDatabase()">
+                                    <i class="fas fa-file-export"></i> تصدير قاعدة البيانات (Excel)
+                                </button>
+                                <button class="btn btn-export" style="background:#17a2b8; color:white;" onclick="exportFullDatabaseJSON()">
+                                    <i class="fas fa-file-code"></i> تصدير قاعدة البيانات (JSON)
+                                </button>
+                                <button class="btn btn-import" onclick="document.getElementById('dbImportInput').click()">
+                                    <i class="fas fa-file-import"></i> استيراد قاعدة بيانات
+                                </button>
+                                <input type="file" id="dbImportInput" accept=".xlsx,.xls,.json,.csv" style="display:none;" onchange="importFullDatabase(event)">
+                            </div>
+                            <p style="text-align:center; margin-top:18px; font-size:13px; color:#666;">
+                                عدد التلاميذ الحالي في القاعدة: <strong id="dbCountDisplay">0</strong>
+                            </p>
+                        </div>
                     </div>
 
                 </div>
@@ -1795,9 +1806,13 @@
         }
 
         function switchTab(tabIndex) {
-            // منع الدخول لنتائج BEM
+            // منع الدخول للتبويبات المعطلة
             if (tabIndex === 7) {
                 Swal.fire('غير متاح', 'تبويب نتائج شهادة التعليم المتوسط غير مفعل حالياً.', 'info');
+                return;
+            }
+            if (tabIndex === 9) {
+                Swal.fire('غير متاح', 'تبويب إدماج التلاميذ المنقطعين عن الدراسة غير مفعل حالياً.', 'info');
                 return;
             }
 
@@ -1807,20 +1822,15 @@
             setTimeout(() => {
                 overlay.style.display = 'none';
                 currentTab = tabIndex;
-                document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-                    // نتجاهل الزر المعطل
-                    if (!btn.classList.contains('disabled-tab')) {
-                        btn.classList.toggle('active', parseInt(btn.getAttribute('onclick')?.match(/\d+/)?.[0] || -1) === tabIndex);
-                    }
-                });
                 
-                // تصحيح تفعيل التبويبات حسب الترتيب الجديد
-                const tabMap = {0:0, 1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 8:8, 9:9};
                 document.querySelectorAll('.tab-btn:not(.disabled-tab)').forEach(btn => {
                     const onclickVal = btn.getAttribute('onclick');
                     if (onclickVal) {
-                        const idx = parseInt(onclickVal.match(/\d+/)[0]);
-                        btn.classList.toggle('active', idx === tabIndex);
+                        const match = onclickVal.match(/\d+/);
+                        if (match) {
+                            const idx = parseInt(match[0]);
+                            btn.classList.toggle('active', idx === tabIndex);
+                        }
                     }
                 });
 
@@ -1833,7 +1843,7 @@
                     5: "التسجيل البيداغوجي",
                     6: "حجز التوجيه المسبق والنهائي",
                     8: "متابعة التحويلات",
-                    9: "إدماج التلاميذ المنقطعين عن الدراسة"
+                    10: "تصدير واستيراد قاعدة البيانات"
                 };
                 document.getElementById('currentSectionTitle').innerText = tabTitles[tabIndex] || '';
 
@@ -1857,6 +1867,7 @@
                 document.getElementById('notAvailableSection').style.display = 'none';
                 document.getElementById('transfersSection').style.display = 'none';
                 document.getElementById('dropoutSection').style.display = 'none';
+                document.getElementById('dbSection').style.display = 'none';
 
                 if (tabIndex === 1) {
                     document.getElementById('statsSection').style.display = 'block';
@@ -1865,9 +1876,9 @@
                     document.getElementById('notAvailableSection').style.display = 'block';
                 } else if (tabIndex === 8) {
                     document.getElementById('transfersSection').style.display = 'block';
-                } else if (tabIndex === 9) {
-                    document.getElementById('dropoutSection').style.display = 'block';
-                    renderDropoutSection();
+                } else if (tabIndex === 10) {
+                    document.getElementById('dbSection').style.display = 'block';
+                    document.getElementById('dbCountDisplay').innerText = students.length;
                 } else {
                     document.getElementById('filterSection').style.display = 'flex';
                     document.getElementById('searchContainer').style.display = 'flex';
@@ -2019,7 +2030,7 @@
                     labels: ['الفوج 1', 'الفوج 2', 'الفوج 3', 'الفوج 4'],
                     datasets: [{
                         data: [g1, g2, g3, g4],
-                        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545']
+                        backgroundColor: ['#43a047', '#66bb6a', '#ffc107', '#dc3545']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -2450,6 +2461,92 @@
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "التلاميذ");
             XLSX.writeFile(workbook, "قائمة_التلاميذ_2026_2027.xlsx");
+        }
+
+        function exportFullDatabase() {
+            if (students.length === 0) {
+                Swal.fire('تنبيه', 'لا توجد بيانات لتصديرها.', 'warning');
+                return;
+            }
+            const worksheet = XLSX.utils.json_to_sheet(students);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "قاعدة_البيانات");
+            XLSX.writeFile(workbook, "قاعدة_بيانات_التلاميذ_كاملة_" + new Date().toISOString().slice(0,10) + ".xlsx");
+            Swal.fire('تم التصدير', 'تم تصدير قاعدة البيانات بالكامل بنجاح.', 'success');
+        }
+
+        function exportFullDatabaseJSON() {
+            if (students.length === 0) {
+                Swal.fire('تنبيه', 'لا توجد بيانات لتصديرها.', 'warning');
+                return;
+            }
+            const dataStr = JSON.stringify(students, null, 2);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "قاعدة_بيانات_التلاميذ_" + new Date().toISOString().slice(0,10) + ".json";
+            a.click();
+            URL.revokeObjectURL(url);
+            Swal.fire('تم التصدير', 'تم تصدير قاعدة البيانات بصيغة JSON بنجاح.', 'success');
+        }
+
+        function importFullDatabase(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const fileName = file.name.toLowerCase();
+            const reader = new FileReader();
+
+            reader.onload = function(evt) {
+                try {
+                    let json = [];
+                    if (fileName.endsWith('.json')) {
+                        json = JSON.parse(evt.target.result);
+                        if (!Array.isArray(json)) {
+                            if (json.students && Array.isArray(json.students)) json = json.students;
+                            else throw new Error('صيغة JSON غير مدعومة');
+                        }
+                    } else {
+                        const data = new Uint8Array(evt.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        json = XLSX.utils.sheet_to_json(worksheet);
+                    }
+
+                    if (json.length > 0) {
+                        students = json.map((row, idx) => ({
+                            id: String(row.id || row['رقم التعريف'] || row.ID || '2026' + (1000 + idx)),
+                            lastName: row.lastName || row['اللقب'] || row.nom || '',
+                            firstName: row.firstName || row['الاسم'] || row.prenom || '',
+                            gender: row.gender || row['الجنس'] || 'ذكر',
+                            birthDate: row.birthDate || row['تاريخ الميلاد'] || '',
+                            birthPlace: row.birthPlace || row['مكان الميلاد'] || '',
+                            address: row.address || row['العنوان'] || '',
+                            level: row.level || row['المستوى'] || 'رابعة',
+                            group: String(row.group || row['الفوج'] || (idx % 4) + 1),
+                            status: row.status || row['الصفة'] || 'خارجي',
+                            paymentStatus: row.paymentStatus || 'pending',
+                            ...row
+                        }));
+                        saveToDatabase();
+                        document.getElementById('dbCountDisplay').innerText = students.length;
+                        Swal.fire('نجاح', `تم استيراد ${students.length} سجل بنجاح من الملف.`, 'success');
+                    } else {
+                        Swal.fire('تنبيه', 'الملف فارغ أو لا يحتوي على بيانات صالحة.', 'warning');
+                    }
+                } catch (err) {
+                    Swal.fire('خطأ', 'تعذر قراءة الملف. تأكد من أنه Excel أو JSON صالح.', 'error');
+                    console.error(err);
+                }
+            };
+
+            if (fileName.endsWith('.json')) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsArrayBuffer(file);
+            }
+            e.target.value = '';
         }
 
         function importExcel(e) {
